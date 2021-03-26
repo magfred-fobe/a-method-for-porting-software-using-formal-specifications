@@ -2,7 +2,10 @@
 #include "src/queue.h"
 #include "gtest/gtest.h"
 #include "integerlists.h"
-
+#include <gtest/gtest.h>
+#include <rapidcheck.h>
+//#include "rapidcheck/extras/gtest/include/rapidcheck/gtest.h"
+#include <rapidcheck/gtest.h>
 //Example test case
 TEST(queueTest, isInitiallyEmpty) {
     struct IntegerSTAILQueueType entry;

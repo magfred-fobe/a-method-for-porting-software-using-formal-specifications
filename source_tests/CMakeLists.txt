@@ -29,6 +29,17 @@ add_executable(project test.cpp integerlists.h)
 target_link_libraries(project gtest_main)
 add_test(NAME example_test COMMAND example)
 
+# Link against rapidcheck
+# Wasn't able to include the module directly.
+target_include_directories(project PRIVATE ${CMAKE_SOURCE_DIR}/rapidcheck/include)
+target_include_directories(project PRIVATE ${CMAKE_SOURCE_DIR}/rapidcheck/extras/gtest/include)
+
+
+target_link_libraries(project)
+
+
+#target_link_libraries(project rapidcheck_gtest)
+
 project(project)
 
 set(CMAKE_CXX_STANDARD 20)
