@@ -1,3 +1,8 @@
+/*Source from
+ *  sys/sys/queue.h
+ *  gcc -E queue.h
+ *  */
+
 /*-
  * SPDX-License-Identifier: BSD-3-Clause
  *
