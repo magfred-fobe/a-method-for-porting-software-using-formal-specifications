@@ -31,14 +31,17 @@ add_test(NAME example_test COMMAND example)
 
 # Link against rapidcheck
 # Wasn't able to include the module directly.
-target_include_directories(project PRIVATE ${CMAKE_SOURCE_DIR}/rapidcheck/include)
-target_include_directories(project PRIVATE ${CMAKE_SOURCE_DIR}/rapidcheck/extras/gtest/include)
+add_subdirectory(${CMAKE_SOURCE_DIR}/rapidcheck
+        ${CMAKE_CURRENT_BINARY_DIR}/rapidcheck EXCLUDE_FROM_ALL)
+add_subdirectory(${CMAKE_SOURCE_DIR}/rapidcheck/extras/gtest
+        ${CMAKE_CURRENT_BINARY_DIR}/rapidcheck/extras/gtest EXCLUDE_FROM_ALL)
+#target_link_libraries(project ${CMAKE_CURRENT_BINARY_DIR}/librapidcheck.a)
+target_link_libraries(project rapidcheck_gtest rapidcheck)
+target_include_directories(project PRIVATE ${CMAKE_CURRENT_WORKING_DIR}/rapidcheck/include)
+target_include_directories(project PRIVATE ${CMAKE_CURRENT_WORKING_DIR}/rapidcheck/extras/gtest/include)
 
 
-target_link_libraries(project)
 
-
-#target_link_libraries(project rapidcheck_gtest)
 
 project(project)
 

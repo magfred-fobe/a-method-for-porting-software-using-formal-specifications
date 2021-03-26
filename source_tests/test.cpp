@@ -3,10 +3,19 @@
 #include "gtest/gtest.h"
 #include "integerlists.h"
 #include <gtest/gtest.h>
-#include <rapidcheck.h>
-//#include "rapidcheck/extras/gtest/include/rapidcheck/gtest.h"
-#include <rapidcheck/gtest.h>
-//Example test case
+#include "rapidcheck/include/rapidcheck.h"
+#include "rapidcheck/extras/gtest/include/rapidcheck/gtest.h"
+//#include <rapidcheck/gtest.h>
+//Example rapdtest_gtest cases
+
+RC_GTEST_PROP(MyTestCase,
+        copyOfStringIsIdenticalToOriginal,
+(const std::string &str)) {
+const auto strCopy = str;
+RC_ASSERT(strCopy == str);
+}
+
+//Example gtest cases
 TEST(queueTest, isInitiallyEmpty) {
     struct IntegerSTAILQueueType entry;
     mySTAILQueue head;
