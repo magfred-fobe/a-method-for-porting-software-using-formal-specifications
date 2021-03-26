@@ -1,13 +1,14 @@
 #include <iostream>
+#include <string>
 #include "src/queue.h"
 #include "gtest/gtest.h"
 #include "integerlists.h"
-#include <gtest/gtest.h>
-#include "rapidcheck/include/rapidcheck.h"
-#include "rapidcheck/extras/gtest/include/rapidcheck/gtest.h"
-//#include <rapidcheck/gtest.h>
-//Example rapdtest_gtest cases
+#include <rapidcheck.h>
+//Unfortunate, likely a bug in Clion makes it not able can't handle the include path
+//symlinking it solves it and gives syntax highlighting...
+#include <rapidcheck_gtest.h>
 
+//Example rapdtest_gtest property based test
 RC_GTEST_PROP(MyTestCase,
         copyOfStringIsIdenticalToOriginal,
 (const std::string &str)) {
@@ -20,7 +21,6 @@ TEST(queueTest, isInitiallyEmpty) {
     struct IntegerSTAILQueueType entry;
     mySTAILQueue head;
     STAILQ_INIT(&head);
-    std::cout << "queue is " << (STAILQ_EMPTY(&head) ? "" : "not ") << "empty " << std::endl; //Queue is empty
     EXPECT_EQ (true, STAILQ_EMPTY(&head));
 }
 
@@ -29,7 +29,6 @@ TEST(queueTest, isNotemptyWhenOneElement) {
     mySTAILQueue head;
     STAILQ_INIT(&head);
     STAILQ_INSERT_HEAD(&head, &entry, links);
-    std::cout << "queue is "  << (STAILQ_EMPTY(&head) ? "" : "not ") << "empty " << std::endl; //Queue is not empty
     EXPECT_EQ (false, STAILQ_EMPTY(&head));
 }
 
@@ -39,6 +38,5 @@ TEST(queueTest, becomesEmptyWhenElementRemoved) {
     STAILQ_INIT(&head);
     STAILQ_INSERT_HEAD(&head, &entry, links);
     STAILQ_REMOVE_HEAD(&head, links);
-    std::cout << "queue is "  << (STAILQ_EMPTY(&head) ? "" : "not ") << "empty " << std::endl; //Queue is empty
     EXPECT_EQ (true, STAILQ_EMPTY(&head));
 }

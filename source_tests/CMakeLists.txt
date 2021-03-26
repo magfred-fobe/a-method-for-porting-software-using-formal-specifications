@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.17)
-# Download and unpack googletest at configure time
+
+# Download and unpack googletest
 configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
 execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
         RESULT_VARIABLE result
@@ -27,21 +28,40 @@ add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/googletest-src
 # Now simply link against gtest or gtest_main as needed. Eg
 add_executable(project test.cpp integerlists.h)
 target_link_libraries(project gtest_main)
+target_link_libraries(project gtest)
 add_test(NAME example_test COMMAND example)
 
 # Link against rapidcheck
-# Wasn't able to include the module directly.
-add_subdirectory(${CMAKE_SOURCE_DIR}/rapidcheck
-        ${CMAKE_CURRENT_BINARY_DIR}/rapidcheck EXCLUDE_FROM_ALL)
-add_subdirectory(${CMAKE_SOURCE_DIR}/rapidcheck/extras/gtest
-        ${CMAKE_CURRENT_BINARY_DIR}/rapidcheck/extras/gtest EXCLUDE_FROM_ALL)
-#target_link_libraries(project ${CMAKE_CURRENT_BINARY_DIR}/librapidcheck.a)
+# Download and unpack rapidcheck
+configure_file(CMakeLists.txt.rc rapidcheck-download/CMakeLists.txt)
+execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
+        RESULT_VARIABLE result
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/rapidcheck-download )
+if(result)
+    message(FATAL_ERROR "CMake step for googletest failed: ${result}")
+endif()
+execute_process(COMMAND ${CMAKE_COMMAND} --build .
+        RESULT_VARIABLE result
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/rapidcheck-download )
+if(result)
+    message(FATAL_ERROR "Build step for rapidcheck failed: ${result}")
+endif()
+
+# the gtest and gtest_main targets.
+add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/rapidcheck-src
+        ${CMAKE_CURRENT_BINARY_DIR}/rapidcheck-build
+        EXCLUDE_FROM_ALL)
+
+add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/rapidcheck-src/extras/gtest
+        EXCLUDE_FROM_ALL)
+
 target_link_libraries(project rapidcheck_gtest rapidcheck)
-target_include_directories(project PRIVATE ${CMAKE_CURRENT_WORKING_DIR}/rapidcheck/include)
-target_include_directories(project PRIVATE ${CMAKE_CURRENT_WORKING_DIR}/rapidcheck/extras/gtest/include)
 
-
-
+#this file needs to be linked to another path so Clion can give syntax highlighting
+add_custom_command(TARGET project POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E create_symlink
+        ${CMAKE_CURRENT_BINARY_DIR}/rapidcheck-src/extras/gtest/include/rapidcheck/gtest.h
+        ${CMAKE_CURRENT_BINARY_DIR}/rapidcheck-src/include/rapidcheck_gtest.h)
 
 project(project)
 
