@@ -16,22 +16,22 @@ RC_ASSERT(strCopy == str);
 
 //Example gtest cases
 TEST(queueTest, isInitiallyEmpty) {
-    mySTAILQueue head;
+    mySTAILQueueHead head;
     STAILQ_INIT_impl(&head);
     EXPECT_EQ (true, STAILQ_EMPTY_impl(&head));
 }
 
 TEST(queueTest, isNotemptyWhenOneElement) {
-    struct IntegerSTAILQueueType entry;
-    mySTAILQueue head;
+    struct IntegerSTAILQueueNode entry;
+    mySTAILQueueHead head;
     STAILQ_INIT_impl(&head);
     STAILQ_INSERT_HEAD_impl(&head, &entry);
     EXPECT_EQ (false, STAILQ_EMPTY_impl(&head));
 }
 
 TEST(queueTest, becomesEmptyWhenElementRemoved) {
-    struct IntegerSTAILQueueType entry;
-    mySTAILQueue head;
+    struct IntegerSTAILQueueNode entry;
+    mySTAILQueueHead head;
     STAILQ_INIT_impl(&head);
     STAILQ_INSERT_HEAD_impl(&head, &entry);
     STAILQ_REMOVE_HEAD_impl(&head);
