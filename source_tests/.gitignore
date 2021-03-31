@@ -37,6 +37,9 @@
 # *.iml
 # *.ipr
 
+#coverage output
+COVERAGE_VIEW/
+
 # CMake
 cmake-build-*/
 

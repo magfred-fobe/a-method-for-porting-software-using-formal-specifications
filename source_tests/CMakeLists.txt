@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.17)
 
+# Enable coverage
+set(CMAKE_CXX_FLAGS --coverage)
+
 # Download and unpack googletest
 configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
 execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
@@ -25,8 +28,11 @@ add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/googletest-src
         ${CMAKE_CURRENT_BINARY_DIR}/googletest-build
         EXCLUDE_FROM_ALL)
 
-# Now simply link against gtest or gtest_main as needed. Eg
-add_executable(project test.cpp integerlists.h)
+
+# Add the source and test files
+add_executable(project test/test.cpp src/queue.h src/queue_impl.h src/queue_impl.cpp)
+
+# Now link against gtest or gtest_main as needed. Eg
 target_link_libraries(project gtest_main)
 target_link_libraries(project gtest)
 add_test(NAME example_test COMMAND example)
@@ -38,7 +44,7 @@ execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
         RESULT_VARIABLE result
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/rapidcheck-download )
 if(result)
-    message(FATAL_ERROR "CMake step for googletest failed: ${result}")
+    message(FATAL_ERROR "CMake step for rapidcheck failed: ${result}")
 endif()
 execute_process(COMMAND ${CMAKE_COMMAND} --build .
         RESULT_VARIABLE result
