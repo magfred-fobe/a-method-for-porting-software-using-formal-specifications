@@ -2,9 +2,7 @@
 // Created by Magnus on 3/31/21.
 //
 #pragma once
-#ifndef NULL
-#define NULL 0
-#endif
+
 #include "queue.h"
 
 struct IntegerSLISTEntry {
