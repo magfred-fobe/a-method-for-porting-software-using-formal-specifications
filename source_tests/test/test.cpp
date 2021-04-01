@@ -5,16 +5,6 @@
 #include <rapidcheck.h>
 #include <rapidcheck/gtest.h>
 
-
-//Example rapdtest_gtest property based test
-RC_GTEST_PROP(MyTestCase,
-        copyOfStringIsIdenticalToOriginal,
-(const std::string &str)) {
-const auto strCopy = str;
-RC_ASSERT(strCopy == str);
-};
-
-
 template <>
 struct rc::Arbitrary<IntegerSLISTEntry> {
     static Gen<IntegerSLISTEntry> arbitrary() {
