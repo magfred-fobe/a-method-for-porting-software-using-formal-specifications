@@ -38,3 +38,6 @@ void SLIST_INSERT_HEAD_impl(mySinglyLinkedListHead* head,IntegerSLISTEntry* elm)
 void SLIST_REMOVE_impl(mySinglyLinkedListHead* head, IntegerSLISTEntry* elm);
 void SLIST_REMOVE_AFTER_impl(IntegerSLISTEntry* elm);
 void SLIST_REMOVE_HEAD_impl(mySinglyLinkedListHead* head);
+void SLIST_REMOVE_PREVPTR_impl(IntegerSLISTEntry*, IntegerSLISTEntry*);
+void SLIST_SWAP_impl(mySinglyLinkedListHead*,mySinglyLinkedListHead*);
+mySinglyLinkedListHead* SLIST_END_impl(mySinglyLinkedListHead*);

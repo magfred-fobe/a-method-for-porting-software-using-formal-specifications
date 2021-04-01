@@ -19,7 +19,8 @@ void STAILQ_REMOVE_HEAD_impl(mySTAILQueueHead* head) {
     STAILQ_REMOVE_HEAD(head, links);
 }
 
-void STAILQ_SWAP_impl(void* head1,void* head2,void* type) {
+void STAILQ_SWAP_impl(mySTAILQueueHead* head1,mySTAILQueueHead* head2) {
+    STAILQ_SWAP(head1, head2, IntegerSTAILQueueNode);
 }
 
 //LIST
@@ -50,6 +51,18 @@ void SLIST_REMOVE_AFTER_impl(IntegerSLISTEntry* elm) {
 void SLIST_REMOVE_HEAD_impl(mySinglyLinkedListHead* head) {
     SLIST_REMOVE_HEAD(head, entries);
 }
+
+void SLIST_REMOVE_PREVPTR_impl(IntegerSLISTEntry** prevp, IntegerSLISTEntry* elm) {
+    SLIST_REMOVE_PREVPTR(prevp, elm, entries);
+}
+void SLIST_SWAP_impl(mySinglyLinkedListHead* head1,mySinglyLinkedListHead* head2) {
+    SLIST_SWAP(head1, head2, IntegerSLISTEntry);
+}
+
+mySinglyLinkedListHead* SLIST_END_impl(mySinglyLinkedListHead *head) {
+    return SLIST_END(head);
+}
+
 
 //FIELD == entries
 //TYPE = IntegerSLISTEntry

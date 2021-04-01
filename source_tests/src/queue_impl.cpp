@@ -22,7 +22,8 @@ void STAILQ_REMOVE_HEAD_impl(mySTAILQueueHead* head) {
     do { if (((((head))->stqh_first) = (((((head))->stqh_first))->links.stqe_next)) == NULL) (head)->stqh_last = &(((head))->stqh_first); } while (0);
 }
 
-void STAILQ_SWAP_impl(void* head1,void* head2,void* type) {
+void STAILQ_SWAP_impl(mySTAILQueueHead* head1,mySTAILQueueHead* head2) {
+    do { IntegerSTAILQueueNode *swap_first = ((head1)->stqh_first); IntegerSTAILQueueNode **swap_last = (head1)->stqh_last; ((head1)->stqh_first) = ((head2)->stqh_first); (head1)->stqh_last = (head2)->stqh_last; ((head2)->stqh_first) = swap_first; (head2)->stqh_last = swap_last; if (((head1)->stqh_first == NULL)) (head1)->stqh_last = &((head1)->stqh_first); if (((head2)->stqh_first == NULL)) (head2)->stqh_last = &((head2)->stqh_first); } while (0);
 }
 
 
@@ -54,4 +55,13 @@ void SLIST_REMOVE_HEAD_impl(mySinglyLinkedListHead* head) {
     do { (((head))->slh_first) = (((((head))->slh_first))->entries.sle_next); } while (0);
 }
 
+void SLIST_REMOVE_PREVPTR_impl(IntegerSLISTEntry** prevp, IntegerSLISTEntry* elm) {
+    do { ; *(prevp) = ((elm)->entries.sle_next); ; } while (0);
+}
+void SLIST_SWAP_impl(mySinglyLinkedListHead* head1,mySinglyLinkedListHead* head2) {
+    do { IntegerSLISTEntry *swap_first = ((head1)->slh_first); ((head1)->slh_first) = ((head2)->slh_first); ((head2)->slh_first) = swap_first; } while (0);
+}
 
+mySinglyLinkedListHead* SLIST_END_impl(mySinglyLinkedListHead *head) {
+    return NULL;
+}
