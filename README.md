@@ -19,7 +19,8 @@ To generate coverage report:
 If using CLion:\
 $ ./coverage_report.sh
 
-Otherwise
+Otherwise \
+First run the executable once to generate coverage data, then:
 
 $ cd build/CMakeFiles/project.dir/src \
 $ gcov queue_impl.cpp.gcno \
