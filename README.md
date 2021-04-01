@@ -14,7 +14,7 @@ $ make
 To generate coverage report:
 
 If using CLion:\
-$ ./coverage_report
+$ ./coverage_report.shj
 
 Otherwise
 
