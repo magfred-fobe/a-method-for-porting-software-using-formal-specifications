@@ -11,10 +11,13 @@ $ mkdir build && cd build \
 $ cmake .. \
 $ make
 
+This should download the dependencies gtest and rapidcheck and build the project.
+
+
 To generate coverage report:
 
 If using CLion:\
-$ ./coverage_report.shj
+$ ./coverage_report.sh
 
 Otherwise
 
@@ -23,4 +26,3 @@ $ gcov queue_impl.cpp.gcno \
 $ lcov --capture --directory .  --rc lcov_branch_coverage=1 --output-file gtest_coverage.info \
 $ genhtml gtest_coverage.info --branch-coverage --output-directory ../../../../COVERAGE_VIEW 
 
-This should download the dependencies gtest and rapidcheck and build the project.
