@@ -24,6 +24,13 @@ void STAILQ_SWAP_impl(mySTAILQueueHead* head1,mySTAILQueueHead* head2) {
 }
 
 //LIST
+void SLIST_INIT_impl(mySinglyLinkedListHead* head) {
+    SLIST_INIT(head);
+}
+IntegerSLISTEntry* SLIST_FIRST_impl(mySinglyLinkedListHead* head) {
+    return SLIST_FIRST(head);
+}
+
 void SLIST_CONCAT_impl(mySinglyLinkedListHead* head1, mySinglyLinkedListHead* head2) {
     SLIST_CONCAT(head1, head2, IntegerSLISTEntry, entries);
 }

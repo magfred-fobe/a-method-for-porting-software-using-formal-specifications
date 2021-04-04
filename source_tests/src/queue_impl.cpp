@@ -26,6 +26,13 @@ void STAILQ_SWAP_impl(mySTAILQueueHead* head1,mySTAILQueueHead* head2) {
     do { IntegerSTAILQueueNode *swap_first = ((head1)->stqh_first); IntegerSTAILQueueNode **swap_last = (head1)->stqh_last; ((head1)->stqh_first) = ((head2)->stqh_first); (head1)->stqh_last = (head2)->stqh_last; ((head2)->stqh_first) = swap_first; (head2)->stqh_last = swap_last; if (((head1)->stqh_first == NULL)) (head1)->stqh_last = &((head1)->stqh_first); if (((head2)->stqh_first == NULL)) (head2)->stqh_last = &((head2)->stqh_first); } while (0);
 }
 
+//LIST
+void SLIST_INIT_impl(mySinglyLinkedListHead* head) {
+    do { (((head))->slh_first) = NULL; } while (0);
+}
+IntegerSLISTEntry* SLIST_FIRST_impl(mySinglyLinkedListHead* head) {
+    return ((head)->slh_first);
+}
 
 void SLIST_CONCAT_impl(mySinglyLinkedListHead* head1, mySinglyLinkedListHead* head2) {
     do { IntegerSLISTEntry *curelm = ((head1)->slh_first); if (curelm == NULL) { if ((((head1)->slh_first) = ((head2)->slh_first)) != NULL) do { (((head2))->slh_first) = NULL; } while (0); } else if (((head2)->slh_first) != NULL) { while (((curelm)->entries.sle_next) != NULL) curelm = ((curelm)->entries.sle_next); ((curelm)->entries.sle_next) = ((head2)->slh_first); do { (((head2))->slh_first) = NULL; } while (0); } } while (0);
