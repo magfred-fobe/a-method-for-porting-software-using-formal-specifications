@@ -68,19 +68,51 @@ IntegerSTAILQueueNode* STAILQ_FIRST_impl(mySTAILQueueHead *head){
     return STAILQ_FIRST(head);
 }
 
+void STAILQ_FOREACH_impl(mySTAILQueueHead* var, mySTAILQueueHead* head){
+    STAILQ_FOREACH(var, head, entries);
+}
+
+void STAILQ_FOREACH_FROM_impl(IntegerSTAILQueueNode* var, mySTAILQueueHead* head){
+    STAILQ_FOREACH_FROM(var, head, entries);
+}
+
 void STAILQ_INIT_impl(mySTAILQueueHead* head) {
     STAILQ_INIT(head);
 }
 
-void STAILQ_INSERT_HEAD_impl(mySTAILQueueHead* head, IntegerSTAILQueueNode* entry) {
-    STAILQ_INSERT_HEAD(head, entry, links);
+void STAILQ_INSERT_AFTER_impl(mySTAILQueueHead* head, IntegerSTAILQueueNode* tqelm,IntegerSTAILQueueNode* elm){
+    STAILQ_INSERT_AFTER(head, tqelm, elm, entries);
+}
+
+void STAILQ_INSERT_HEAD_impl(mySTAILQueueHead* head, IntegerSTAILQueueNode* elm){
+    STAILQ_INSERT_HEAD(head, elm, entries);
+}
+
+void STAILQ_INSERT_TAIL_impl(mySTAILQueueHead* head,IntegerSTAILQueueNode* elm){
+    STAILQ_INSERT_TAIL(head, elm, entries);
+}
+
+void STAILQ_LAST_impl(mySTAILQueueHead* head, IntegerSTAILQueueNode){
+    STAILQ_LAST(head, IntegerSTAILQueueNode, entries);
+}
+
+void STAILQ_NEXT_impl(IntegerSTAILQueueNode* elm){
+    STAILQ_NEXT(elm, entries);
+}
+
+void STAILQ_REMOVE_impl(mySTAILQueueHead* head,IntegerSTAILQueueNode* elm, IntegerSTAILQueueNode){
+    STAILQ_REMOVE(head, elm, IntegerSTAILQueueNode, entries);
+}
+
+void STAILQ_REMOVE_AFTER_impl(mySTAILQueueHead* head,IntegerSTAILQueueNode* elm){
+    STAILQ_REMOVE_AFTER(head, elm, entries);
 }
 
 void STAILQ_REMOVE_HEAD_impl(mySTAILQueueHead* head) {
     STAILQ_REMOVE_HEAD(head, links);
 }
 
-void STAILQ_SWAP_impl(mySTAILQueueHead* head1,mySTAILQueueHead* head2) {
+void STAILQ_SWAP_impl(mySTAILQueueHead* head1,mySTAILQueueHead* head2, IntegerSTAILQueueNode) {
     STAILQ_SWAP(head1, head2, IntegerSTAILQueueNode);
 }
 
@@ -126,6 +158,10 @@ void LIST_SWAP_impl(myLISTHead* head1, myLISTHead* head2) {
 }
 void LIST_END_impl(myLISTHead* head) {
     LIST_END(head);
+}
+
+void STAILQ_END_impl(mySTAILQueueHead* head){
+    STAILQ_END(head);
 }
 
 

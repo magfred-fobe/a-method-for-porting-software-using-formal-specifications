@@ -69,27 +69,82 @@ IntegerSTAILQueueNode* STAILQ_FIRST_impl(mySTAILQueueHead *head){
     return ((head)->stqh_first);
 }
 
+void STAILQ_FOREACH_impl(IntegerSTAILQueueNode* var, mySTAILQueueHead* head){
+    for((var) = (((head))->stqh_first); (var); (var) = (((var))->entries.stqe_next));
+}
+
+void STAILQ_FOREACH_FROM_impl(IntegerSTAILQueueNode* var, mySTAILQueueHead* head){
+    for ((var) = ((var) ? (var) : (((head))->stqh_first)); (var); (var) = (((var))->entries.stqe_next));
+}
+
 void STAILQ_INIT_impl(mySTAILQueueHead* head) {
     do { (((head))->stqh_first) = NULL; (head)->stqh_last = &(((head))->stqh_first); } while (0);
 }
 
-void STAILQ_INSERT_HEAD_impl(mySTAILQueueHead* head, IntegerSTAILQueueNode* entry) {
-    do { if (((((entry))->links.stqe_next) = (((head))->stqh_first)) == NULL) (head)->stqh_last = &(((entry))->links.stqe_next); (((head))->stqh_first) = (entry); } while (0);
+void STAILQ_INSERT_AFTER_impl(mySTAILQueueHead* head, IntegerSTAILQueueNode* tqelm,IntegerSTAILQueueNode* elm){
+    do { if (((((elm))->entries.stqe_next) = (((tqelm))->entries.stqe_next)) == NULL) (head)->stqh_last = &(((elm))->entries.stqe_next); (((tqelm))->entries.stqe_next) = (elm); } while (0);
+}
+
+void STAILQ_INSERT_HEAD_impl(mySTAILQueueHead* head, IntegerSTAILQueueNode* elm){
+    do { if (((((elm))->entries.stqe_next) = (((head))->stqh_first)) == NULL) (head)->stqh_last = &(((elm))->entries.stqe_next); (((head))->stqh_first) = (elm); } while (0);
+}
+
+void STAILQ_INSERT_TAIL_impl(mySTAILQueueHead* head,IntegerSTAILQueueNode* elm){
+    do { (((elm))->entries.stqe_next) = NULL; *(head)->stqh_last = (elm); (head)->stqh_last = &(((elm))->entries.stqe_next); } while (0);
+}
+
+void STAILQ_LAST_impl(mySTAILQueueHead* head, IntegerSTAILQueueNode){
+    ((((head))->stqh_first == NULL) ? NULL : __containerof((head)->stqh_last, IntegerSTAILQueueNode, entries.stqe_next));
+}
+
+void STAILQ_NEXT_impl(IntegerSTAILQueueNode* elm){
+    ((elm)->entries.stqe_next);
+}
+
+void STAILQ_REMOVE_impl(mySTAILQueueHead* head,IntegerSTAILQueueNode* elm, IntegerSTAILQueueNode){
+    do { ; if ((((head))->stqh_first) == (elm)) { do { if ((((((head)))->stqh_first) = ((((((head)))->stqh_first))->entries.stqe_next)) == NULL) ((head))->stqh_last = &((((head)))->stqh_first); } while (0); } else { IntegerSTAILQueueNode *curelm = ((head)->stqh_first); while (((curelm)->entries.stqe_next) != (elm)) curelm = ((curelm)->entries.stqe_next); do { if ((((curelm)->entries.stqe_next) = ((((curelm)->entries.stqe_next))->entries.stqe_next)) == NULL) (head)->stqh_last = &(((curelm))->entries.stqe_next); } while (0); } ; } while (0);
+}
+
+void STAILQ_REMOVE_AFTER_impl(mySTAILQueueHead* head,IntegerSTAILQueueNode* elm){
+    do { if ((((elm)->entries.stqe_next) = ((((elm)->entries.stqe_next))->entries.stqe_next)) == NULL) (head)->stqh_last = &(((elm))->entries.stqe_next); } while (0);
 }
 
 void STAILQ_REMOVE_HEAD_impl(mySTAILQueueHead* head) {
-    do { if (((((head))->stqh_first) = (((((head))->stqh_first))->links.stqe_next)) == NULL) (head)->stqh_last = &(((head))->stqh_first); } while (0);
+    do {
+        if (((((head))->stqh_first) = (((((head))->stqh_first))->entries.stqe_next)) == NULL)
+            (head)->stqh_last = &(((head))->stqh_first);
+    }
+    while (0);
 }
 
 void STAILQ_SWAP_impl(mySTAILQueueHead* head1,mySTAILQueueHead* head2) {
     do { IntegerSTAILQueueNode *swap_first = ((head1)->stqh_first); IntegerSTAILQueueNode **swap_last = (head1)->stqh_last; ((head1)->stqh_first) = ((head2)->stqh_first); (head1)->stqh_last = (head2)->stqh_last; ((head2)->stqh_first) = swap_first; (head2)->stqh_last = swap_last; if (((head1)->stqh_first == NULL)) (head1)->stqh_last = &((head1)->stqh_first); if (((head2)->stqh_first == NULL)) (head2)->stqh_last = &((head2)->stqh_first); } while (0);
 }
 
-//Doubly linked list
-void LIST_CONCAT_impl(myLISTHead* head1, myLISTHead* head2) {
-    do { IntegerLISTEntry *curelm = ((head1)->lh_first); if (curelm == NULL) { if ((((head1)->lh_first) = ((head2)->lh_first)) != NULL) { ((head2)->lh_first)->links.le_prev = &(((head1))->lh_first); do { (((head2))->lh_first) = NULL; } while (0); } } else if (((head2)->lh_first) != NULL) { while (((curelm)->links.le_next) != NULL) curelm = ((curelm)->links.le_next); ((curelm)->links.le_next) = ((head2)->lh_first); ((head2)->lh_first)->links.le_prev = &((curelm)->links.le_next); do { (((head2))->lh_first) = NULL; } while (0); } } while (0);
+void STAILQ_END_impl(mySTAILQueueHead* head){
+    NULL;
 }
 
+//Doubly linked list
+void LIST_CONCAT_impl(myLISTHead* head1, myLISTHead* head2) {
+    do {
+        IntegerLISTEntry *curelm = ((head1)->lh_first);
+        if (curelm == NULL) {
+            if ((((head1)->lh_first) = ((head2)->lh_first)) != NULL) {
+                ((head2)->lh_first)->links.le_prev = &(((head1))->lh_first);
+                do { (((head2))->lh_first) = NULL; } while (0);
+            }
+        }
+        else if (((head2)->lh_first) != NULL) {
+            while (((curelm)->links.le_next) != NULL)
+                curelm = ((curelm)->links.le_next);
+            ((curelm)->links.le_next) = ((head2)->lh_first);
+            ((head2)->lh_first)->links.le_prev = &((curelm)->links.le_next);
+            do { (((head2))->lh_first) = NULL; } while (0);
+        }
+    }
+    while (0);
+}
 bool LIST_EMPTY_impl(myLISTHead* head) {
     return ((head)->lh_first == NULL);
 }
