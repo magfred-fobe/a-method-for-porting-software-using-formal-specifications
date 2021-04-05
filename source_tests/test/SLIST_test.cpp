@@ -18,14 +18,13 @@ struct rc::Arbitrary<IntegerSLISTEntry> {
 
 void createList(mySinglyLinkedListHead &head,std::vector<IntegerSLISTEntry> &ents) {
     if(ents.empty()) {
-        head.slh_first = nullptr;
+        SLIST_INIT_impl(&head);
         return;
     }
-        for (std::size_t i = 0; i < ents.size()-1; i++) {
-        ents.at(i).entries.sle_next = &(ents.at(i+1));
-    }
-        ents.at(ents.size()-1).entries.sle_next = nullptr;
-        head.slh_first = &ents.at(0);
+    
+    SLIST_INSERT_HEAD_impl(&head, &ents.at(0));
+    for (std::size_t i = 0; i < ents.size()-1; i++)
+        SLIST_INSERT_AFTER_impl(&ents.at(i), &ents.at(i+1));
 }
 
 //rc::gen:.arbitrary should have an implicit size argument, which should start at 0
