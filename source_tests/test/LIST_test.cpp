@@ -1,5 +1,5 @@
 //
-// Created by kali on 4/5/21.
+// Created by Magnus on 4/5/21.
 //
 #include "../src/queue_impl.h"
 #include "gtest/gtest.h"
@@ -356,21 +356,20 @@ RC_GTEST_PROP(LIST,
               removingElementNotPartOfListShouldNotMutateList,
               (std::vector<IntegerLISTEntry> a, std::vector<IntegerLISTEntry> b)){
     RC_SUCCEED_IF(b.size() < 2);
-    mySinglyLinkedListHead headA{nullptr};
+    myLISTHead headA{nullptr};
     createList(headA, a);
 
-    mySinglyLinkedListHead headB{nullptr};
+    myLISTHead headB{nullptr};
     createList(headB, b);
 
-    SLIST_REMOVE_AFTER_impl(headB.slh_first);
-    IntegerSLISTEntry* var;
+    LIST_REMOVE_impl(headB.lh_first);
+    IntegerLISTEntry* var;
     unsigned int count  = 0;
-    SLIST_FOREACH(var, &headA, entries) {
+    LIST_FOREACH(var, &headA, links) {
         RC_ASSERT(&(a.at(count)) == var);
         count++;
     }
 }
-
 
 RC_GTEST_PROP(LIST,
               afterRemovingElementPrevNextNextShouldBePrevNextNext,
@@ -393,3 +392,4 @@ RC_GTEST_PROP(LIST,
     RC_ASSERT(prev->links.le_next == next);
 
 }
+

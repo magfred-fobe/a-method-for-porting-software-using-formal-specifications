@@ -15,7 +15,7 @@ SLIST_HEAD(mySinglyLinkedListHead, IntegerSLISTEntry);
 
 struct IntegerSTAILQueueNode {
     int val;
-    STAILQ_ENTRY(IntegerSTAILQueueNode) links;
+    STAILQ_ENTRY(IntegerSTAILQueueNode) entries;
 };
 
 STAILQ_HEAD(mySTAILQueueHead, IntegerSTAILQueueNode);
@@ -51,9 +51,19 @@ void STAILQ_CONCAT_impl(mySTAILQueueHead* head1,mySTAILQueueHead* head2);
 bool STAILQ_EMPTY_impl(mySTAILQueueHead *head);
 IntegerSTAILQueueNode* STAILQ_FIRST_impl(mySTAILQueueHead *head);
 void STAILQ_INIT_impl(mySTAILQueueHead* head);
-void STAILQ_INSERT_HEAD_impl(mySTAILQueueHead* head, IntegerSTAILQueueNode* entry);
+void STAILQ_INSERT_AFTER_impl(mySTAILQueueHead* head, IntegerSTAILQueueNode* tqelm,IntegerSTAILQueueNode* elm);
+void STAILQ_INSERT_HEAD_impl(mySTAILQueueHead* head,IntegerSTAILQueueNode* elm);
+void STAILQ_INSERT_TAIL_impl(mySTAILQueueHead* head,IntegerSTAILQueueNode* elm);
+IntegerSTAILQueueNode* STAILQ_LAST_impl(mySTAILQueueHead* head, IntegerSTAILQueueNode);
+IntegerSTAILQueueNode* STAILQ_NEXT_impl(IntegerSTAILQueueNode* elm);
+void STAILQ_REMOVE_impl(mySTAILQueueHead* head,IntegerSTAILQueueNode* elm, IntegerSTAILQueueNode);
+void STAILQ_REMOVE_AFTER_impl(mySTAILQueueHead* head,IntegerSTAILQueueNode* elm);
 void STAILQ_REMOVE_HEAD_impl(mySTAILQueueHead* head);
-void STAILQ_SWAP_impl(void* head1,void* head2,void* type);
+void STAILQ_SWAP_impl(mySTAILQueueHead* head1,mySTAILQueueHead* head2, mySTAILQueueHead);
+IntegerSTAILQueueNode* STAILQ_END_impl(mySTAILQueueHead* head);
+
+
+//void STAILQ_SWAP_impl(void* head1,void* head2,void* type);
 
 //doubly linked list
 void LIST_CONCAT_impl(myLISTHead* , myLISTHead*);
@@ -67,5 +77,5 @@ IntegerLISTEntry* LIST_NEXT_impl(IntegerLISTEntry*);
 IntegerLISTEntry* LIST_PREV_impl(IntegerLISTEntry*);
 void LIST_REMOVE_impl(IntegerLISTEntry*);
 void LIST_SWAP_impl(myLISTHead*, myLISTHead*);
-void LIST_END_impl(myLISTHead*);
+IntegerLISTEntry* LIST_END_impl(myLISTHead*);
 

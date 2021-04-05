@@ -53,7 +53,7 @@ mySinglyLinkedListHead* SLIST_END_impl(mySinglyLinkedListHead *head) {
 
 //Singly Linked Tail Queue
 mySTAILQueueHead STAILQ_HEAD_INITIALIZER_impl(mySTAILQueueHead* head){
-   return STAILQ_HEAD_INITIALIZER(*head);
+    return STAILQ_HEAD_INITIALIZER(*head);
 }
 
 void STAILQ_CONCAT_impl(mySTAILQueueHead* head1,mySTAILQueueHead* head2){
@@ -72,35 +72,46 @@ void STAILQ_INIT_impl(mySTAILQueueHead* head) {
     STAILQ_INIT(head);
 }
 
-void STAILQ_INSERT_AFTER_impl(mySTAILQueueHead, IntegerSTAILQueueNode* tgelm, IntegerSTAILQueueNode*, elm) {
-    return STAILQ_INSERT_AFTER(head, tqelm, elm, links);
+void STAILQ_INSERT_AFTER_impl(mySTAILQueueHead* head, IntegerSTAILQueueNode* tqelm,IntegerSTAILQueueNode* elm){
+    STAILQ_INSERT_AFTER(head, tqelm, elm, entries);
 }
 
-void STAILQ_INSERT_HEAD_impl(mySTAILQueueHead* head, IntegerSTAILQueueNode* elm) {
-    STAILQ_INSERT_HEAD(head, elm, links);
+void STAILQ_INSERT_HEAD_impl(mySTAILQueueHead* head, IntegerSTAILQueueNode* elm){
+    STAILQ_INSERT_HEAD(head, elm, entries);
 }
 
-void STAILQ_INSERT_TAIL_impl(mySTAILQueueHead* head, IntegerSTAILQueueNode* elm) {
-    STAILQ_INSERT_TAIL(head, elm, links);
+void STAILQ_INSERT_TAIL_impl(mySTAILQueueHead* head,IntegerSTAILQueueNode* elm){
+    STAILQ_INSERT_TAIL(head, elm, entries);
 }
 
-IntegerSTAILQueueNode* STAILQ_LAST_impl(mySTAILQueueHead* head) {
-        return STAILQ_LAST(head, IntegerSTAILQueueNode, links)
+IntegerSTAILQueueNode* STAILQ_LAST_impl(mySTAILQueueHead* head, IntegerSTAILQueueNode){
+    return STAILQ_LAST(head, IntegerSTAILQueueNode, entries);
 }
 
-IntegerSTAILQueueNode* STAILQ_NEXT_impl(mySTAILQueueHead* head) {
-        return STAILQ_NEXT(head, links)
+IntegerSTAILQueueNode* STAILQ_NEXT_impl(IntegerSTAILQueueNode* elm){
+    return STAILQ_NEXT(elm, entries);
 }
 
+void STAILQ_REMOVE_impl(mySTAILQueueHead* head,IntegerSTAILQueueNode* elm, IntegerSTAILQueueNode){
+    STAILQ_REMOVE(head, elm, IntegerSTAILQueueNode, entries);
+}
 
+void STAILQ_REMOVE_AFTER_impl(mySTAILQueueHead* head,IntegerSTAILQueueNode* elm){
+    STAILQ_REMOVE_AFTER(head, elm, entries);
+}
 
 void STAILQ_REMOVE_HEAD_impl(mySTAILQueueHead* head) {
-    STAILQ_REMOVE_HEAD(head, links);
+    STAILQ_REMOVE_HEAD(head, entries);
 }
 
-void STAILQ_SWAP_impl(mySTAILQueueHead* head1,mySTAILQueueHead* head2) {
+void STAILQ_SWAP_impl(mySTAILQueueHead* head1,mySTAILQueueHead* head2, IntegerSTAILQueueNode) {
     STAILQ_SWAP(head1, head2, IntegerSTAILQueueNode);
 }
+
+IntegerSTAILQueueNode* STAILQ_END_impl(mySTAILQueueHead* head){
+    return STAILQ_END(head);
+}
+
 
 //Doubly linked list
 void LIST_CONCAT_impl(myLISTHead* head1, myLISTHead* head2) {
@@ -142,10 +153,10 @@ void LIST_REMOVE_impl(IntegerLISTEntry* elm) {
 void LIST_SWAP_impl(myLISTHead* head1, myLISTHead* head2) {
     LIST_SWAP(head1, head2, IntegerLISTEntry, links);
 }
-void LIST_END_impl(myLISTHead* head) {
-    LIST_END(head);
-}
 
+IntegerLISTEntry* LIST_END_impl(myLISTHead* head) {
+    return LIST_END(head);
+}
 
 //FIELD == entries
 //TYPE = IntegerSLISTEntry
