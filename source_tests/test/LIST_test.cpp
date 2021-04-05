@@ -26,7 +26,7 @@ void createList(myLISTHead &head,std::vector<IntegerLISTEntry> &ents) {
 }
 
 RC_GTEST_PROP(LIST,
-        concatenatingListsEmptiesSecondList,
+        concatenatingListsAlwaysEmptiesSecondList,
 (std::vector<IntegerLISTEntry> a,std::vector<IntegerLISTEntry> b)){
     myLISTHead headA{};
     createList(headA, a);
@@ -37,7 +37,7 @@ RC_GTEST_PROP(LIST,
 }
 
 RC_GTEST_PROP(LIST,
-              concatenatingMakesLinkFromListAlastToHeadBfirstAndViceVersa,
+              concatenatingAlwaysMakesLinkFromListAlastToHeadBfirstAndViceVersa,
               (std::vector<IntegerLISTEntry> a,std::vector<IntegerLISTEntry> b)){
 
     RC_SUCCEED_IF(a.empty() || b.empty());
@@ -51,7 +51,7 @@ RC_GTEST_PROP(LIST,
 }
 
 RC_GTEST_PROP(LIST,
-              concatenatingListsYieldsCorrectSizeOnList1,
+              concatenatingListsAlwaysYieldsCorrectSizeOnList1,
               (std::vector<IntegerLISTEntry> a,std::vector<IntegerLISTEntry> b)){
 
     myLISTHead headA{};
@@ -73,7 +73,7 @@ RC_GTEST_PROP(LIST,
 }
 
 RC_GTEST_PROP(LIST,
-              concatenatingWithHead1EmptyPutsHeadAFirstOnHeadB,
+              concatenatingWithHead1AlwaysEmptyPutsHeadAFirstOnHeadB,
               (std::vector<IntegerLISTEntry> b)){
     RC_SUCCEED_IF(b.empty());
     myLISTHead headA{};
@@ -86,7 +86,7 @@ RC_GTEST_PROP(LIST,
 }
 
 RC_GTEST_PROP(LIST,
-              concatenatingWithHeadBEmptyPutsHeadAFirstOnHeadA,
+              concatenatingWithHeadBEmptyAlwaysPutsHeadAFirstOnHeadA,
               (std::vector<IntegerLISTEntry> a)){
     RC_SUCCEED_IF(a.empty());
     myLISTHead headA{};
@@ -98,7 +98,7 @@ RC_GTEST_PROP(LIST,
 }
 
 RC_GTEST_PROP(LIST,
-              concatenatingListsPreservesOrder,
+              concatenatingListsAlwaysPreservesOrder,
               (std::vector<IntegerLISTEntry> a,std::vector<IntegerLISTEntry> b)){
 
     myLISTHead headA{};
@@ -130,7 +130,7 @@ TEST(LIST, emptyListAlwaysReturnsNullAsFirst) {
 }
 
 RC_GTEST_PROP(LIST,
-              foreachSummingaShouldYieldCorectSum,
+              foreachSummingaAlwaysYieldsCorrectSum,
               (std::vector<IntegerLISTEntry> a, std::vector<IntegerLISTEntry> b)){
     myLISTHead headA{};
     createList(headA, a);
@@ -155,7 +155,7 @@ RC_GTEST_PROP(LIST,
 }
 
 RC_GTEST_PROP(LIST,
-              addingElementsInForEachDoublesListSize,
+              addingElementsInForEachAlwaysDoublesListSize,
               (std::vector<IntegerLISTEntry> a)){
     myLISTHead headA{};
     createList(headA, a);
@@ -180,7 +180,7 @@ RC_GTEST_PROP(LIST,
 }
 
 RC_GTEST_PROP(LIST,
-              foreachSafeShouldHandleRemovalDuringTraversal,
+              foreachSafeShouldAlwaysHandleRemovalDuringTraversal,
               (std::vector<IntegerLISTEntry> a)){
     myLISTHead headA{};
     createList(headA, a);
@@ -198,7 +198,7 @@ RC_GTEST_PROP(LIST,
 }
 
 RC_GTEST_PROP(LIST,
-              insertingAfterIntoNonEmptyListShouldIncreaseSizeBy1,
+              insertingAfterIntoNonEmptyListAlwaysIncreasesSizeBy1,
               (std::vector<IntegerLISTEntry> a)){
     RC_SUCCEED_IF(a.empty());
     std::default_random_engine generator;
@@ -223,7 +223,7 @@ RC_GTEST_PROP(LIST,
 }
 
 RC_GTEST_PROP(LIST,
-              insertingElementWithVal1ShouldIncreaseSumBy1,
+              insertingElementWithVal1AlwaysIncreasesSumBy1,
               (std::vector<IntegerLISTEntry> a)){
     RC_SUCCEED_IF(a.empty());
     std::default_random_engine generator;
@@ -248,7 +248,7 @@ RC_GTEST_PROP(LIST,
 }
 
 RC_GTEST_PROP(LIST,
-              insertingAtHeadShouldIncreaseLengthBy1,
+              insertingAtHeadAlwaysIncreasesLengthBy1,
               (std::vector<IntegerLISTEntry> a)){
     myLISTHead headA{};
     createList(headA, a);
@@ -267,7 +267,7 @@ RC_GTEST_PROP(LIST,
 }
 
 RC_GTEST_PROP(LIST,
-              insertingHeadFromList2IntoList1ShouldMakeThemEqual,
+              insertingHeadFromList2IntoList1AlwaysdMakesThemEqual,
               (std::vector<IntegerLISTEntry> a, std::vector<IntegerLISTEntry> b)){
     RC_SUCCEED_IF(b.empty());
     myLISTHead headA{nullptr};
@@ -280,7 +280,7 @@ RC_GTEST_PROP(LIST,
 }
 
 RC_GTEST_PROP(LIST,
-              removingFromListWith1ElementShouldMakeEmpty,
+              removingFromListWith1ElementAlwaysMakesEmpty,
               ()){
     myLISTHead headA{nullptr};
 
@@ -291,7 +291,7 @@ RC_GTEST_PROP(LIST,
 }
 
 RC_GTEST_PROP(LIST,
-              removingFromListShouldEventuallyMakeEmpty,
+              removingFromListAlwaysEventuallyMakesEmpty,
               (std::vector<IntegerLISTEntry> a)){
     std::default_random_engine generator;
 
@@ -322,7 +322,7 @@ RC_GTEST_PROP(LIST,
 }
 
 RC_GTEST_PROP(LIST,
-              removingHeadFromListShouldEventuallyMakeEmpty,
+              removingHeadFromListAlwaysEventuallyMakesEmpty,
               (std::vector<IntegerLISTEntry> a)){
     myLISTHead headA{};
     LIST_INIT_impl(&headA);
@@ -341,19 +341,19 @@ RC_GTEST_PROP(LIST,
 }
 
 RC_GTEST_PROP(LIST,
-              removingHeadShouldYieldCorrectFirstElement,
+              removingHeadAlwaysYieldsCorrectFirstElement,
               (std::vector<IntegerLISTEntry> a)){
     myLISTHead headA{nullptr};
     RC_SUCCEED_IF(a.empty());
     createList(headA, a);
 
-    auto expectedNextElement = headA.lh_first->links.le_next;
+    auto expectedNextElement = LIST_NEXT_impl(headA.lh_first);
     LIST_REMOVE_impl(headA.lh_first);
     RC_ASSERT(headA.lh_first == expectedNextElement);
 }
 
 RC_GTEST_PROP(LIST,
-              removingElementNotPartOfListShouldNotMutateList,
+              removingElementNotPartOfListNeverNotMutatesList,
               (std::vector<IntegerLISTEntry> a, std::vector<IntegerLISTEntry> b)){
     RC_SUCCEED_IF(b.size() < 2);
     myLISTHead headA{nullptr};
@@ -372,9 +372,9 @@ RC_GTEST_PROP(LIST,
 }
 
 RC_GTEST_PROP(LIST,
-              afterRemovingElementPrevNextNextShouldBePrevNextNext,
+              afterRemovingElementPrevNextNextAlwaysBecomesPrevNextNext,
               (std::vector<IntegerLISTEntry> a)){
-    RC_SUCCEED_IF(a.size() <= 1);
+    RC_SUCCEED_IF(a.size() < 2);
     std::default_random_engine generator;
     myLISTHead headA{};
     LIST_INIT_impl(&headA);
@@ -384,12 +384,80 @@ RC_GTEST_PROP(LIST,
     unsigned int removeIndex = distribution(generator);
     IntegerLISTEntry* next;
     auto prev = &a.at(removeIndex-1);
-    if(removeIndex >= a.size()-1)
-        next = nullptr;
-    else
-        next = a.at(removeIndex).links.le_next;
+    next = a.at(removeIndex).links.le_next;
     LIST_REMOVE_impl(&a.at(removeIndex));
-    RC_ASSERT(prev->links.le_next == next);
-
+    auto actualNext = prev->links.le_next;
+    RC_ASSERT(actualNext == next);
+    if(next == nullptr)
+        RC_SUCCEED();
+    RC_ASSERT(prev == LIST_PREV_impl(next, &headA));
 }
 
+RC_GTEST_PROP(LIST,
+              prevAlwaysReturnsThePreviousElementOrNull,
+              (std::vector<IntegerLISTEntry> a)){
+    RC_SUCCEED_IF(a.size() < 1);
+    std::default_random_engine generator;
+    myLISTHead headA{};
+    LIST_INIT_impl(&headA);
+    createList(headA, a);
+    for(int i = 0; i < a.size(); i++) {
+        auto prev = i == 0 ? nullptr : &a.at(i-1);
+        RC_ASSERT(LIST_PREV_impl(&a.at(i), &headA) == prev);
+    }
+}
+
+RC_GTEST_PROP(LIST,
+              swappingAlwaysSwapHeadsOfAandB,
+              (std::vector<IntegerLISTEntry> a, std::vector<IntegerLISTEntry> b)){
+    myLISTHead headA{};
+    createList(headA, a);
+    myLISTHead headB{};
+    createList(headB, b);
+        auto prev_headAFirst = headA.lh_first;
+    auto prev_headBFirst = headB.lh_first;
+    LIST_SWAP_impl(&headA, &headB);
+    RC_ASSERT(prev_headBFirst == headA.lh_first);
+    RC_ASSERT(prev_headAFirst == headB.lh_first);
+    unsigned int actualBSize = 0;
+    IntegerLISTEntry* var;
+    LIST_FOREACH(var, &headB, links) {
+        actualBSize++;
+    }
+    RC_ASSERT(actualBSize == a.size());
+
+    unsigned int actualASize = 0;
+    LIST_FOREACH(var, &headA, links) {
+        actualASize++;
+    }
+    RC_ASSERT(actualASize == b.size());
+}
+
+RC_GTEST_PROP(LIST,
+              swappingSwappedListsAlwaysGivesIntitialLists,
+              (std::vector<IntegerLISTEntry> a, std::vector<IntegerLISTEntry> b)){
+    myLISTHead headA{};
+    createList(headA, a);
+    myLISTHead headB{};
+    createList(headB, b);
+    LIST_SWAP_impl(&headA, &headB);
+    LIST_SWAP_impl(&headB, &headA);
+    IntegerLISTEntry *var;
+    unsigned int i = 0;
+    LIST_FOREACH(var, &headA, links) {
+        RC_ASSERT(var->data == a.at(i).data);
+        i++;
+    }
+    i = 0;
+    LIST_FOREACH(var, &headB, links) {
+        RC_ASSERT(var->data == b.at(i).data);
+        i++;
+    }
+}
+
+RC_GTEST_PROP(LIST, endIsAlwaysNull,
+              (std::vector<IntegerLISTEntry> a)) {
+    myLISTHead head;
+    createList(head, a);
+    RC_ASSERT(LIST_END_impl(&head) == nullptr);
+}

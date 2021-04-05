@@ -74,7 +74,7 @@ void LIST_INSERT_AFTER_impl(IntegerLISTEntry*, IntegerLISTEntry*);
 void LIST_INSERT_BEFORE_impl(IntegerLISTEntry* , IntegerLISTEntry*);
 void LIST_INSERT_HEAD_impl(myLISTHead*,IntegerLISTEntry*);
 IntegerLISTEntry* LIST_NEXT_impl(IntegerLISTEntry*);
-IntegerLISTEntry* LIST_PREV_impl(IntegerLISTEntry*);
+IntegerLISTEntry* LIST_PREV_impl(IntegerLISTEntry*, myLISTHead*);
 void LIST_REMOVE_impl(IntegerLISTEntry*);
 void LIST_SWAP_impl(myLISTHead*, myLISTHead*);
 IntegerLISTEntry* LIST_END_impl(myLISTHead*);
