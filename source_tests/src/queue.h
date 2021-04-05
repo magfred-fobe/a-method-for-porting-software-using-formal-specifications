@@ -41,6 +41,53 @@
 #define	_SYS_QUEUE_H_
 
 #include <sys/cdefs.h>
+#include <cstdint>
+#include <stdint.h>
+//#include <stddef.h>
+/*
+ * From FREEBSD /sys/sys/cdefs.h
+ * */
+/*
+ * Given the pointer x to the member m of the struct s, return
+ * a pointer to the containing structure.  When using GCC, we first
+ * assign pointer x to a local variable, to check that its type is
+ * compatible with member m.
+ */
+
+//Required for GNU macros
+#include <features.h>
+
+//Defined in sys/sys/cdefs.h
+//#if __GNUC_PREREQ__(4, 1)
+#if __GNUC_PREREQ(4, 1)
+#define	__offsetof(type, field)	 __builtin_offsetof(type, field)
+#else
+#ifndef __cplusplus
+#define	__offsetof(type, field) \
+	((__size_t)(uintptr_t)((const volatile void *)&((type *)0)->field))
+#else
+#define	__offsetof(type, field)					\
+  (__offsetof__ (reinterpret_cast <__size_t>			\
+                 (&reinterpret_cast <const volatile char &>	\
+                  (static_cast<type *> (0)->field))))
+#endif
+#endif
+
+#ifndef	__DEQUALIFY
+#define	__DEQUALIFY(type, var)	((type)(uintptr_t)(const volatile void *)(var))
+#endif
+//#if __GNUC_PREREQ__(3, 1)
+#if __GNUC_PREREQ(3, 1)
+#define	__containerof(x, s, m) ({					\
+	const volatile __typeof(((s *)0)->m) *__x = (x);		\
+	__DEQUALIFY(s *, (const volatile char *)__x - __offsetof(s, m));\
+})
+#else
+#define	__containerof(x, s, m)						\
+	__DEQUALIFY(s *, (const volatile char *)(x) - __offsetof(s, m))
+#endif
+
+
 
 /*
  * This file defines four types of data structures: singly-linked lists,

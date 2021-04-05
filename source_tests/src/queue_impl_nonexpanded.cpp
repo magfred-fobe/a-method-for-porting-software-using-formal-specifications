@@ -4,7 +4,7 @@
 //Inline functions would be more like a macro. Can easily be done, but not when separate definition declaration
 
 
-//LIST
+//Singly linked list
 void SLIST_INIT_impl(mySinglyLinkedListHead* head) {
     SLIST_INIT(head);
 }
@@ -52,9 +52,8 @@ mySinglyLinkedListHead* SLIST_END_impl(mySinglyLinkedListHead *head) {
 }
 
 //Singly Linked Tail Queue
-
 mySTAILQueueHead STAILQ_HEAD_INITIALIZER_impl(mySTAILQueueHead* head){
-   return STAILQ_HEAD_INITIALIZER(head);
+   return STAILQ_HEAD_INITIALIZER(*head);
 }
 
 void STAILQ_CONCAT_impl(mySTAILQueueHead* head1,mySTAILQueueHead* head2){
@@ -85,6 +84,49 @@ void STAILQ_SWAP_impl(mySTAILQueueHead* head1,mySTAILQueueHead* head2) {
     STAILQ_SWAP(head1, head2, IntegerSTAILQueueNode);
 }
 
+//Doubly linked list
+void LIST_CONCAT_impl(myLISTHead* head1, myLISTHead* head2) {
+    LIST_CONCAT(head1, head2, IntegerLISTEntry, links);
+}
+
+bool LIST_EMPTY_impl(myLISTHead* head) {
+    return LIST_EMPTY(head);
+}
+
+IntegerLISTEntry* LIST_FIRST_impl(myLISTHead* head) {
+    return LIST_FIRST(head);
+}
+
+void LIST_INIT_impl(myLISTHead* head) {
+    LIST_INIT(head);
+}
+void LIST_INSERT_AFTER_impl(IntegerLISTEntry* listelm, IntegerLISTEntry* elm) {
+    LIST_INSERT_AFTER(listelm, elm, links);
+}
+void LIST_INSERT_BEFORE_impl(IntegerLISTEntry* listelm, IntegerLISTEntry* elm) {
+    LIST_INSERT_BEFORE(listelm, elm, links);
+}
+void LIST_INSERT_HEAD_impl(myLISTHead* head,IntegerLISTEntry* elm) {
+    LIST_INSERT_HEAD(head, elm, links);
+}
+
+IntegerLISTEntry* LIST_NEXT_impl(IntegerLISTEntry* elm) {
+    return LIST_NEXT(elm, links);
+}
+
+IntegerLISTEntry* LIST_PREV_impl(IntegerLISTEntry* elm, myLISTHead* head) {
+    return LIST_PREV(elm, head, IntegerLISTEntry, links);
+}
+
+void LIST_REMOVE_impl(IntegerLISTEntry* elm) {
+    LIST_REMOVE(elm, links);
+}
+void LIST_SWAP_impl(myLISTHead* head1, myLISTHead* head2) {
+    LIST_SWAP(head1, head2, IntegerLISTEntry, links);
+}
+void LIST_END_impl(myLISTHead* head) {
+    LIST_END(head);
+}
 
 
 //FIELD == entries
