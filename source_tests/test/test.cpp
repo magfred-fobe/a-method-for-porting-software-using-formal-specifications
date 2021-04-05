@@ -475,25 +475,3 @@ RC_GTEST_PROP(SLIST,
     RC_ASSERT(SLIST_END_impl(&headA) == nullptr);
 }
 
-TEST(queueTest, isInitiallyEmpty) {
-    mySTAILQueueHead head;
-    STAILQ_INIT_impl(&head);
-    EXPECT_EQ (true, STAILQ_EMPTY_impl(&head));
-}
-
-TEST(queueTest, isNotemptyWhenOneElement) {
-    struct IntegerSTAILQueueNode entry;
-    mySTAILQueueHead head;
-    STAILQ_INIT_impl(&head);
-    STAILQ_INSERT_HEAD_impl(&head, &entry);
-    EXPECT_EQ (false, STAILQ_EMPTY_impl(&head));
-}
-
-TEST(queueTest, becomesEmptyWhenElementRemoved) {
-    struct IntegerSTAILQueueNode entry;
-    mySTAILQueueHead head;
-    STAILQ_INIT_impl(&head);
-    STAILQ_INSERT_HEAD_impl(&head, &entry);
-    STAILQ_REMOVE_HEAD_impl(&head);
-    EXPECT_EQ (true, STAILQ_EMPTY_impl(&head));
-}

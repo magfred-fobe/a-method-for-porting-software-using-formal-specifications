@@ -3,25 +3,6 @@
 //We want to get metrics on coverage, but macros themselves can tell us about coverage
 //Inline functions would be more like a macro. Can easily be done, but not when separate definition declaration
 
-void STAILQ_INIT_impl(mySTAILQueueHead* head) {
-    STAILQ_INIT(head);
-}
-
-bool STAILQ_EMPTY_impl(mySTAILQueueHead *head) {
-    return STAILQ_EMPTY(head);
-}
-
-void STAILQ_INSERT_HEAD_impl(mySTAILQueueHead* head, IntegerSTAILQueueNode* entry) {
-    STAILQ_INSERT_HEAD(head, entry, links);
-}
-
-void STAILQ_REMOVE_HEAD_impl(mySTAILQueueHead* head) {
-    STAILQ_REMOVE_HEAD(head, links);
-}
-
-void STAILQ_SWAP_impl(mySTAILQueueHead* head1,mySTAILQueueHead* head2) {
-    STAILQ_SWAP(head1, head2, IntegerSTAILQueueNode);
-}
 
 //LIST
 void SLIST_INIT_impl(mySinglyLinkedListHead* head) {
@@ -69,6 +50,41 @@ void SLIST_SWAP_impl(mySinglyLinkedListHead* head1,mySinglyLinkedListHead* head2
 mySinglyLinkedListHead* SLIST_END_impl(mySinglyLinkedListHead *head) {
     return SLIST_END(head);
 }
+
+//Singly Linked Tail Queue
+
+mySTAILQueueHead STAILQ_HEAD_INITIALIZER_impl(mySTAILQueueHead* head){
+   return STAILQ_HEAD_INITIALIZER(head);
+}
+
+void STAILQ_CONCAT_impl(mySTAILQueueHead* head1,mySTAILQueueHead* head2){
+    STAILQ_CONCAT(head1, head2);
+}
+
+bool STAILQ_EMPTY_impl(mySTAILQueueHead *head) {
+    return STAILQ_EMPTY(head);
+}
+
+IntegerSTAILQueueNode* STAILQ_FIRST_impl(mySTAILQueueHead *head){
+    return STAILQ_FIRST(head);
+}
+
+void STAILQ_INIT_impl(mySTAILQueueHead* head) {
+    STAILQ_INIT(head);
+}
+
+void STAILQ_INSERT_HEAD_impl(mySTAILQueueHead* head, IntegerSTAILQueueNode* entry) {
+    STAILQ_INSERT_HEAD(head, entry, links);
+}
+
+void STAILQ_REMOVE_HEAD_impl(mySTAILQueueHead* head) {
+    STAILQ_REMOVE_HEAD(head, links);
+}
+
+void STAILQ_SWAP_impl(mySTAILQueueHead* head1,mySTAILQueueHead* head2) {
+    STAILQ_SWAP(head1, head2, IntegerSTAILQueueNode);
+}
+
 
 
 //FIELD == entries
