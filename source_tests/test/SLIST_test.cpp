@@ -21,7 +21,7 @@ void createList(mySinglyLinkedListHead &head,std::vector<IntegerSLISTEntry> &ent
         SLIST_INIT_impl(&head);
         return;
     }
-    
+
     SLIST_INSERT_HEAD_impl(&head, &ents.at(0));
     for (std::size_t i = 0; i < ents.size()-1; i++)
         SLIST_INSERT_AFTER_impl(&ents.at(i), &ents.at(i+1));
@@ -120,6 +120,7 @@ RC_GTEST_PROP(SLIST,
 RC_GTEST_PROP(SLIST,
               nonemptyListIsAlwaysEmptyAfterNonRemovingOperation,
               (std::vector<IntegerSLISTEntry> a, std::vector<IntegerSLISTEntry> b)){
+    ///TODO: MODEL PROPERTY TEST.
     mySinglyLinkedListHead headA{nullptr};
     createList(headA, a);
     mySinglyLinkedListHead headB{nullptr};

@@ -72,9 +72,27 @@ void STAILQ_INIT_impl(mySTAILQueueHead* head) {
     STAILQ_INIT(head);
 }
 
-void STAILQ_INSERT_HEAD_impl(mySTAILQueueHead* head, IntegerSTAILQueueNode* entry) {
-    STAILQ_INSERT_HEAD(head, entry, links);
+void STAILQ_INSERT_AFTER_impl(mySTAILQueueHead, IntegerSTAILQueueNode* tgelm, IntegerSTAILQueueNode*, elm) {
+    return STAILQ_INSERT_AFTER(head, tqelm, elm, links);
 }
+
+void STAILQ_INSERT_HEAD_impl(mySTAILQueueHead* head, IntegerSTAILQueueNode* elm) {
+    STAILQ_INSERT_HEAD(head, elm, links);
+}
+
+void STAILQ_INSERT_TAIL_impl(mySTAILQueueHead* head, IntegerSTAILQueueNode* elm) {
+    STAILQ_INSERT_TAIL(head, elm, links);
+}
+
+IntegerSTAILQueueNode* STAILQ_LAST_impl(mySTAILQueueHead* head) {
+        return STAILQ_LAST(head, IntegerSTAILQueueNode, links)
+}
+
+IntegerSTAILQueueNode* STAILQ_NEXT_impl(mySTAILQueueHead* head) {
+        return STAILQ_NEXT(head, links)
+}
+
+
 
 void STAILQ_REMOVE_HEAD_impl(mySTAILQueueHead* head) {
     STAILQ_REMOVE_HEAD(head, links);
