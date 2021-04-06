@@ -115,7 +115,7 @@ IntegerSTAILQueueNode* STAILQ_END_impl(mySTAILQueueHead* head){
 
 //Doubly linked list
 void LIST_CONCAT_impl(myLISTHead* head1, myLISTHead* head2) {
-    LIST_CONCAT(head1, head2, IntegerLISTEntry, links);
+    LIST_CONCAT(head1, head2, IntegerLISTEntry, entries);
 }
 
 bool LIST_EMPTY_impl(myLISTHead* head) {
@@ -129,33 +129,101 @@ IntegerLISTEntry* LIST_FIRST_impl(myLISTHead* head) {
 void LIST_INIT_impl(myLISTHead* head) {
     LIST_INIT(head);
 }
+
 void LIST_INSERT_AFTER_impl(IntegerLISTEntry* listelm, IntegerLISTEntry* elm) {
-    LIST_INSERT_AFTER(listelm, elm, links);
+    LIST_INSERT_AFTER(listelm, elm, entries);
 }
+
 void LIST_INSERT_BEFORE_impl(IntegerLISTEntry* listelm, IntegerLISTEntry* elm) {
-    LIST_INSERT_BEFORE(listelm, elm, links);
+    LIST_INSERT_BEFORE(listelm, elm, entries);
 }
+
 void LIST_INSERT_HEAD_impl(myLISTHead* head,IntegerLISTEntry* elm) {
-    LIST_INSERT_HEAD(head, elm, links);
+    LIST_INSERT_HEAD(head, elm, entries);
 }
 
 IntegerLISTEntry* LIST_NEXT_impl(IntegerLISTEntry* elm) {
-    return LIST_NEXT(elm, links);
+    return LIST_NEXT(elm, entries);
 }
 
 IntegerLISTEntry* LIST_PREV_impl(IntegerLISTEntry* elm, myLISTHead* head) {
-    return LIST_PREV(elm, head, IntegerLISTEntry, links);
+    return LIST_PREV(elm, head, IntegerLISTEntry, entries);
 }
 
 void LIST_REMOVE_impl(IntegerLISTEntry* elm) {
-    LIST_REMOVE(elm, links);
+    LIST_REMOVE(elm, entries);
 }
+
 void LIST_SWAP_impl(myLISTHead* head1, myLISTHead* head2) {
-    LIST_SWAP(head1, head2, IntegerLISTEntry, links);
+    LIST_SWAP(head1, head2, IntegerLISTEntry, entries);
 }
 
 IntegerLISTEntry* LIST_END_impl(myLISTHead* head) {
     return LIST_END(head);
+}
+
+//TAILQ, doubly linked tail queue
+void TAILQ_CONCAT_impl(myTAILQueueHead* head1,myTAILQueueHead* head2) {
+    TAILQ_CONCAT(head1, head2, entries);
+}
+
+bool TAILQ_EMPTY_impl(myTAILQueueHead* head) {
+    return TAILQ_EMPTY(head);
+}
+
+IntegerTAILQueueNode* TAILQ_FIRST_impl(myTAILQueueHead *head) {
+    return TAILQ_FIRST(head);
+}
+
+void TAILQ_INIT_impl(myTAILQueueHead* head) {
+    TAILQ_INIT(head);
+}
+
+void TAILQ_INSERT_AFTER_impl(myTAILQueueHead* head,IntegerTAILQueueNode* listelm, IntegerTAILQueueNode* elm) {
+    TAILQ_INSERT_AFTER(head, listelm, elm, entries);
+}
+
+void TAILQ_INSERT_BEFORE_impl(IntegerTAILQueueNode* listelm, IntegerTAILQueueNode* elm) {
+    TAILQ_INSERT_BEFORE(listelm, elm, entries);
+}
+
+void TAILQ_INSERT_HEAD_impl(myTAILQueueHead* head, IntegerTAILQueueNode* elm) {
+    TAILQ_INSERT_HEAD(head, elm, entries);
+}
+
+void TAILQ_INSERT_TAIL_impl(myTAILQueueHead* head, IntegerTAILQueueNode* elm) {
+    TAILQ_INSERT_TAIL(head, elm, entries);
+}
+
+IntegerTAILQueueNode* TAILQ_LAST_impl(myTAILQueueHead* head) {
+    return TAILQ_LAST(head, myTAILQueueHead);
+}
+
+IntegerTAILQueueNode* TAILQ_LAST_FAST_impl(myTAILQueueHead* head) {
+    return TAILQ_LAST_FAST(head, IntegerTAILQueueNode, entries);
+}
+
+IntegerTAILQueueNode* TAILQ_NEXT_impl(IntegerTAILQueueNode* elm) {
+    return TAILQ_NEXT(elm, entries);
+}
+
+IntegerTAILQueueNode* TAILQ_PREV_impl(IntegerTAILQueueNode* elm) {
+    return TAILQ_PREV(elm, myTAILQueueHead, entries);
+}
+
+IntegerTAILQueueNode* TAILQ_PREV_FAST_impl(IntegerTAILQueueNode* elm, myTAILQueueHead* head ) {
+    return TAILQ_PREV_FAST(elm, head,  IntegerTAILQueueNode, entries);
+}
+
+void TAILQ_REMOVE_impl(myTAILQueueHead* head, IntegerTAILQueueNode* elm) {
+    TAILQ_REMOVE(head, elm, entries);
+}
+void TAILQ_SWAP_impl(myTAILQueueHead* head1, myTAILQueueHead* head2) {
+    TAILQ_SWAP(head1, head2, IntegerTAILQueueNode, entries);
+}
+
+IntegerTAILQueueNode* TAILQ_END_impl(myTAILQueueHead* head) {
+    return TAILQ_END(head);
 }
 
 //FIELD == entries

@@ -46,8 +46,8 @@ RC_GTEST_PROP(LIST,
     myLISTHead headB{};
     createList(headB, b);
     LIST_CONCAT_impl(&headA, &headB);
-    RC_ASSERT(a.at(a.size()-1).links.le_next == &b.at(0));
-    RC_ASSERT((b.at(0).links.le_prev) == &a.at(a.size()-1).links.le_next);
+    RC_ASSERT(a.at(a.size()-1).entries.le_next == &b.at(0));
+    RC_ASSERT((b.at(0).entries.le_prev) == &a.at(a.size()-1).entries.le_next);
 }
 
 RC_GTEST_PROP(LIST,
@@ -64,7 +64,7 @@ RC_GTEST_PROP(LIST,
     unsigned int actualSize = 0;
     unsigned int expectedSize = a.size() + b.size();
 
-    LIST_FOREACH(entry, &headA, links) {
+    LIST_FOREACH(entry, &headA, entries) {
         actualSize++;
     }
 
@@ -109,7 +109,7 @@ RC_GTEST_PROP(LIST,
 
     IntegerLISTEntry *entry;
     int temp = 0;
-    LIST_FOREACH(entry, &headA, links) {
+    LIST_FOREACH(entry, &headA, entries) {
         const IntegerLISTEntry &shouldPointTo = temp < a.size() ? a.at(temp) : b.at(temp - a.size());
         RC_ASSERT(&shouldPointTo == entry);
         temp++;
@@ -145,10 +145,10 @@ RC_GTEST_PROP(LIST,
         expectedSum += (unsigned)abs(el.data);
     }
     IntegerLISTEntry* var;
-    LIST_FOREACH(var, &headA, links) {
+    LIST_FOREACH(var, &headA, entries) {
         actualSum+=(unsigned)abs(var->data);
     }
-    LIST_FOREACH(var, &headB, links) {
+    LIST_FOREACH(var, &headB, entries) {
         actualSum+=(unsigned)abs(var->data);
     }
     RC_ASSERT(actualSum == expectedSum);
@@ -162,7 +162,7 @@ RC_GTEST_PROP(LIST,
     IntegerLISTEntry* var;
     std::vector<IntegerLISTEntry> newEntries;
     newEntries.reserve(a.size());
-    LIST_FOREACH(var, &headA, links) {
+    LIST_FOREACH(var, &headA, entries) {
         if(var != &a.at(0)) {
             IntegerLISTEntry entry = *rc::gen::arbitrary<IntegerLISTEntry>();
             newEntries.push_back(entry);
@@ -172,7 +172,7 @@ RC_GTEST_PROP(LIST,
     }
     unsigned expectedSize = std::max((int)(a.size()*2-1), 0);
     unsigned int actualSize = 0;
-    LIST_FOREACH(var, &headA, links) {
+    LIST_FOREACH(var, &headA, entries) {
         actualSize++;
     }
 
@@ -186,12 +186,12 @@ RC_GTEST_PROP(LIST,
     createList(headA, a);
     IntegerLISTEntry* var;
     IntegerLISTEntry* tvar;
-    LIST_FOREACH_SAFE(var, &headA, links, tvar) {
+    LIST_FOREACH_SAFE(var, &headA, entries, tvar) {
         LIST_REMOVE_impl(var);
     }
     unsigned int actualSize = 0;
     unsigned int expectedSize = 0;
-    LIST_FOREACH(var, &headA, links) {
+    LIST_FOREACH(var, &headA, entries) {
         actualSize++;
     }
     RC_ASSERT(actualSize == expectedSize);
@@ -208,7 +208,7 @@ RC_GTEST_PROP(LIST,
 
     IntegerLISTEntry* var;
     unsigned int expectedSize = 1;
-    LIST_FOREACH(var, &headA, links) {
+    LIST_FOREACH(var, &headA, entries) {
         expectedSize++;
     }
 
@@ -216,7 +216,7 @@ RC_GTEST_PROP(LIST,
     auto toInsert = *rc::gen::arbitrary<IntegerLISTEntry>();
     LIST_INSERT_AFTER_impl(insertAfterThis, &toInsert);
     unsigned int actualSize = 0;
-    LIST_FOREACH(var, &headA, links) {
+    LIST_FOREACH(var, &headA, entries) {
         actualSize++;
     }
     RC_ASSERT(actualSize == expectedSize);
@@ -233,7 +233,7 @@ RC_GTEST_PROP(LIST,
 
     IntegerLISTEntry* var;
     unsigned int expectedSum = 1;
-    LIST_FOREACH(var, &headA, links) {
+    LIST_FOREACH(var, &headA, entries) {
         expectedSum+= var->data;
     }
 
@@ -241,7 +241,7 @@ RC_GTEST_PROP(LIST,
     auto toInsert = IntegerLISTEntry{1, nullptr};
     LIST_INSERT_AFTER_impl(insertAfterThis, &toInsert);
     unsigned int actualSum = 0;
-    LIST_FOREACH(var, &headA, links) {
+    LIST_FOREACH(var, &headA, entries) {
         actualSum+=var->data;
     }
     RC_ASSERT(actualSum == expectedSum);
@@ -259,7 +259,7 @@ RC_GTEST_PROP(LIST,
     auto toInsert = IntegerLISTEntry{1, nullptr};
     LIST_INSERT_HEAD_impl(&headA, &toInsert);
     unsigned int actualLength = 0;
-    LIST_FOREACH(var, &headA, links) {
+    LIST_FOREACH(var, &headA, entries) {
         actualLength++;
     }
     RC_ASSERT(LIST_FIRST_impl(&headA) == &toInsert);
@@ -313,7 +313,7 @@ RC_GTEST_PROP(LIST,
         LIST_REMOVE_impl(elementToRemove);
         pointers.erase(pointers.begin() + removeIndex);
         unsigned new_size = 0;
-        LIST_FOREACH(var, &headA, links)  {
+        LIST_FOREACH(var, &headA, entries)  {
             new_size++;
         }
         RC_ASSERT(new_size == prev_size-1);
@@ -332,7 +332,7 @@ RC_GTEST_PROP(LIST,
     while(headA.lh_first) {
         LIST_REMOVE_impl(headA.lh_first);
         unsigned new_size = 0;
-        LIST_FOREACH(var, &headA, links)  {
+        LIST_FOREACH(var, &headA, entries)  {
             new_size++;
         }
         RC_ASSERT(new_size == prev_size-1);
@@ -365,7 +365,7 @@ RC_GTEST_PROP(LIST,
     LIST_REMOVE_impl(headB.lh_first);
     IntegerLISTEntry* var;
     unsigned int count  = 0;
-    LIST_FOREACH(var, &headA, links) {
+    LIST_FOREACH(var, &headA, entries) {
         RC_ASSERT(&(a.at(count)) == var);
         count++;
     }
@@ -384,9 +384,9 @@ RC_GTEST_PROP(LIST,
     unsigned int removeIndex = distribution(generator);
     IntegerLISTEntry* next;
     auto prev = &a.at(removeIndex-1);
-    next = a.at(removeIndex).links.le_next;
+    next = a.at(removeIndex).entries.le_next;
     LIST_REMOVE_impl(&a.at(removeIndex));
-    auto actualNext = prev->links.le_next;
+    auto actualNext = prev->entries.le_next;
     RC_ASSERT(actualNext == next);
     if(next == nullptr)
         RC_SUCCEED();
@@ -421,13 +421,13 @@ RC_GTEST_PROP(LIST,
     RC_ASSERT(prev_headAFirst == headB.lh_first);
     unsigned int actualBSize = 0;
     IntegerLISTEntry* var;
-    LIST_FOREACH(var, &headB, links) {
+    LIST_FOREACH(var, &headB, entries) {
         actualBSize++;
     }
     RC_ASSERT(actualBSize == a.size());
 
     unsigned int actualASize = 0;
-    LIST_FOREACH(var, &headA, links) {
+    LIST_FOREACH(var, &headA, entries) {
         actualASize++;
     }
     RC_ASSERT(actualASize == b.size());
@@ -444,12 +444,12 @@ RC_GTEST_PROP(LIST,
     LIST_SWAP_impl(&headB, &headA);
     IntegerLISTEntry *var;
     unsigned int i = 0;
-    LIST_FOREACH(var, &headA, links) {
+    LIST_FOREACH(var, &headA, entries) {
         RC_ASSERT(var->data == a.at(i).data);
         i++;
     }
     i = 0;
-    LIST_FOREACH(var, &headB, links) {
+    LIST_FOREACH(var, &headB, entries) {
         RC_ASSERT(var->data == b.at(i).data);
         i++;
     }
