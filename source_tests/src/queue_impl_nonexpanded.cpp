@@ -113,6 +113,10 @@ IntegerSTAILQueueNode* STAILQ_END_impl(mySTAILQueueHead* head){
 }
 
 
+void STAILQ_END_impl(mySTAILQueueHead* head){
+    STAILQ_END(head);
+}
+
 //Doubly linked list
 void LIST_CONCAT_impl(myLISTHead* head1, myLISTHead* head2) {
     LIST_CONCAT(head1, head2, IntegerLISTEntry, entries);

@@ -18,18 +18,19 @@ struct rc::Arbitrary<IntegerSTAILQueueNode> {
 };
 
 void createList(mySTAILQueueHead &head,std::vector<IntegerSTAILQueueNode> &ents) {
+
+    STAILQ_INIT_impl(&head);
+
     if(ents.empty()) {
-        head.stqh_first = nullptr;
-        *head.stqh_last = nullptr;
         return;
     }
-    for (std::size_t i = 0; i < ents.size()-1; i++) {
-        ents.at(i).entries.stqe_next = &(ents.at(i+1));
+
+    STAILQ_INSERT_HEAD_impl(&head, &ents.at(0));
+    for (std::size_t i = 1; i < ents.size(); i++) {
+        STAILQ_INSERT_AFTER_impl(&head, &ents.at(i-1),&ents.at(i));
     }
 
-    ents.at(ents.size()-1).entries.stqe_next = nullptr;
-    head.stqh_first = &ents.at(0);
-    *head.stqh_last = &ents.at(ents.size()-1);
+    STAILQ_INSERT_TAIL_impl(&head, &ents.at(ents.size()-1));
 }
 
 
@@ -44,16 +45,23 @@ RC_GTEST_PROP(STAILQ,
               concatenatingSTAILQLists,
               (std::vector<IntegerSTAILQueueNode> a, std::vector<IntegerSTAILQueueNode> b)){
       mySTAILQueueHead headA;
-      STAILQ_INIT_impl(&headA);
       createList(headA, a);
       mySTAILQueueHead headB;
-      STAILQ_INIT_impl(&headB);
       createList(headB, b);
-      IntegerSTAILQueueNode* temp = headA.stqh_first;
+      IntegerSTAILQueueNode* temp;
+      IntegerSTAILQueueNode* first = STAILQ_FIRST_impl(&headA);
+      unsigned int actualSize = 0;
+      unsigned int expectedSize = a.size() + b.size();
 
       STAILQ_CONCAT_impl(&headA, &headB);
-      EXPECT_EQ(nullptr, headB.stqh_first);
-//      EXPECT_EQ(temp, )
+
+   //   STAILQ_FOREACH(temp, &headA, entries) {
+     //       actualSize++;
+     // }
+
+      EXPECT_EQ(true, STAILQ_EMPTY_impl(&headB));
+//      EXPECT_EQ(first, headA.stqh_first);
+    //  EXPECT_EQ(expectedSize, actualSize);
 }
 
 

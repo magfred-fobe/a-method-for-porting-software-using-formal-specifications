@@ -142,7 +142,7 @@ void STAILQ_INSERT_TAIL_impl(mySTAILQueueHead *head, IntegerSTAILQueueNode *elm)
     } while (0);
 }
 
-IntegerSTAILQueueNode *STAILQ_LAST_impl(mySTAILQueueHead *head, IntegerSTAILQueueNode) {
+IntegerSTAILQueueNode *STAILQ_LAST_impl(mySTAILQueueHead *head) {
     return ((((head))->stqh_first == NULL) ? NULL : ({
         const volatile __typeof(((IntegerSTAILQueueNode *) 0)->entries.stqe_next) *__x = ((head)->stqh_last);
         ((IntegerSTAILQueueNode *) (uintptr_t) (const volatile void *) ((const volatile char *) __x -
