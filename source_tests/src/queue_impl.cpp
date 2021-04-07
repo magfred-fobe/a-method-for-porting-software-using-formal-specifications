@@ -155,7 +155,7 @@ IntegerSTAILQueueNode *STAILQ_NEXT_impl(IntegerSTAILQueueNode *elm) {
     return ((elm)->entries.stqe_next);
 }
 
-void STAILQ_REMOVE_impl(mySTAILQueueHead *head, IntegerSTAILQueueNode *elm, IntegerSTAILQueueNode) {
+void STAILQ_REMOVE_impl(mySTAILQueueHead *head, IntegerSTAILQueueNode *elm) {
     do { ;
         if ((((head))->stqh_first) == (elm)) {
             do {
