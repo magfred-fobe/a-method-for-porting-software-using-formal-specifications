@@ -13,7 +13,7 @@ template<>
 struct rc::Arbitrary<IntegerSTAILQueueNode> {
     static Gen<IntegerSTAILQueueNode> arbitrary() {
         return gen::build<IntegerSTAILQueueNode>(
-                gen::set(&IntegerSTAILQueueNode::val, gen::arbitrary<int>()));
+                gen::set(&IntegerSTAILQueueNode::data, gen::arbitrary<int>()));
     }
 };
 
@@ -205,7 +205,7 @@ RC_GTEST_PROP(STAILQ, doubleSwappingSTAILQAlwaysGivesInitialLists, (std::vector<
     IntegerSTAILQueueNode* var;
     unsigned int size = 0;
     STAILQ_FOREACH(var, &headA, entries) {
-        RC_ASSERT(var->val == a.at(size).val);
+        RC_ASSERT(var->data == a.at(size).data);
         EXPECT_EQ(var, &a.at(size));
         size++;
     }
@@ -213,7 +213,7 @@ RC_GTEST_PROP(STAILQ, doubleSwappingSTAILQAlwaysGivesInitialLists, (std::vector<
 
     size = 0;
     STAILQ_FOREACH(var, &headB, entries) {
-        RC_ASSERT(var->val == b.at(size).val);
+        RC_ASSERT(var->data == b.at(size).data);
         EXPECT_EQ(var, &b.at(size));
         size++;
     }

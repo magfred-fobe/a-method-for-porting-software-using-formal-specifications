@@ -14,7 +14,7 @@ SLIST_HEAD(mySinglyLinkedListHead, IntegerSLISTEntry);
 
 
 struct IntegerSTAILQueueNode {
-    int val;
+    int data;
     STAILQ_ENTRY(IntegerSTAILQueueNode) entries;
 };
 
@@ -70,9 +70,6 @@ void STAILQ_REMOVE_HEAD_impl(mySTAILQueueHead* head);
 void STAILQ_SWAP_impl(mySTAILQueueHead* head1,mySTAILQueueHead* head2, mySTAILQueueHead);
 IntegerSTAILQueueNode* STAILQ_END_impl(mySTAILQueueHead* head);
 
-
-//void STAILQ_SWAP_impl(void* head1,void* head2,void* type);
-
 //doubly linked list
 void LIST_CONCAT_impl(myLISTHead* , myLISTHead*);
 bool LIST_EMPTY_impl(myLISTHead*);
@@ -98,6 +95,7 @@ void TAILQ_INSERT_HEAD_impl(myTAILQueueHead* , IntegerTAILQueueNode*);
 void TAILQ_INSERT_TAIL_impl(myTAILQueueHead* , IntegerTAILQueueNode*);
 IntegerTAILQueueNode* TAILQ_LAST_impl(myTAILQueueHead*);
 IntegerTAILQueueNode* TAILQ_LAST_FAST_impl(myTAILQueueHead*);
+
 IntegerTAILQueueNode* TAILQ_NEXT_impl(IntegerTAILQueueNode*);
 IntegerTAILQueueNode* TAILQ_PREV_impl(IntegerTAILQueueNode*);
 IntegerTAILQueueNode* TAILQ_PREV_FAST_impl(IntegerTAILQueueNode*, myTAILQueueHead* );

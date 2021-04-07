@@ -30,7 +30,7 @@ add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/googletest-src
 
 
 # Add the source and test files
-add_executable(project test/SLIST_test.cpp test/STAILQ_test.cpp src/queue.h src/queue_impl.h src/queue_impl.cpp test/STAILQ_test.cpp test/LIST_test.cpp test/LIST_test.cpp)
+add_executable(project test/SLIST_test.cpp test/STAILQ_test.cpp src/queue.h src/queue_impl.h src/queue_impl.cpp test/STAILQ_test.cpp test/LIST_test.cpp test/LIST_test.cpp test/TAILQ_test.cpp)
 
 # Now link against gtest or gtest_main as needed. Eg
 target_link_libraries(project gtest_main)
