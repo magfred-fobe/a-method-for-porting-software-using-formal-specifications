@@ -138,14 +138,13 @@ RC_GTEST_PROP(TAILQ, tailIsInserted, (std::vector<IntegerTAILQueueNode> a)) {
 
 RC_GTEST_PROP(TAILQ, returnsLastElement, (std::vector<IntegerTAILQueueNode> a)) {
 
-//    myTAILQueueHead head;
-//    IntegerTAILQueueNode last;
-//    createList(head, a);
-//
-//    TAILQ_INSERT_TAIL_impl(&head, &last);
-//
-//    if(a.size() > 0)
-//        EXPECT_EQ (TAILQ_LAST_impl(&head), &a.at(a.size()-1));
+    myTAILQueueHead head;
+    IntegerTAILQueueNode last = *rc::gen::arbitrary<IntegerTAILQueueNode>();
+    createList(head, a);
+
+    TAILQ_INSERT_TAIL_impl(&head, &last);
+
+    EXPECT_EQ (TAILQ_LAST_impl(&head), &last);
 }
 
 
