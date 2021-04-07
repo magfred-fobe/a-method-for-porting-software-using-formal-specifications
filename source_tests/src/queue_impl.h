@@ -67,7 +67,7 @@ IntegerSTAILQueueNode* STAILQ_NEXT_impl(IntegerSTAILQueueNode* elm);
 void STAILQ_REMOVE_impl(mySTAILQueueHead* head,IntegerSTAILQueueNode* elm);
 void STAILQ_REMOVE_AFTER_impl(mySTAILQueueHead* head,IntegerSTAILQueueNode* elm);
 void STAILQ_REMOVE_HEAD_impl(mySTAILQueueHead* head);
-void STAILQ_SWAP_impl(mySTAILQueueHead* head1,mySTAILQueueHead* head2, mySTAILQueueHead);
+void STAILQ_SWAP_impl(mySTAILQueueHead* head1,mySTAILQueueHead* head2);
 IntegerSTAILQueueNode* STAILQ_END_impl(mySTAILQueueHead* head);
 
 //doubly linked list

@@ -29,7 +29,7 @@ void createList(myTAILQueueHead &head,std::vector<IntegerTAILQueueNode> &ents) {
     if(ents.empty())
         return;
 
-    TAILQ_INSERT_HEAD(&head, &ents.at(0), entries);
+    TAILQ_INSERT_HEAD_impl(&head, &ents.at(0));
 
     for (std::size_t i = 1; i < ents.size(); i++)
         TAILQ_INSERT_TAIL_impl(&head, &ents.at(i));
@@ -149,106 +149,80 @@ RC_GTEST_PROP(TAILQ, returnsLastElement, (std::vector<IntegerTAILQueueNode> a)) 
 }
 
 
-//RC_GTEST_PROP(STAILQ, nextElementIsCorrect, (std::vector<IntegerSTAILQueueNode> a)) {
-//
-//    mySTAILQueueHead head;
-//    IntegerSTAILQueueNode* next;
-//    createList(head, a);
-//    int index = 1;
-//
-//    STAILQ_FOREACH(next, &head, entries){
-//        if (next && index < a.size())EXPECT_EQ (STAILQ_NEXT_impl(next), &a.at(index));
-//        index++;
-//    }
-//
-//
-//}
-//
-//TEST(STAILQ, becomesEmptyWhenElementRemoved) {
-//    IntegerSTAILQueueNode entry;
-//    mySTAILQueueHead head;
-//    STAILQ_INIT_impl(&head);
-//    STAILQ_INSERT_HEAD_impl(&head, &entry);
-//    STAILQ_REMOVE_impl(&head, &entry);
-//    EXPECT_EQ (true, STAILQ_EMPTY_impl(&head));
-//}
-//
-//RC_GTEST_PROP(STAILQ, elementIsRemoved, (std::vector<IntegerSTAILQueueNode> a)) {
-//
-//    mySTAILQueueHead head;
-//    IntegerSTAILQueueNode* temp;
-//    int index;
-//    int actualSize = 0;
-//    createList(head, a);
-//
-//    if (a.size() > 0) {
-//        index = std::rand() % a.size();
-//
-//        STAILQ_REMOVE_impl(&head, &a.at(index));
-//
-//        STAILQ_FOREACH(temp, &head, entries) {
-//            actualSize++;
-//        }
-//        EXPECT_EQ(a.size(), actualSize + 1);
-//    }
-//}
-//
-//RC_GTEST_PROP(STAILQ, elementAfterIsRemoved, (std::vector<IntegerSTAILQueueNode> a)) {
-//
-//    mySTAILQueueHead head;
-//    IntegerSTAILQueueNode* temp;
-//    int actualSize = 0;
-//    createList(head, a);
-//
-//    if (a.size() > 2) {
-//        STAILQ_REMOVE_AFTER_impl(&head, &a.at(0));
-//
-//        STAILQ_FOREACH(temp, &head, entries) {
-//            actualSize++;
-//        }
-//        EXPECT_EQ(head.stqh_first->entries.stqe_next, &a.at(2));
-//        EXPECT_EQ(a.size(), actualSize + 1);
-//    }
-//}
-//
-//RC_GTEST_PROP(STAILQ, removesHead, (std::vector<IntegerSTAILQueueNode> a)) {
-//
-//    mySTAILQueueHead head;
-//    createList(head, a);
-//
-//    if(a.size() > 0)STAILQ_REMOVE_HEAD_impl(&head);
-//    if(a.size() > 1)EXPECT_EQ(STAILQ_FIRST_impl(&head), &a.at(1));
-//    else if (a.size() == 1) RC_ASSERT(STAILQ_EMPTY_impl(&head));
-//}
-//
-//
-//RC_GTEST_PROP(STAILQ, doubleSwappingSTAILQAlwaysGivesInitialLists, (std::vector<IntegerSTAILQueueNode> a, std::vector<IntegerSTAILQueueNode> b)){
-//    mySTAILQueueHead headA;
-//    createList(headA, a);
-//    mySTAILQueueHead headB;
-//    createList(headB, b);
-//    IntegerSTAILQueueNode* var;
-//    unsigned int size = 0;
-//    STAILQ_FOREACH(var, &headA, entries) {
-//        RC_ASSERT(var->data == a.at(size).data);
-//        EXPECT_EQ(var, &a.at(size));
-//        size++;
-//    }
-//    EXPECT_EQ(size, a.size());
-//
-//    size = 0;
-//    STAILQ_FOREACH(var, &headB, entries) {
-//        RC_ASSERT(var->data == b.at(size).data);
-//        EXPECT_EQ(var, &b.at(size));
-//        size++;
-//    }
-//    EXPECT_EQ(size, b.size());
-//}
-//
-//
-//RC_GTEST_PROP(STAILQ, endIsAlwaysNull,
-//              (std::vector<IntegerSTAILQueueNode> a)) {
-//    mySTAILQueueHead head;
-//    createList(head, a);
-//    EXPECT_EQ(STAILQ_END_impl(&head), nullptr);
-//}
+RC_GTEST_PROP(TAILQ, nextElementIsCorrect, (std::vector<IntegerTAILQueueNode> a)) {
+
+    myTAILQueueHead head;
+    IntegerTAILQueueNode* next;
+    createList(head, a);
+    int index = 1;
+
+    TAILQ_FOREACH(next, &head, entries){
+        if (next && index < a.size())EXPECT_EQ (TAILQ_NEXT_impl(next), &a.at(index));
+        index++;
+    }
+}
+
+
+TEST(TAILQ, becomesEmptyWhenElementRemoved) {
+    IntegerTAILQueueNode entry;
+    myTAILQueueHead head;
+    TAILQ_INIT_impl(&head);
+    TAILQ_INSERT_HEAD_impl(&head, &entry);
+    TAILQ_REMOVE_impl(&head, &entry);
+    EXPECT_EQ (true, TAILQ_EMPTY_impl(&head));
+}
+
+RC_GTEST_PROP(TAILQ, elementIsRemoved, (std::vector<IntegerTAILQueueNode> a)) {
+
+    myTAILQueueHead head;
+    IntegerTAILQueueNode* temp;
+    int index;
+    int actualSize = 0;
+    createList(head, a);
+
+    if (a.size() > 0) {
+        index = std::rand() % a.size();
+
+        TAILQ_REMOVE_impl(&head, &a.at(index));
+
+        TAILQ_FOREACH(temp, &head, entries) {
+            actualSize++;
+        }
+        EXPECT_EQ(a.size(), actualSize + 1);
+    }
+}
+
+RC_GTEST_PROP(TAILQ, doubleSwappingTAILQAlwaysGivesInitialLists, (std::vector<IntegerTAILQueueNode> a, std::vector<IntegerTAILQueueNode> b)){
+    myTAILQueueHead headA;
+    createList(headA, a);
+    myTAILQueueHead headB;
+    createList(headB, b);
+    IntegerTAILQueueNode* var;
+    unsigned int size = 0;
+
+    TAILQ_SWAP_impl(&headA, &headB);
+    TAILQ_SWAP_impl(&headA, &headB);
+
+    TAILQ_FOREACH(var, &headA, entries) {
+        RC_ASSERT(var->data == a.at(size).data);
+        EXPECT_EQ(var, &a.at(size));
+        size++;
+    }
+    EXPECT_EQ(size, a.size());
+
+    size = 0;
+    TAILQ_FOREACH(var, &headB, entries) {
+        RC_ASSERT(var->data == b.at(size).data);
+        EXPECT_EQ(var, &b.at(size));
+        size++;
+    }
+    EXPECT_EQ(size, b.size());
+}
+
+
+RC_GTEST_PROP(TAILQ, endIsAlwaysNull,
+              (std::vector<IntegerTAILQueueNode> a)) {
+    myTAILQueueHead head;
+    createList(head, a);
+    EXPECT_EQ(TAILQ_END_impl(&head), nullptr);
+}

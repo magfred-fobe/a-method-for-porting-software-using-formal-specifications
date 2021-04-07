@@ -204,6 +204,10 @@ RC_GTEST_PROP(STAILQ, doubleSwappingSTAILQAlwaysGivesInitialLists, (std::vector<
     createList(headB, b);
     IntegerSTAILQueueNode* var;
     unsigned int size = 0;
+
+    STAILQ_SWAP_impl(&headA, &headB);
+    STAILQ_SWAP_impl(&headA, &headB);
+
     STAILQ_FOREACH(var, &headA, entries) {
         RC_ASSERT(var->data == a.at(size).data);
         EXPECT_EQ(var, &a.at(size));

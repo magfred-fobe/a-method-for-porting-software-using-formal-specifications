@@ -187,7 +187,7 @@ void STAILQ_REMOVE_HEAD_impl(mySTAILQueueHead *head) {
     } while (0);
 }
 
-void STAILQ_SWAP_impl(mySTAILQueueHead *head1, mySTAILQueueHead *head2, IntegerSTAILQueueNode) {
+void STAILQ_SWAP_impl(mySTAILQueueHead *head1, mySTAILQueueHead *head2) {
     do {
         IntegerSTAILQueueNode *swap_first = ((head1)->stqh_first);
         IntegerSTAILQueueNode **swap_last = (head1)->stqh_last;
