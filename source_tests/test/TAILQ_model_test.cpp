@@ -12,7 +12,7 @@ struct TAILQ_model {
     std::vector<int> list;
 };
 
-struct first: rc::state::Command<TAILQ_model, myTAILQueueHead> {
+struct TAILQ_first: rc::state::Command<TAILQ_model, myTAILQueueHead> {
     void run(const TAILQ_model &model, myTAILQueueHead &head) const override {
         if(model.list.empty())
             RC_ASSERT(TAILQ_FIRST_impl(&head) == nullptr);
@@ -25,7 +25,7 @@ struct first: rc::state::Command<TAILQ_model, myTAILQueueHead> {
     }
 };
 
-struct insert_head : rc::state::Command<TAILQ_model, myTAILQueueHead> {
+struct TAILQ_insert_head : rc::state::Command<TAILQ_model, myTAILQueueHead> {
     int val = *rc::gen::arbitrary<int>();
     void apply(TAILQ_model &model) const override {
         model.list.insert(model.list.begin(), 1, val);
@@ -44,7 +44,7 @@ struct insert_head : rc::state::Command<TAILQ_model, myTAILQueueHead> {
     }
 };
 
-struct insert_after : rc::state::Command<TAILQ_model, myTAILQueueHead> {
+struct TAILQ_insert_after : rc::state::Command<TAILQ_model, myTAILQueueHead> {
     unsigned int index = *rc::gen::arbitrary<unsigned int>();
     int val = *rc::gen::arbitrary<int>();
 
@@ -76,7 +76,7 @@ struct insert_after : rc::state::Command<TAILQ_model, myTAILQueueHead> {
     }
 };
 
-struct remove_element : rc::state::Command<TAILQ_model, myTAILQueueHead> {
+struct TAILQ_remove_element : rc::state::Command<TAILQ_model, myTAILQueueHead> {
     unsigned int index = *rc::gen::arbitrary<unsigned int>();
 
     void checkPreconditions(const TAILQ_model &model) const override {
@@ -102,7 +102,47 @@ struct remove_element : rc::state::Command<TAILQ_model, myTAILQueueHead> {
     }
 };
 
-struct swap : rc::state::Command<TAILQ_model, myTAILQueueHead> {
+struct TAILQ_prev_prev_fast : rc::state::Command<TAILQ_model, myTAILQueueHead> {
+    void checkPreconditions(const TAILQ_model &model) const override {
+        RC_PRE(!model.list.empty());
+    }
+
+    void run(const TAILQ_model &model, myTAILQueueHead &head) const override {
+        auto element_after = TAILQ_FIRST_impl(&head);
+        unsigned int after_index = *rc::gen::inRange<unsigned int>(0, model.list.size()-1);
+        for(int i = 0; i < after_index; i++)
+            element_after = TAILQ_NEXT_impl(element_after);
+        if(after_index == 0) {
+            RC_ASSERT(TAILQ_PREV_FAST_impl(element_after, &head) == nullptr);
+            RC_ASSERT(TAILQ_PREV_impl(element_after) == nullptr);
+            RC_SUCCEED();
+        }
+        RC_ASSERT(TAILQ_PREV_FAST_impl(element_after, &head)->data == model.list.at(after_index-1));
+        RC_ASSERT(TAILQ_PREV_impl(element_after)->data == model.list.at(after_index-1));
+    }
+
+    void show(std::ostream &os) const override {
+        os << "TAILQ_PREV";
+    }
+};
+
+struct TAILQ_last_last_fast : rc::state::Command<TAILQ_model, myTAILQueueHead> {
+    void run(const TAILQ_model &model, myTAILQueueHead &head) const override {
+        if(model.list.empty()) {
+            RC_ASSERT(TAILQ_LAST_FAST_impl(&head) == nullptr);
+            RC_ASSERT(TAILQ_LAST_impl(&head) == nullptr);
+            RC_SUCCEED();
+        }
+            RC_ASSERT(TAILQ_LAST_FAST_impl(&head)->data == model.list.back());
+            RC_ASSERT(TAILQ_LAST_impl(&head)->data == model.list.back());
+    }
+
+    void show(std::ostream &os) const override {
+        os << "TAILQ_LAST";
+    }
+};
+
+struct TAILQ_swap : rc::state::Command<TAILQ_model, myTAILQueueHead> {
     std::vector<int> swap_with = *rc::gen::arbitrary<std::vector<int>>();
 
     void apply(TAILQ_model &model) const override {
@@ -132,7 +172,7 @@ struct swap : rc::state::Command<TAILQ_model, myTAILQueueHead> {
     }
 };
 
-struct concatenate : rc::state::Command<TAILQ_model, myTAILQueueHead> {
+struct TAILQ_concatenate : rc::state::Command<TAILQ_model, myTAILQueueHead> {
     std::vector<int> concatenate_with = *rc::gen::arbitrary<std::vector<int>>();
 
     void apply(TAILQ_model &model) const override {
@@ -163,7 +203,7 @@ struct concatenate : rc::state::Command<TAILQ_model, myTAILQueueHead> {
     }
 };
 
-struct empty : rc::state::Command<TAILQ_model, myTAILQueueHead> {
+struct TAILQ_empty : rc::state::Command<TAILQ_model, myTAILQueueHead> {
     void run(const TAILQ_model &model, myTAILQueueHead &head1) const override {
         RC_ASSERT(model.list.empty() == TAILQ_EMPTY_impl(&head1));
     }
@@ -173,7 +213,7 @@ struct empty : rc::state::Command<TAILQ_model, myTAILQueueHead> {
     }
 };
 
-struct foreach : rc::state::Command<TAILQ_model, myTAILQueueHead> {
+struct TAILQ_foreach : rc::state::Command<TAILQ_model, myTAILQueueHead> {
     void run(const TAILQ_model &model, myTAILQueueHead &head) const override {
         auto entry = TAILQ_FIRST_impl(&head);
         for(int i = 0; i < model.list.size(); i++) {
@@ -188,7 +228,7 @@ struct foreach : rc::state::Command<TAILQ_model, myTAILQueueHead> {
     }
 };
 
-struct foreach_from : rc::state::Command<TAILQ_model, myTAILQueueHead> {
+struct TAILQ_foreach_from : rc::state::Command<TAILQ_model, myTAILQueueHead> {
     unsigned int random_index = *rc::gen::arbitrary<unsigned int>();
 
     void run(const TAILQ_model &model, myTAILQueueHead &head) const override {
@@ -211,7 +251,7 @@ struct foreach_from : rc::state::Command<TAILQ_model, myTAILQueueHead> {
 
 //RC will generate a sequence of valid operations based on each operations preconditions.
 //The results of the operations can are checked with an assumed to be correct model.
-TEST(STAILQ_model, sequenceOfOperationsAlwaysResultsInExpectedState){
+TEST(TAILQ_model, TAILQ_sequenceTest){
     RC_ASSERT(rc::check([] {
         TAILQ_model model;
         myTAILQueueHead head{};
@@ -219,15 +259,17 @@ TEST(STAILQ_model, sequenceOfOperationsAlwaysResultsInExpectedState){
         rc::state::check(model,
                          head,
                          rc::state::gen::execOneOfWithArgs<
-                                 insert_head
-                                ,first
-                                ,insert_after
-                                ,remove_element
-                                ,swap
-                                ,concatenate
-                                ,empty
-                                ,foreach
-                                ,foreach_from
+                                 TAILQ_insert_head
+                                ,TAILQ_first
+                                ,TAILQ_insert_after
+                                ,TAILQ_remove_element
+                                ,TAILQ_prev_prev_fast
+                                ,TAILQ_last_last_fast
+                                ,TAILQ_swap
+                                ,TAILQ_concatenate
+                                ,TAILQ_empty
+                                ,TAILQ_foreach
+                                ,TAILQ_foreach_from
                                 >());
     }));
 };

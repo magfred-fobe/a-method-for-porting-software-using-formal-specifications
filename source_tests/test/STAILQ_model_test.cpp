@@ -12,7 +12,7 @@ struct STAILQ_model {
     std::vector<int> list;
 };
 
-struct first: rc::state::Command<STAILQ_model, mySTAILQueueHead> {
+struct STAILQ_first: rc::state::Command<STAILQ_model, mySTAILQueueHead> {
     void run(const STAILQ_model &model, mySTAILQueueHead &head) const override {
         if(model.list.empty())
             RC_ASSERT(STAILQ_FIRST_impl(&head) == nullptr);
@@ -25,7 +25,21 @@ struct first: rc::state::Command<STAILQ_model, mySTAILQueueHead> {
     }
 };
 
-struct insert_head : rc::state::Command<STAILQ_model, mySTAILQueueHead> {
+
+struct STAILQ_last: rc::state::Command<STAILQ_model, mySTAILQueueHead> {
+    void run(const STAILQ_model &model, mySTAILQueueHead &head) const override {
+        if(model.list.empty())
+            RC_ASSERT(STAILQ_LAST_impl(&head) == nullptr);
+        else
+            RC_ASSERT(STAILQ_LAST_impl(&head)->data == model.list.back());
+    }
+
+    void show(std::ostream &os) const override {
+        os << "STAILQ_FIRST";
+    }
+};
+
+struct STAILQ_insert_head : rc::state::Command<STAILQ_model, mySTAILQueueHead> {
     int val = *rc::gen::arbitrary<int>();
     void apply(STAILQ_model &model) const override {
         model.list.insert(model.list.begin(), 1, val);
@@ -44,7 +58,7 @@ struct insert_head : rc::state::Command<STAILQ_model, mySTAILQueueHead> {
     }
 };
 
-struct insert_after : rc::state::Command<STAILQ_model, mySTAILQueueHead> {
+struct STAILQ_insert_after : rc::state::Command<STAILQ_model, mySTAILQueueHead> {
     unsigned int index = *rc::gen::arbitrary<unsigned int>();
     int val = *rc::gen::arbitrary<int>();
 
@@ -76,7 +90,7 @@ struct insert_after : rc::state::Command<STAILQ_model, mySTAILQueueHead> {
     }
 };
 
-struct remove_element : rc::state::Command<STAILQ_model, mySTAILQueueHead> {
+struct STAILQ_remove_element : rc::state::Command<STAILQ_model, mySTAILQueueHead> {
     unsigned int index = *rc::gen::arbitrary<unsigned int>();
 
     void checkPreconditions(const STAILQ_model &model) const override {
@@ -102,7 +116,7 @@ struct remove_element : rc::state::Command<STAILQ_model, mySTAILQueueHead> {
     }
 };
 
-struct remove_after : rc::state::Command<STAILQ_model, mySTAILQueueHead> {
+struct STAILQ_remove_after : rc::state::Command<STAILQ_model, mySTAILQueueHead> {
     unsigned int index = *rc::gen::arbitrary<unsigned int>();
 
     void checkPreconditions(const STAILQ_model &model) const override {
@@ -128,7 +142,7 @@ struct remove_after : rc::state::Command<STAILQ_model, mySTAILQueueHead> {
     }
 };
 
-struct remove_head : rc::state::Command<STAILQ_model, mySTAILQueueHead> {
+struct STAILQ_remove_head : rc::state::Command<STAILQ_model, mySTAILQueueHead> {
     //For every action, we can override checkPreconditions, to dynamically check if the action is valid
     //given the current state of the SUT
     void checkPreconditions(const STAILQ_model &model) const override {
@@ -158,7 +172,7 @@ struct remove_head : rc::state::Command<STAILQ_model, mySTAILQueueHead> {
     }
 };
 
-struct swap : rc::state::Command<STAILQ_model, mySTAILQueueHead> {
+struct STAILQ_swap : rc::state::Command<STAILQ_model, mySTAILQueueHead> {
     std::vector<int> swap_with = *rc::gen::arbitrary<std::vector<int>>();
 
     void apply(STAILQ_model &model) const override {
@@ -188,7 +202,7 @@ struct swap : rc::state::Command<STAILQ_model, mySTAILQueueHead> {
     }
 };
 
-struct concatenate : rc::state::Command<STAILQ_model, mySTAILQueueHead> {
+struct STAILQ_concatenate : rc::state::Command<STAILQ_model, mySTAILQueueHead> {
     std::vector<int> concatenate_with = *rc::gen::arbitrary<std::vector<int>>();
 
     void apply(STAILQ_model &model) const override {
@@ -219,7 +233,7 @@ struct concatenate : rc::state::Command<STAILQ_model, mySTAILQueueHead> {
     }
 };
 
-struct empty : rc::state::Command<STAILQ_model, mySTAILQueueHead> {
+struct STAILQ_empty : rc::state::Command<STAILQ_model, mySTAILQueueHead> {
     void run(const STAILQ_model &model, mySTAILQueueHead &head1) const override {
         RC_ASSERT(model.list.empty() == STAILQ_EMPTY_impl(&head1));
     }
@@ -229,7 +243,8 @@ struct empty : rc::state::Command<STAILQ_model, mySTAILQueueHead> {
     }
 };
 
-struct foreach : rc::state::Command<STAILQ_model, mySTAILQueueHead> {
+struct STAILQ_foreach : rc::state::Command<STAILQ_model, mySTAILQueueHead> {
+
     void run(const STAILQ_model &model, mySTAILQueueHead &head) const override {
         auto entry = STAILQ_FIRST_impl(&head);
         for(int i = 0; i < model.list.size(); i++) {
@@ -244,7 +259,7 @@ struct foreach : rc::state::Command<STAILQ_model, mySTAILQueueHead> {
     }
 };
 
-struct foreach_from : rc::state::Command<STAILQ_model, mySTAILQueueHead> {
+struct STAILQ_foreach_from : rc::state::Command<STAILQ_model, mySTAILQueueHead> {
     unsigned int random_index = *rc::gen::arbitrary<unsigned int>();
 
     void run(const STAILQ_model &model, mySTAILQueueHead &head) const override {
@@ -267,7 +282,7 @@ struct foreach_from : rc::state::Command<STAILQ_model, mySTAILQueueHead> {
 
 //RC will generate a sequence of valid operations based on each operations preconditions.
 //The results of the operations can are checked with an assumed to be correct model.
-TEST(SSTAILQ_model, sequenceOfOperationsAlwaysResultsInExpectedState){
+TEST(STAILQ_model, STAILQ_sequenceTest){
     RC_ASSERT(rc::check([] {
         STAILQ_model model;
         mySTAILQueueHead head{};
@@ -275,17 +290,18 @@ TEST(SSTAILQ_model, sequenceOfOperationsAlwaysResultsInExpectedState){
         rc::state::check(model,
                          head,
                          rc::state::gen::execOneOfWithArgs<
-                                 insert_head
-                                ,first
-                                ,insert_after
-                                ,remove_element
-                                ,remove_after
-                                ,remove_head
-                                ,swap
-                                ,concatenate
-                                ,empty
-                                ,foreach
-                                ,foreach_from
+                                 STAILQ_insert_head
+                                ,STAILQ_first
+                                ,STAILQ_last
+                                ,STAILQ_insert_after
+                                ,STAILQ_remove_element
+                                ,STAILQ_remove_after
+                                ,STAILQ_remove_head
+                                ,STAILQ_swap
+                                ,STAILQ_concatenate
+                                ,STAILQ_empty
+                                ,STAILQ_foreach
+                                ,STAILQ_foreach_from
                                 >());
     }));
 };

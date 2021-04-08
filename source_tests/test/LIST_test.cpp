@@ -455,6 +455,21 @@ RC_GTEST_PROP(LIST,
     }
 }
 
+RC_GTEST_PROP(LIST,
+              insertingBeforeAlwaysInsertsBefore,
+              (std::vector<IntegerLISTEntry> a)){
+    RC_PRE(!a.empty());
+    myLISTHead headA{};
+    createList(headA, a);
+    auto new_elm = *rc::gen::arbitrary<IntegerLISTEntry>();
+    unsigned int insert_index = *rc::gen::inRange<unsigned int>(1, a.size()-1);
+    LIST_INSERT_BEFORE_impl(&a.at(insert_index), &new_elm);
+    RC_ASSERT(*a.at(insert_index).entries.le_prev == new_elm.entries.le_next);
+    RC_ASSERT(&a.at(insert_index) == new_elm.entries.le_next);
+    RC_SUCCEED_IF(insert_index < 1);
+    RC_ASSERT(a.at(insert_index-1).entries.le_next == &new_elm);
+}
+
 RC_GTEST_PROP(LIST, endIsAlwaysNull,
               (std::vector<IntegerLISTEntry> a)) {
     myLISTHead head;
