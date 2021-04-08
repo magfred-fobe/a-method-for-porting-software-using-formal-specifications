@@ -47,6 +47,10 @@ void SLIST_INSERT_HEAD_impl(mySinglyLinkedListHead *head, IntegerSLISTEntry *elm
     } while (0);
 }
 
+IntegerSLISTEntry* SLIST_NEXT_impl(IntegerSLISTEntry* elm) {
+    return ((elm)->entries.sle_next);
+}
+
 void SLIST_REMOVE_impl(mySinglyLinkedListHead *head, IntegerSLISTEntry *elm) {
     do { ;
         if ((((head))->slh_first) ==
@@ -81,7 +85,7 @@ void SLIST_SWAP_impl(mySinglyLinkedListHead *head1, mySinglyLinkedListHead *head
     } while (0);
 }
 
-mySinglyLinkedListHead *SLIST_END_impl(mySinglyLinkedListHead *head) {
+IntegerSLISTEntry *SLIST_END_impl(mySinglyLinkedListHead *head) {
     return NULL;
 }
 

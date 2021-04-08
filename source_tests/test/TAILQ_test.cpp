@@ -12,7 +12,6 @@
 #include <rapidcheck/gtest.h>
 #include <algorithm>
 #include <cstdlib>
-#include <random>
 
 template<>
 struct rc::Arbitrary<IntegerTAILQueueNode> {
@@ -39,9 +38,9 @@ void createList(myTAILQueueHead &head,std::vector<IntegerTAILQueueNode> &ents) {
 RC_GTEST_PROP(TAILQ,
               concatenatingTAILQLists,
               (std::vector<IntegerTAILQueueNode> a, std::vector<IntegerTAILQueueNode> b)){
-    myTAILQueueHead headA;
+    myTAILQueueHead headA{};
     createList(headA, a);
-    myTAILQueueHead headB;
+    myTAILQueueHead headB{};
     createList(headB, b);
     IntegerTAILQueueNode* temp;
     IntegerTAILQueueNode* first = TAILQ_FIRST_impl(&headA);
@@ -57,20 +56,22 @@ RC_GTEST_PROP(TAILQ,
 
     EXPECT_EQ(true, TAILQ_EMPTY_impl(&headB));
     EXPECT_EQ(expectedSize, actualSize);
-    if(a.size() > 0) EXPECT_EQ(first, TAILQ_FIRST_impl(&headA));
-    else EXPECT_EQ(second, TAILQ_FIRST_impl(&headA));
+    if(!a.empty())
+        EXPECT_EQ(first, TAILQ_FIRST_impl(&headA));
+    else
+        EXPECT_EQ(second, TAILQ_FIRST_impl(&headA));
 }
 
 
 TEST(TAILQ, isInitiallyEmpty) {
-    myTAILQueueHead head;
+    myTAILQueueHead head{};
     TAILQ_INIT_impl(&head);
     EXPECT_EQ (true, TAILQ_EMPTY_impl(&head));
 }
 
 RC_GTEST_PROP(TAILQ, returnsFirstElement, (std::vector<IntegerTAILQueueNode> a)) {
 
-    myTAILQueueHead head;
+    myTAILQueueHead head{};
     createList(head, a);
     IntegerTAILQueueNode* first = TAILQ_FIRST_impl(&head);
 
@@ -79,7 +80,7 @@ RC_GTEST_PROP(TAILQ, returnsFirstElement, (std::vector<IntegerTAILQueueNode> a))
 }
 
 TEST(TAILQ, initWorksCorrectly) {
-    myTAILQueueHead head;
+    myTAILQueueHead head{};
     TAILQ_INIT_impl(&head);
     EXPECT_EQ (true, TAILQ_EMPTY_impl(&head));
     EXPECT_EQ(head.tqh_first, *head.tqh_last);
@@ -87,13 +88,13 @@ TEST(TAILQ, initWorksCorrectly) {
 
 RC_GTEST_PROP(TAILQ, isInsertedAfter, (std::vector<IntegerTAILQueueNode> a)) {
 
-    myTAILQueueHead head;
-    IntegerTAILQueueNode after;
-    int index;
+    myTAILQueueHead head{};
+    IntegerTAILQueueNode after = *rc::gen::arbitrary<IntegerTAILQueueNode>();
+    unsigned int index;
     createList(head, a);
 
     if (a.size() > 0) {
-        index = std::rand() % a.size();
+        index = *rc::gen::inRange<unsigned int>(0, a.size()-1);
         TAILQ_INSERT_AFTER_impl(&head, &a.at(index), &after);
         EXPECT_EQ (a.at(index).entries.tqe_next, &after);
     }
@@ -101,13 +102,13 @@ RC_GTEST_PROP(TAILQ, isInsertedAfter, (std::vector<IntegerTAILQueueNode> a)) {
 
 RC_GTEST_PROP(TAILQ, isInsertedBefore, (std::vector<IntegerTAILQueueNode> a)) {
 
-    myTAILQueueHead head;
-    IntegerTAILQueueNode before;
-    int index;
+    myTAILQueueHead head{};
+    IntegerTAILQueueNode before{};
+    unsigned int index;
     createList(head, a);
 
     if (a.size() > 0) {
-        index = std::rand() % a.size();
+        index = *rc::gen::inRange<unsigned int>(0, a.size()-1);
         TAILQ_INSERT_BEFORE_impl(&a.at(index), &before);
         EXPECT_EQ (&a.at(index), before.entries.tqe_next);
     }
@@ -116,8 +117,8 @@ RC_GTEST_PROP(TAILQ, isInsertedBefore, (std::vector<IntegerTAILQueueNode> a)) {
 
 RC_GTEST_PROP(TAILQ, headIsInserted, (std::vector<IntegerTAILQueueNode> a)) {
 
-    myTAILQueueHead head;
-    IntegerTAILQueueNode newHead;
+    myTAILQueueHead head{};
+    IntegerTAILQueueNode newHead{};
     createList(head, a);
 
     TAILQ_INSERT_HEAD_impl(&head, &newHead);
@@ -127,8 +128,8 @@ RC_GTEST_PROP(TAILQ, headIsInserted, (std::vector<IntegerTAILQueueNode> a)) {
 
 RC_GTEST_PROP(TAILQ, tailIsInserted, (std::vector<IntegerTAILQueueNode> a)) {
 
-    myTAILQueueHead head;
-    IntegerTAILQueueNode tail;
+    myTAILQueueHead head{};
+    IntegerTAILQueueNode tail{};
     createList(head, a);
 
     TAILQ_INSERT_TAIL_impl(&head, &tail);
@@ -138,7 +139,7 @@ RC_GTEST_PROP(TAILQ, tailIsInserted, (std::vector<IntegerTAILQueueNode> a)) {
 
 RC_GTEST_PROP(TAILQ, returnsLastElement, (std::vector<IntegerTAILQueueNode> a)) {
 
-    myTAILQueueHead head;
+    myTAILQueueHead head{};
     IntegerTAILQueueNode last = *rc::gen::arbitrary<IntegerTAILQueueNode>();
     createList(head, a);
 
@@ -150,21 +151,22 @@ RC_GTEST_PROP(TAILQ, returnsLastElement, (std::vector<IntegerTAILQueueNode> a)) 
 
 RC_GTEST_PROP(TAILQ, nextElementIsCorrect, (std::vector<IntegerTAILQueueNode> a)) {
 
-    myTAILQueueHead head;
+    myTAILQueueHead head{};
     IntegerTAILQueueNode* next;
     createList(head, a);
     int index = 1;
 
     TAILQ_FOREACH(next, &head, entries){
-        if (next && index < a.size())EXPECT_EQ (TAILQ_NEXT_impl(next), &a.at(index));
+        if (index < a.size())
+            EXPECT_EQ (TAILQ_NEXT_impl(next), &a.at(index));
         index++;
     }
 }
 
 
 TEST(TAILQ, becomesEmptyWhenElementRemoved) {
-    IntegerTAILQueueNode entry;
-    myTAILQueueHead head;
+    IntegerTAILQueueNode entry{};
+    myTAILQueueHead head{};
     TAILQ_INIT_impl(&head);
     TAILQ_INSERT_HEAD_impl(&head, &entry);
     TAILQ_REMOVE_impl(&head, &entry);
@@ -173,14 +175,14 @@ TEST(TAILQ, becomesEmptyWhenElementRemoved) {
 
 RC_GTEST_PROP(TAILQ, elementIsRemoved, (std::vector<IntegerTAILQueueNode> a)) {
 
-    myTAILQueueHead head;
+    myTAILQueueHead head{};
     IntegerTAILQueueNode* temp;
-    int index;
+    unsigned int index;
     int actualSize = 0;
     createList(head, a);
 
     if (a.size() > 0) {
-        index = std::rand() % a.size();
+        index = *rc::gen::inRange<unsigned int>(0, a.size()-1);
 
         TAILQ_REMOVE_impl(&head, &a.at(index));
 
@@ -192,9 +194,9 @@ RC_GTEST_PROP(TAILQ, elementIsRemoved, (std::vector<IntegerTAILQueueNode> a)) {
 }
 
 RC_GTEST_PROP(TAILQ, doubleSwappingTAILQAlwaysGivesInitialLists, (std::vector<IntegerTAILQueueNode> a, std::vector<IntegerTAILQueueNode> b)){
-    myTAILQueueHead headA;
+    myTAILQueueHead headA{};
     createList(headA, a);
-    myTAILQueueHead headB;
+    myTAILQueueHead headB{};
     createList(headB, b);
     IntegerTAILQueueNode* var;
     unsigned int size = 0;
@@ -221,7 +223,32 @@ RC_GTEST_PROP(TAILQ, doubleSwappingTAILQAlwaysGivesInitialLists, (std::vector<In
 
 RC_GTEST_PROP(TAILQ, endIsAlwaysNull,
               (std::vector<IntegerTAILQueueNode> a)) {
-    myTAILQueueHead head;
+    myTAILQueueHead head{};
     createList(head, a);
     EXPECT_EQ(TAILQ_END_impl(&head), nullptr);
+}
+
+RC_GTEST_PROP(TAILQ, prevIsAlwaysPrevious,
+              (std::vector<IntegerTAILQueueNode> a)) {
+    myTAILQueueHead head{};
+    RC_PRE(a.size() > 1);
+    createList(head, a);
+    auto next_index = *rc::gen::inRange<int>(1, a.size()-1);
+    auto entry = TAILQ_FIRST_impl(&head);
+    for(int i = 0; i < next_index; i++)
+        entry = TAILQ_NEXT_impl(entry);
+    RC_ASSERT(entry == &a.at(next_index));
+    RC_ASSERT(TAILQ_PREV_impl(entry) == &a.at(next_index-1));
+}
+
+RC_GTEST_PROP(TAILQ, prevFastIsAlwaysPrevious,
+              (std::vector<IntegerTAILQueueNode> a)) {
+    myTAILQueueHead head{};
+    RC_PRE(a.size() > 1);
+    createList(head, a);
+    auto next_index = *rc::gen::inRange<int>(1, a.size()-1);
+    auto entry = TAILQ_FIRST_impl(&head);
+    for(int i = 0; i < next_index; i++)
+        entry = TAILQ_NEXT_impl(entry);
+    RC_ASSERT(TAILQ_PREV_FAST_impl(entry, &head) == &a.at(next_index-1));
 }

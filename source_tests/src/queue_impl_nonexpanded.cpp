@@ -28,6 +28,10 @@ void SLIST_INSERT_HEAD_impl(mySinglyLinkedListHead* head,IntegerSLISTEntry* elm)
     SLIST_INSERT_HEAD(head, elm, entries);
 }
 
+IntegerSLISTEntry* SLIST_NEXT_impl(IntegerSLISTEntry* elm) {
+    return SLIST_NEXT(elm, entries);
+}
+
 void SLIST_REMOVE_impl(mySinglyLinkedListHead* head, IntegerSLISTEntry* elm) {
     SLIST_REMOVE(head, elm, IntegerSLISTEntry, entries);
 }
@@ -47,7 +51,7 @@ void SLIST_SWAP_impl(mySinglyLinkedListHead* head1,mySinglyLinkedListHead* head2
     SLIST_SWAP(head1, head2, IntegerSLISTEntry);
 }
 
-mySinglyLinkedListHead* SLIST_END_impl(mySinglyLinkedListHead *head) {
+IntegerSLISTEntry* SLIST_END_impl(mySinglyLinkedListHead *head) {
     return SLIST_END(head);
 }
 

@@ -45,12 +45,13 @@ void SLIST_CONCAT_impl(mySinglyLinkedListHead* head1, mySinglyLinkedListHead* he
 bool SLIST_EMPTY_impl(mySinglyLinkedListHead* head);
 void SLIST_INSERT_AFTER_impl(IntegerSLISTEntry* slistelm, IntegerSLISTEntry* elm);
 void SLIST_INSERT_HEAD_impl(mySinglyLinkedListHead* head,IntegerSLISTEntry* elm);
+IntegerSLISTEntry* SLIST_NEXT_impl(IntegerSLISTEntry* elm);
 void SLIST_REMOVE_impl(mySinglyLinkedListHead* head, IntegerSLISTEntry* elm);
 void SLIST_REMOVE_AFTER_impl(IntegerSLISTEntry* elm);
 void SLIST_REMOVE_HEAD_impl(mySinglyLinkedListHead* head);
 void SLIST_REMOVE_PREVPTR_impl(IntegerSLISTEntry**, IntegerSLISTEntry*);
 void SLIST_SWAP_impl(mySinglyLinkedListHead*,mySinglyLinkedListHead*);
-mySinglyLinkedListHead* SLIST_END_impl(mySinglyLinkedListHead*);
+IntegerSLISTEntry* SLIST_END_impl(mySinglyLinkedListHead*);
 IntegerSLISTEntry* SLIST_FIRST_impl(mySinglyLinkedListHead* h);
 
 //Singly Linked Tail Queue
