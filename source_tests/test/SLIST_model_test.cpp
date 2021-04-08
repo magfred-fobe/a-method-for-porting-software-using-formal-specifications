@@ -295,7 +295,7 @@ struct SLIST_foreach_from : rc::state::Command<SLIST_model, mySinglyLinkedListHe
 
 //RC will generate a sequence of valid operations based on each operations preconditions.
 //The results of the operations can are checked with an assumed to be correct model.
-TEST(SLIST_model, sequenceOfOperationsAlwaysResultsInExpectedState){
+TEST(SLIST_model, SLIST_sequenceTest){
     RC_ASSERT(rc::check([] {
         SLIST_model model;
         mySinglyLinkedListHead head{};
