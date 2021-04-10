@@ -2,11 +2,7 @@
 // Created by fredrik on 2021-04-07.
 //
 
-//
-// Created by fredrik on 2021-04-04.
-//
 #include "../src/queue_impl.h"
-#include "../src/queue.h"
 #include "gtest/gtest.h"
 #include <rapidcheck.h>
 #include <rapidcheck/gtest.h>

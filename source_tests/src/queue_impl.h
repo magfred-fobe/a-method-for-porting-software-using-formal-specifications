@@ -96,7 +96,6 @@ void TAILQ_INSERT_HEAD_impl(myTAILQueueHead* , IntegerTAILQueueNode*);
 void TAILQ_INSERT_TAIL_impl(myTAILQueueHead* , IntegerTAILQueueNode*);
 IntegerTAILQueueNode* TAILQ_LAST_impl(myTAILQueueHead*);
 IntegerTAILQueueNode* TAILQ_LAST_FAST_impl(myTAILQueueHead*);
-
 IntegerTAILQueueNode* TAILQ_NEXT_impl(IntegerTAILQueueNode*);
 IntegerTAILQueueNode* TAILQ_PREV_impl(IntegerTAILQueueNode*);
 IntegerTAILQueueNode* TAILQ_PREV_FAST_impl(IntegerTAILQueueNode*, myTAILQueueHead* );

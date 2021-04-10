@@ -1,0 +1,96 @@
+\documentclass{article}
+
+\usepackage{csquotes}
+\usepackage[giveninits=true]{biblatex}
+\usepackage{authblk}
+\usepackage{listings}
+\usepackage{amsmath}
+
+
+
+
+\begin{document}
+
+\title{Working Title}
+\author{Magnus Fredriksson}
+\author{Fredrik Öberg}
+\affil{Examiner: Leif Lindbäck}
+\affil{KTH Royal Institute of Technology, Sweden}
+\date{\today}
+\maketitle
+
+\begin{abstract}
+
+\begin{verbatim}
+
+        for [index = 0 to ITERATIONS by 2]{
+            for [i = 1 to GRIDSIZE j = i to GRIDSIZE]
+                new[i,j] = (grid[i-1,j] + grid[i+1,j] +
+                 grid[i,j-1] +  grid[i,j+1]) * 0.25
+	
+            for [i = 1 to GRIDSIZE j = i to GRIDSIZE]
+                grid[i,j] = (new[i-1,j] + new[i+1,j] + 
+                 new[i,j-1] +  new[i,j+1]) * 0.25
+        }
+
+\end{verbatim}
+
+\begin{lstlisting}[language=C]
+
+#include <stdlib.h>
+#include <stdio.h>
+
+int main(int argc, char *argv[]) {
+
+  
+    printf("Hello world!");
+   
+   return 0;
+}
+
+\end{lstlisting}
+
+\begin{displaymath} 
+	E = {mc^2} 
+\end{displaymath}
+
+
+$\alpha \exists \forall  \Leftrightarrow$
+
+\[\alpha \exists \forall  \Leftrightarrow\]
+
+\[ x^n + y^n = z^n \]
+
+\[E = {mc^2} \]
+\begin{equation}
+E=mc^3
+\end{equation}
+
+\begin{equation}
+E=mc^4
+\end{equation}
+
+\end{abstract}
+
+\newpage
+\tableofcontents
+\newpage
+
+\section{Introduction}
+
+\section{Background}\label{background}
+
+\section{Method}\label{method}
+
+ 
+\section{Result}\label{result}
+
+
+
+\section{Discussion}\label{discussion}
+
+
+\section{Conclusion}\label{conclusion}
+
+
+\end{document}
