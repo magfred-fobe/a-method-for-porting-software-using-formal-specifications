@@ -1,16 +1,16 @@
 ----------------------------- MODULE LinkedList -----------------------------
-CONSTANT NULL
-
 LOCAL INSTANCE TLC
 LOCAL INSTANCE FiniteSets
 LOCAL INSTANCE Sequences
 LOCAL INSTANCE Integers
+          
+CONSTANTS NULL, VALUE
                 
-PointerMaps(Nodes) == 
-    [Nodes -> Nodes \union {NULL}]
+PointerMaps(domain) == 
+    [domain -> [value: {VALUE}, next: domain \union {NULL}]]
     
 Range(f) == 
-    {f[x]: x \in DOMAIN f}
+    {f[x]["next"]: x \in DOMAIN f}
     
 Ring(LL)  ==  
     (DOMAIN  LL  =  Range(LL))
@@ -24,10 +24,11 @@ Cyclic(LL) ==
     
 isLinkedList(PointerMap) ==
     LET nodes == DOMAIN PointerMap 
-        all_seqs == [1..Cardinality(nodes) -> nodes] 
+        all_seqs == [1..Cardinality(nodes) -> nodes]
+        localRange(f) == {f[x]: x \in DOMAIN f}
     IN \E ordering \in all_seqs: 
-        /\ \A i \in 1..Len(ordering) - 1: PointerMap[ordering[i]] = ordering[i+1]
-        /\ nodes \subseteq Range(ordering)
+        /\ \A i \in 1..Len(ordering) - 1: PointerMap[ordering[i]]["next"] = ordering[i+1]
+        /\ nodes \subseteq localRange(ordering)
         /\ Cyclic(PointerMap) = FALSE
         /\ Ring(PointerMap) = FALSE
         

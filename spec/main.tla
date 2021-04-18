@@ -1,34 +1,34 @@
 -------------------------------- MODULE main --------------------------------
 EXTENDS TLC, FiniteSets, Sequences, Integers
-CONSTANTS NULL
+CONSTANTS NULL, VALUE
 INSTANCE LinkedList
                               
 (* --algorithm List
-variables domain = {"a", "b", "c"}, seq =[a |-> "c", b |-> "a", c |-> "b"], nod = DOMAIN seq, all = [1..Cardinality(nod) -> nod]
-
+variables domain = {"a", "b", "c"}, list = [domain -> [value : {1}, next: domain \union {NULL}]],
+pointermap = [a |-> [value |-> 1, next |-> "b"], b |-> [value |-> 1, next |-> NULL]],
+old = [a |-> "c", b |-> "a", c |-> NULL]
 begin
-   \* print isLinkedList(seq);
-   
-   print LinkedLists(domain);
-  \* print First(seq);
-  \* print Cyclic(seq);
-end algorithm;*)
-\* BEGIN TRANSLATION (chksum(pcal) = "e99507a8" /\ chksum(tla) = "603d3d3f")
-VARIABLES domain, seq, nod, all, pc
+    print isLinkedList(pointermap);
+    print LinkedLists(domain);
 
-vars == << domain, seq, nod, all, pc >>
+end algorithm;*)
+\* BEGIN TRANSLATION (chksum(pcal) = "eb8d7b3b" /\ chksum(tla) = "c66036a5")
+VARIABLES domain, list, pointermap, old, pc
+
+vars == << domain, list, pointermap, old, pc >>
 
 Init == (* Global variables *)
         /\ domain = {"a", "b", "c"}
-        /\ seq = [a |-> "c", b |-> "a", c |-> "b"]
-        /\ nod = DOMAIN seq
-        /\ all = [1..Cardinality(nod) -> nod]
+        /\ list = [domain -> [value : {1}, next: domain \union {NULL}]]
+        /\ pointermap = [a |-> [value |-> 1, next |-> "b"], b |-> [value |-> 1, next |-> NULL]]
+        /\ old = [a |-> "c", b |-> "a", c |-> NULL]
         /\ pc = "Lbl_1"
 
 Lbl_1 == /\ pc = "Lbl_1"
+         /\ PrintT(isLinkedList(pointermap))
          /\ PrintT(LinkedLists(domain))
          /\ pc' = "Done"
-         /\ UNCHANGED << domain, seq, nod, all >>
+         /\ UNCHANGED << domain, list, pointermap, old >>
 
 (* Allow infinite stuttering to prevent deadlock on termination. *)
 Terminating == pc = "Done" /\ UNCHANGED vars
@@ -41,4 +41,5 @@ Spec == Init /\ [][Next]_vars
 Termination == <>(pc = "Done")
 
 \* END TRANSLATION 
+
 =============================================================================
