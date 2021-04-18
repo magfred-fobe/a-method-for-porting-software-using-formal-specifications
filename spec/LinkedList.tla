@@ -33,9 +33,6 @@ isLinkedList(PointerMap) ==
         
 LinkedLists(Nodes) ==   
     IF NULL \in Nodes THEN Assert(FALSE, "Null cannot be in Nodes") 
-    ELSE LET node_subsets == (SUBSET Nodes \ {{}})
-             pointer_maps_sets == {PointerMaps(subn): subn \in node_subsets}
-             all_pointer_maps == UNION pointer_maps_sets
-         IN {pm \in all_pointer_maps : isLinkedList(pm)}
+    ELSE CHOOSE pm \in PointerMaps(Nodes) : isLinkedList(pm)
 
 ============================================================================
