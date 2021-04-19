@@ -4,31 +4,43 @@ CONSTANTS NULL, VALUE
 INSTANCE LinkedList
                               
 (* --algorithm List
-variables domain = {"a", "b", "c"}, list = [domain -> [value : {1}, next: domain \union {NULL}]],
-pointermap = [a |-> [value |-> 1, next |-> "b"], b |-> [value |-> 1, next |-> NULL]],
-old = [a |-> "c", b |-> "a", c |-> NULL]
+variables 
+list = [a |-> [next |-> "b", value |-> NULL]],
+domain = {"a","b","c","d","e","f"},
+old = [a |-> "b", b |-> "c", c |-> "a"]
+
+define
+head == CHOOSE h \in DOMAIN old: ~\E el \in DOMAIN old: old[el] = h
+
+isll(PointerMap) ==
+    \A el \in ((DOMAIN PointerMap \union {NULL}) \ {head}): \E x \in DOMAIN PointerMap : PointerMap[x] = el  /\ el /= x
+end define
+
 begin
-    print isLinkedList(pointermap);
-    print LinkedLists(domain);
-
+ print isll(old);
 end algorithm;*)
-\* BEGIN TRANSLATION (chksum(pcal) = "eb8d7b3b" /\ chksum(tla) = "c66036a5")
-VARIABLES domain, list, pointermap, old, pc
+\* BEGIN TRANSLATION (chksum(pcal) \in STRING /\ chksum(tla) = "8d133eca")
+VARIABLES list, domain, old, pc
 
-vars == << domain, list, pointermap, old, pc >>
+(* define statement *)
+head == CHOOSE h \in DOMAIN old: ~\E el \in DOMAIN old: old[el] = h
+
+isll(PointerMap) ==
+    \A el \in ((DOMAIN PointerMap \union {NULL}) \ {head}): \E x \in DOMAIN PointerMap : PointerMap[x] = el  /\ el /= x
+
+
+vars == << list, domain, old, pc >>
 
 Init == (* Global variables *)
-        /\ domain = {"a", "b", "c"}
-        /\ list = [domain -> [value : {1}, next: domain \union {NULL}]]
-        /\ pointermap = [a |-> [value |-> 1, next |-> "b"], b |-> [value |-> 1, next |-> NULL]]
-        /\ old = [a |-> "c", b |-> "a", c |-> NULL]
+        /\ list = [a |-> [next |-> "b", value |-> NULL]]
+        /\ domain = {"a","b","c","d","e","f"}
+        /\ old = [a |-> "b", b |-> "c", c |-> "a"]
         /\ pc = "Lbl_1"
 
 Lbl_1 == /\ pc = "Lbl_1"
-         /\ PrintT(isLinkedList(pointermap))
-         /\ PrintT(LinkedLists(domain))
+         /\ PrintT(isll(old))
          /\ pc' = "Done"
-         /\ UNCHANGED << domain, list, pointermap, old >>
+         /\ UNCHANGED << list, domain, old >>
 
 (* Allow infinite stuttering to prevent deadlock on termination. *)
 Terminating == pc = "Done" /\ UNCHANGED vars
