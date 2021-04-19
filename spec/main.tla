@@ -4,16 +4,25 @@ CONSTANTS NULL, VALUE
 INSTANCE LinkedList
                               
 (* --algorithm List
-variables domain = {"a", "b", "c"}, list = [domain -> [value : {1}, next: domain \union {NULL}]],
+variables domain = {"a", "b", "c"}, 
+list = [domain -> [value : {1}, next: domain \union {NULL}]],
 pointermap = [a |-> [value |-> 1, next |-> "b"], b |-> [value |-> 1, next |-> NULL]],
 old = [a |-> "c", b |-> "a", c |-> NULL]
+define
+    HasLast == \E l \in list: \E x \in DOMAIN l: l[x]["next"]= NULL \* invariant for all lists
+end define;
 begin
     print isLinkedList(pointermap);
     print LinkedLists(domain);
 
 end algorithm;*)
-\* BEGIN TRANSLATION (chksum(pcal) = "eb8d7b3b" /\ chksum(tla) = "c66036a5")
+\* BEGIN TRANSLATION (chksum(pcal) = "8117d045" /\ chksum(tla) = "322ef1f2")
 VARIABLES domain, list, pointermap, old, pc
+
+(* define statement *)
+HasLast == \E l \in list: \E x \in DOMAIN l: l[x]["next"]= NULL
+Fail == \A l \in list: \A x \in DOMAIN l: l[x]["next"]= NULL
+
 
 vars == << domain, list, pointermap, old, pc >>
 
@@ -41,5 +50,8 @@ Spec == Init /\ [][Next]_vars
 Termination == <>(pc = "Done")
 
 \* END TRANSLATION 
+
+
+
 
 =============================================================================
