@@ -4,13 +4,16 @@ CONSTANTS NULL, VALUE
 INSTANCE LinkedList
                               
 (* --algorithm List
+
 variables 
 list = [a |-> [next |-> "b", value |-> NULL]],
 domain = {"a","b","c","d","e","f"},
-old = [a |-> "b", b |-> "c", c |-> "a"]
+old = [a |-> NULL, b |-> "c", c |-> "a"]
 
 define
 head == CHOOSE h \in DOMAIN old: ~\E el \in DOMAIN old: old[el] = h
+
+HasLast == \E el \in DOMAIN list: list[el]["next"] = NULL \* invariant for all lists
 
 isll(PointerMap) ==
     \A el \in ((DOMAIN PointerMap \union {NULL}) \ {head}): \E x \in DOMAIN PointerMap : PointerMap[x] = el  /\ el /= x
@@ -19,11 +22,13 @@ end define
 begin
  print isll(old);
 end algorithm;*)
-\* BEGIN TRANSLATION (chksum(pcal) \in STRING /\ chksum(tla) = "8d133eca")
+\* BEGIN TRANSLATION (chksum(pcal) = "972e59bf" /\ chksum(tla) = "c03245d8")
 VARIABLES list, domain, old, pc
 
 (* define statement *)
 head == CHOOSE h \in DOMAIN old: ~\E el \in DOMAIN old: old[el] = h
+
+HasLast == \E el \in DOMAIN list: list[el]["next"] = NULL
 
 isll(PointerMap) ==
     \A el \in ((DOMAIN PointerMap \union {NULL}) \ {head}): \E x \in DOMAIN PointerMap : PointerMap[x] = el  /\ el /= x
@@ -34,7 +39,7 @@ vars == << list, domain, old, pc >>
 Init == (* Global variables *)
         /\ list = [a |-> [next |-> "b", value |-> NULL]]
         /\ domain = {"a","b","c","d","e","f"}
-        /\ old = [a |-> "b", b |-> "c", c |-> "a"]
+        /\ old = [a |-> NULL, b |-> "c", c |-> "a"]
         /\ pc = "Lbl_1"
 
 Lbl_1 == /\ pc = "Lbl_1"
@@ -53,5 +58,10 @@ Spec == Init /\ [][Next]_vars
 Termination == <>(pc = "Done")
 
 \* END TRANSLATION 
+
+
+
+
+
 
 =============================================================================
