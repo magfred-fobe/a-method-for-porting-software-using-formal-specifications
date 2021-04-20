@@ -18,8 +18,6 @@ Ring(LL)  ==
 First(LL) ==
     IF Ring(LL)THEN Assert(FALSE, "A Linked List Cannot be a ring")  
     ELSE CHOOSE node \in DOMAIN LL:node \notin Range(LL)
- 
-\*  LET head == CHOOSE h \in DOMAIN PointerMap: ~\E el \in DOMAIN PointerMap: PointerMap[el]["next"] = h 
     
 Cyclic(LL) == 
     NULL \notin Range(LL)
@@ -34,20 +32,26 @@ isLinkedList(PointerMap) ==
         /\ Cyclic(PointerMap) = FALSE
         /\ Ring(PointerMap) = FALSE
 
+\* A list may not contain cyclic references
 isll(PointerMap) ==
-    IF Cyclic(PointerMap) = FALSE /\ Ring(PointerMap) = FALSE THEN
-        \A el \in ((DOMAIN PointerMap \union {NULL}) \ {First(PointerMap)}): \E x \in DOMAIN PointerMap : PointerMap[x]["next"] = el  /\ el /= x
-    ELSE
-        FALSE
-       \* \E el \in DOMAIN PointerMap : PointerMap[el]["next"] = NULL
-     
- 
+       Cyclic(PointerMap) = FALSE 
+    /\ Ring(PointerMap) = FALSE
+    /\ \A el \in ((DOMAIN PointerMap \union {NULL}) \ {First(PointerMap)}): \E x \in DOMAIN PointerMap : PointerMap[x]["next"] = el  /\ el /= x
+
 LinkedLists(Nodes) ==   
     IF NULL \in Nodes THEN Assert(FALSE, "Null cannot be in Nodes") 
-    ELSE CHOOSE pm \in PointerMaps(Nodes) : isLinkedList(pm)
+    ELSE 
+    CHOOSE pm \in PointerMaps(Nodes) : isLinkedList(pm)
     
+\* The empty list is a list with an empty domain
 ll(Nodes) == 
-    IF NULL \in Nodes THEN Assert(FALSE, "Null cannot be in Nodes") 
-    ELSE CHOOSE pm \in PointerMaps(Nodes) : isll(pm)
+    IF NULL \in Nodes 
+        THEN Assert(FALSE, "Null cannot be in Nodes") 
+    ELSE
+        IF Nodes \subseteq {}
+            THEN [NULL |-> [next |-> NULL, value |-> NULL]]
+        ELSE
+            CHOOSE pm \in PointerMaps(Nodes) : isll(pm)
+
 
 ============================================================================

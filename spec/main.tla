@@ -6,9 +6,8 @@ INSTANCE LinkedList
 (* --algorithm List
 
 variables 
-list = [NULL |-> [next |-> NULL, value |-> NULL]],
-domain = 1..3,
-a =1;
+list = [a |-> [next |-> "a", value |-> NULL]],
+domain = 1..3
 
 
 
@@ -20,25 +19,24 @@ isllinv ==
      Cyclic(list) = FALSE /\ 
      Ring(list) = FALSE /\
      \A el \in ((DOMAIN list \union {NULL}) \ {First(list)}): \E x \in DOMAIN list : list[x]["next"] = el  /\ el /= x
-    
+
+\* head2 == CHOOSE h \in DOMAIN old: ~\E el \in DOMAIN old: old[el] = h  
 end define
 
 
-procedure Empty(l) begin 
-   Cardinality(DOMAIN l);
-   return;
-end procedure;
-
-
-
-begin
-  print list;
- \* InsertHead([a |-> "a"]);
-  Empty(list);
-  print a;
+begin  
+    print isll(list);   
+    \* Perform with a non empty and empty list
+    either 
+    list := ll({"a", "b", "c"});
+    or
+    list := ll({})
+    end either;
+    print isll(list);
+    print list;
 end algorithm;*)
-\* BEGIN TRANSLATION (chksum(pcal) = "486f16e" /\ chksum(tla) = "43524abe")
-VARIABLES list, domain, a, pc
+\* BEGIN TRANSLATION (chksum(pcal) = "56161191" /\ chksum(tla) = "37771161")
+VARIABLES list, domain, pc
 
 (* define statement *)
 HasLast ==
@@ -50,22 +48,21 @@ isllinv ==
      \A el \in ((DOMAIN list \union {NULL}) \ {First(list)}): \E x \in DOMAIN list : list[x]["next"] = el  /\ el /= x
 
 
-vars == << list, domain, a, pc >>
+vars == << list, domain, pc >>
 
 Init == (* Global variables *)
-        /\ list = [NULL |-> [next |-> NULL, value |-> NULL]]
+        /\ list = [a |-> [next |-> "a", value |-> NULL]]
         /\ domain = 1..3
-        /\ a = 1
         /\ pc = "Lbl_1"
 
 Lbl_1 == /\ pc = "Lbl_1"
-         /\ PrintT(list)
-         /\ Assert(Cardinality(DOMAIN list) = 1, 
-                   "Failure of assertion at line 28, column 4 of macro called at line 38, column 3.")
-         /\ PrintT(Empty(list))
-         /\ PrintT(a)
+         /\ PrintT(isll(list))
+         /\ \/ /\ list' = ll({"a", "b", "c"})
+            \/ /\ list' = ll({})
+         /\ PrintT(isll(list'))
+         /\ PrintT(list')
          /\ pc' = "Done"
-         /\ UNCHANGED << list, domain, a >>
+         /\ UNCHANGED domain
 
 (* Allow infinite stuttering to prevent deadlock on termination. *)
 Terminating == pc = "Done" /\ UNCHANGED vars
@@ -78,9 +75,6 @@ Spec == Init /\ [][Next]_vars
 Termination == <>(pc = "Done")
 
 \* END TRANSLATION 
-
-
-
 
 
 
