@@ -17,10 +17,18 @@ HasLast == \E el \in DOMAIN list: list[el]["next"] = NULL \* invariant for all l
 end define
 
 begin
-\*  print PointerMaps(domain);   
-  print ll(domain);
+    print isll(list);   
+    \* Perform with a non empty and empty list
+    either 
+    list := ll({"a", "b", "c"});
+    or
+    list := ll({})
+    end either;
+    print isll(list);
+    print list;
+    
 end algorithm;*)
-\* BEGIN TRANSLATION (chksum(pcal) = "bf086545" /\ chksum(tla) = "fb327ade")
+\* BEGIN TRANSLATION (chksum(pcal) = "67f41eb9" /\ chksum(tla) = "73dd3056")
 VARIABLES list, domain, old, pc
 
 (* define statement *)
@@ -38,9 +46,13 @@ Init == (* Global variables *)
         /\ pc = "Lbl_1"
 
 Lbl_1 == /\ pc = "Lbl_1"
-         /\ PrintT(ll(domain))
+         /\ PrintT(isll(list))
+         /\ \/ /\ list' = ll({"a", "b", "c"})
+            \/ /\ list' = ll({})
+         /\ PrintT(isll(list'))
+         /\ PrintT(list')
          /\ pc' = "Done"
-         /\ UNCHANGED << list, domain, old >>
+         /\ UNCHANGED << domain, old >>
 
 (* Allow infinite stuttering to prevent deadlock on termination. *)
 Terminating == pc = "Done" /\ UNCHANGED vars
