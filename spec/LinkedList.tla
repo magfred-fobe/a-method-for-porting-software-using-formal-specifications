@@ -38,6 +38,7 @@ isll(PointerMap) ==
     /\ Ring(PointerMap) = FALSE
     /\ \A el \in ((DOMAIN PointerMap \union {NULL}) \ {First(PointerMap)}): \E x \in DOMAIN PointerMap : PointerMap[x]["next"] = el  /\ el /= x
 
+
 LinkedLists(Nodes) ==   
     IF NULL \in Nodes THEN Assert(FALSE, "Null cannot be in Nodes") 
     ELSE 
