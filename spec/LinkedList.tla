@@ -3,9 +3,9 @@ LOCAL INSTANCE TLC
 LOCAL INSTANCE FiniteSets
 LOCAL INSTANCE Sequences
 LOCAL INSTANCE Integers
-          
-CONSTANTS NULL, VALUE
-                
+CONSTANTS VALUE, NULL
+
+
 PointerMaps(domain) == 
     [domain -> [value: {VALUE}, next: domain \union {NULL}]]
     
@@ -14,6 +14,9 @@ Range(f) ==
     
 Ring(LL)  ==  
     (DOMAIN  LL  =  Range(LL))
+
+IsNull(v) == 
+    v \in {NULL, "NULL"}
     
 First(LL) ==
     IF Ring(LL)THEN Assert(FALSE, "A Linked List Cannot be a ring")  
@@ -44,13 +47,12 @@ LinkedLists(Nodes) ==
     ELSE 
     CHOOSE pm \in PointerMaps(Nodes) : isLinkedList(pm)
     
-\* The empty list is a list with an empty domain
+\* empty domain gives an empty list
 ll(Nodes) == 
     IF NULL \in Nodes 
         THEN Assert(FALSE, "Null cannot be in Nodes") 
-    ELSE
-        IF Nodes \subseteq {}
-            THEN [NULL |-> [next |-> NULL, value |-> NULL]]
+     ELSE IF Nodes \subseteq {}
+            THEN <<>>
         ELSE
             CHOOSE pm \in PointerMaps(Nodes) : isll(pm)
 
