@@ -1,6 +1,7 @@
 -------------------------------- MODULE main --------------------------------
+
 EXTENDS TLC, FiniteSets, Sequences, Integers
-CONSTANTS NULL, VALUE
+CONSTANTS VALUE, NULL
 INSTANCE LinkedList
                               
 (* --algorithm List
@@ -20,7 +21,6 @@ isllinv ==
      Ring(list) = FALSE /\
      \A el \in ((DOMAIN list \union {NULL}) \ {First(list)}): \E x \in DOMAIN list : list[x]["next"] = el  /\ el /= x
 
-
 Empty(l) == 
     Cardinality(DOMAIN l) = 1 /\ \E el \in DOMAIN l: el = "NULL"
 
@@ -28,7 +28,8 @@ Empty(l) ==
 InsertHead(head) == 
    IF Empty(list) THEN head 
    ELSE head
-    
+  
+
 \* head2 == CHOOSE h \in DOMAIN old: ~\E el \in DOMAIN old: old[el] = h  
 end define
 
@@ -48,7 +49,7 @@ begin
     print Empty(list);
     print list;
 end algorithm;*)
-\* BEGIN TRANSLATION (chksum(pcal) = "65db66f2" /\ chksum(tla) = "9618d17")
+\* BEGIN TRANSLATION (chksum(pcal) = "959e9895" /\ chksum(tla) = "9618d17")
 VARIABLES list, domain, pc
 
 (* define statement *)
@@ -61,10 +62,8 @@ isllinv ==
      Ring(list) = FALSE /\
      \A el \in ((DOMAIN list \union {NULL}) \ {First(list)}): \E x \in DOMAIN list : list[x]["next"] = el  /\ el /= x
 
-
 Empty(l) ==
     Cardinality(DOMAIN l) = 1 /\ \E el \in DOMAIN l: el = "NULL"
-
 
 
 InsertHead(head) ==
