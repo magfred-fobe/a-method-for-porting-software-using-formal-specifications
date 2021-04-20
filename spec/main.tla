@@ -3,8 +3,6 @@ EXTENDS TLC, FiniteSets, Sequences, Integers
 CONSTANTS VALUE, NULL
 INSTANCE LinkedList
 (* --algorithm List
-
-
                          
 variables 
 list = [NULL |-> [next |-> NULL, value |-> NULL]],
@@ -19,8 +17,10 @@ HasLast ==
 isllinv ==
      Cyclic(list) = FALSE /\
      Ring(list) = FALSE /\
-     \A el \in ((DOMAIN list \union {NULL}) \ {First(list)}): \E x \in DOMAIN list : list[x]["next"] = el  /\ el /= x
+     \A el \in ((DOMAIN list \union {0}) \ {First(list)}): \E x \in DOMAIN list : list[x]["next"] = el  /\ el /= x
 
+
+IncerementAfter(l) == <<>>
 
 Empty(l) == 
     Cardinality(DOMAIN l) = 0
@@ -31,6 +31,16 @@ InsertHead(val) ==
     <<[next |-> NULL, value |-> val ]>>
    ELSE \* link a new element in as head of list
     Append(list, [next |-> First(list), value |-> val])
+
+InsertAfter(index) == 
+   IF Cardinality(DOMAIN list) < index
+   THEN \* create a new list with 1 element 
+   Assert(FALSE, "Can not insert after element not in list")
+   ELSE \* link a new element in as head of list
+   Append(IncerementAfter(list), [next |-> First(list), value |-> 1])
+
+IncrementAfter(index) ==
+   \A el \in list: el["next"] > index 
     
 \* head2 == CHOOSE h \in DOMAIN old: ~\E el \in DOMAIN old: old[el] = h  
 end define
@@ -47,14 +57,17 @@ begin
     print isll(list);
     print list;*)
     list := ll({});
-    print Empty(list);
+    list := InsertHead(1);
+    
     list := InsertHead(1);
     print list;
-    print InsertHead(2);
-    print Append(<<[next |-> NULL, value |-> 1]>>,[next |-> NULL, value |-> 1]);
+    list := InsertHead(2);
+    print list;
+    
+    print {incrementAt \in DOMAIN list: IsNull(list[incrementAt]["next"]) = FALSE /\ list[incrementAt]["next"] >= 1};
     print DOMAIN list;
 end algorithm;*)
-\* BEGIN TRANSLATION (chksum(pcal) = "4d3ec07b" /\ chksum(tla) = "7550f151")
+\* BEGIN TRANSLATION (chksum(pcal) = "798f10a8" /\ chksum(tla) = "8171d28c")
 VARIABLES list, domain, pc
 
 (* define statement *)
@@ -65,8 +78,10 @@ HasLast ==
 isllinv ==
      Cyclic(list) = FALSE /\
      Ring(list) = FALSE /\
-     \A el \in ((DOMAIN list \union {NULL}) \ {First(list)}): \E x \in DOMAIN list : list[x]["next"] = el  /\ el /= x
+     \A el \in ((DOMAIN list \union {0}) \ {First(list)}): \E x \in DOMAIN list : list[x]["next"] = el  /\ el /= x
 
+
+IncerementAfter(l) == <<>>
 
 Empty(l) ==
     Cardinality(DOMAIN l) = 0
@@ -78,6 +93,16 @@ InsertHead(val) ==
    ELSE
     Append(list, [next |-> First(list), value |-> val])
 
+InsertAfter(index) ==
+   IF Cardinality(DOMAIN list) < index
+   THEN
+   Assert(FALSE, "Can not insert after element not in list")
+   ELSE
+   Append(IncerementAfter(list), [next |-> First(list), value |-> 1])
+
+IncrementAfter(index) ==
+   \A el \in list: el["next"] > index
+
 
 vars == << list, domain, pc >>
 
@@ -88,15 +113,24 @@ Init == (* Global variables *)
 
 Lbl_1 == /\ pc = "Lbl_1"
          /\ list' = ll({})
-         /\ PrintT(Empty(list'))
          /\ pc' = "Lbl_2"
          /\ UNCHANGED domain
 
 Lbl_2 == /\ pc = "Lbl_2"
          /\ list' = InsertHead(1)
+         /\ pc' = "Lbl_3"
+         /\ UNCHANGED domain
+
+Lbl_3 == /\ pc = "Lbl_3"
+         /\ list' = InsertHead(1)
          /\ PrintT(list')
-         /\ PrintT(InsertHead(2))
-         /\ PrintT(Append(<<[next |-> NULL, value |-> 1]>>,[next |-> NULL, value |-> 1]))
+         /\ pc' = "Lbl_4"
+         /\ UNCHANGED domain
+
+Lbl_4 == /\ pc = "Lbl_4"
+         /\ list' = InsertHead(2)
+         /\ PrintT(list')
+         /\ PrintT({incrementAt \in DOMAIN list': IsNull(list'[incrementAt]["next"]) = FALSE /\ list'[incrementAt]["next"] >= 1})
          /\ PrintT(DOMAIN list')
          /\ pc' = "Done"
          /\ UNCHANGED domain
@@ -104,7 +138,7 @@ Lbl_2 == /\ pc = "Lbl_2"
 (* Allow infinite stuttering to prevent deadlock on termination. *)
 Terminating == pc = "Done" /\ UNCHANGED vars
 
-Next == Lbl_1 \/ Lbl_2
+Next == Lbl_1 \/ Lbl_2 \/ Lbl_3 \/ Lbl_4
            \/ Terminating
 
 Spec == Init /\ [][Next]_vars
