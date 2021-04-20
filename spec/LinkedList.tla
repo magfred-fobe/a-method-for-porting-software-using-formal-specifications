@@ -36,8 +36,7 @@ isLinkedList(PointerMap) ==
 
 isll(PointerMap) ==
     IF Cyclic(PointerMap) = FALSE /\ Ring(PointerMap) = FALSE THEN
-      \*  LET head == CHOOSE h \in DOMAIN PointerMap: ~\E el \in DOMAIN PointerMap: PointerMap[el]["next"] = h
-         \A el \in ((DOMAIN PointerMap \union {NULL}) \ {First(PointerMap)}): \E x \in DOMAIN PointerMap : PointerMap[x]["next"] = el  /\ el /= x
+        \A el \in ((DOMAIN PointerMap \union {NULL}) \ {First(PointerMap)}): \E x \in DOMAIN PointerMap : PointerMap[x]["next"] = el  /\ el /= x
     ELSE
         FALSE
        \* \E el \in DOMAIN PointerMap : PointerMap[el]["next"] = NULL
@@ -49,6 +48,6 @@ LinkedLists(Nodes) ==
     
 ll(Nodes) == 
     IF NULL \in Nodes THEN Assert(FALSE, "Null cannot be in Nodes") 
-    ELSE { pm \in PointerMaps(Nodes) : isll(pm)}
+    ELSE CHOOSE pm \in PointerMaps(Nodes) : isll(pm)
 
 ============================================================================
