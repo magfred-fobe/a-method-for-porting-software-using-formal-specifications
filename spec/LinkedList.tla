@@ -3,9 +3,11 @@ LOCAL INSTANCE TLC
 LOCAL INSTANCE FiniteSets
 LOCAL INSTANCE Sequences
 LOCAL INSTANCE Integers
+
+          
 CONSTANTS VALUE, NULL
-
-
+ 
+               
 PointerMaps(domain) == 
     [domain -> [value: {VALUE}, next: domain \union {NULL}]]
     

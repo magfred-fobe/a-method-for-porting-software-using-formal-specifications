@@ -1,9 +1,9 @@
 -------------------------------- MODULE main --------------------------------
+
 EXTENDS TLC, FiniteSets, Sequences, Integers
 CONSTANTS VALUE, NULL
 INSTANCE LinkedList
 (* --algorithm List
-                         
 variables 
 list = [NULL |-> [next |-> NULL, value |-> NULL]],
 domain = 1..4
@@ -19,8 +19,6 @@ isllinv ==
      Ring(list) = FALSE /\
      \A el \in ((DOMAIN list \union {0}) \ {First(list)}): \E x \in DOMAIN list : list[x]["next"] = el  /\ el /= x
 
-
-IncerementAfter(l) == <<>>
 
 Empty(l) == 
     Cardinality(DOMAIN l) = 0
@@ -67,7 +65,7 @@ begin
     print {incrementAt \in DOMAIN list: IsNull(list[incrementAt]["next"]) = FALSE /\ list[incrementAt]["next"] >= 1};
     print DOMAIN list;
 end algorithm;*)
-\* BEGIN TRANSLATION (chksum(pcal) = "798f10a8" /\ chksum(tla) = "8171d28c")
+\* BEGIN TRANSLATION (chksum(pcal) = "b87369b3" /\ chksum(tla) = "854e6eb0")
 VARIABLES list, domain, pc
 
 (* define statement *)
@@ -80,8 +78,6 @@ isllinv ==
      Ring(list) = FALSE /\
      \A el \in ((DOMAIN list \union {0}) \ {First(list)}): \E x \in DOMAIN list : list[x]["next"] = el  /\ el /= x
 
-
-IncerementAfter(l) == <<>>
 
 Empty(l) ==
     Cardinality(DOMAIN l) = 0
@@ -146,6 +142,8 @@ Spec == Init /\ [][Next]_vars
 Termination == <>(pc = "Done")
 
 \* END TRANSLATION 
+
+
 
 
 
