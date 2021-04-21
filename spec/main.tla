@@ -26,17 +26,28 @@ InsertHead(val) ==
    ELSE
     list @@ (CHOOSE x \in [{NewLabel} -> [next: {First(list)}, value: {1}]]:TRUE)
 
-    
+Remove(label) ==  
+    \*CHOOSE l \in [DOMAIN list \ {label} -> [value: VALUE, next: Range(list) \ {label}]]: \A d \in DOMAIN list \ label: l[d]["next"]: 
+       CHOOSE l \in [(DOMAIN list) \ {label} -> [value: VALUE, next: Range(list) \ {label}]]:
+        \A d \in ((DOMAIN list) \ {label}): (l[d]["next"] = list[d]["next"] \/ (list[d]["next"] = label /\ l[d]["next"] = list[list[d]["next"]]["next"]))
+
 
 end define
 begin
     PRESTART:
-    list := ll({"a", "b", "c"});
-    print list["b"];
+    list := ll({"f", "g", "h"});
+    print "BEFORE";
+    print list;
+    print "REMOVED";
+    REMOVE:
+    list := Remove("h");
+    print list;
+    
+    print "===";
     \* Perform with a non empty and empty list 
     START:
     either
-    list := ll({"a", "b", "c"});
+    list := ll({"f", "g", "h"});
     or
     list := ll({})
     end either;
@@ -81,7 +92,7 @@ print list;
 end while;
     
 end algorithm;*)
-\* BEGIN TRANSLATION (chksum(pcal) = "74dc5efc" /\ chksum(tla) = "1a57d133")
+\* BEGIN TRANSLATION (chksum(pcal) = "ff3b7a44" /\ chksum(tla) = "33bacec")
 VARIABLES i, list, characters, domain, old, temp, pc
 
 (* define statement *)
@@ -99,6 +110,11 @@ InsertHead(val) ==
    ELSE
     list @@ (CHOOSE x \in [{NewLabel} -> [next: {First(list)}, value: {1}]]:TRUE)
 
+Remove(label) ==
+
+       CHOOSE l \in [(DOMAIN list) \ {label} -> [value: VALUE, next: Range(list) \ {label}]]:
+        \A d \in ((DOMAIN list) \ {label}): (l[d]["next"] = list[d]["next"] \/ (list[d]["next"] = label /\ l[d]["next"] = list[list[d]["next"]]["next"]))
+
 
 vars == << i, list, characters, domain, old, temp, pc >>
 
@@ -112,13 +128,22 @@ Init == (* Global variables *)
         /\ pc = "PRESTART"
 
 PRESTART == /\ pc = "PRESTART"
-            /\ list' = ll({"a", "b", "c"})
-            /\ PrintT(list'["b"])
-            /\ pc' = "START"
+            /\ list' = ll({"f", "g", "h"})
+            /\ PrintT("BEFORE")
+            /\ PrintT(list')
+            /\ PrintT("REMOVED")
+            /\ pc' = "REMOVE"
             /\ UNCHANGED << i, characters, domain, old, temp >>
 
+REMOVE == /\ pc = "REMOVE"
+          /\ list' = Remove("h")
+          /\ PrintT(list')
+          /\ PrintT("===")
+          /\ pc' = "START"
+          /\ UNCHANGED << i, characters, domain, old, temp >>
+
 START == /\ pc = "START"
-         /\ \/ /\ list' = ll({"a", "b", "c"})
+         /\ \/ /\ list' = ll({"f", "g", "h"})
             \/ /\ list' = ll({})
          /\ pc' = "LOOP"
          /\ UNCHANGED << i, characters, domain, old, temp >>
@@ -160,7 +185,7 @@ INCREMENT == /\ pc = "INCREMENT"
 (* Allow infinite stuttering to prevent deadlock on termination. *)
 Terminating == pc = "Done" /\ UNCHANGED vars
 
-Next == PRESTART \/ START \/ LOOP \/ INCREMENT
+Next == PRESTART \/ REMOVE \/ START \/ LOOP \/ INCREMENT
            \/ Terminating
 
 Spec == Init /\ [][Next]_vars
