@@ -31,7 +31,7 @@ InsertHead(val) ==
 
 \* with next[label] == list[label]["next"]
 \* Find a function so that each element lab in the domain of the list U an arbitrary new label
-\* maps to list[lab] except, for list[label] which maps to the new label, and new label which maps to list[label] 
+\* maps to lext[lab] except, for label which maps to the new label, and new label which maps to next[label] 
 InsertAfter(label) == 
     IF label \notin DOMAIN list THEN
         Assert("FALSE", "CAN NOT INSERT AFTER ELEMENT NOT IN LIST")
