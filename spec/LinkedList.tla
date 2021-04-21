@@ -43,6 +43,8 @@ isll(PointerMap) ==
 Empty(l) == 
     Cardinality(DOMAIN l) = 1 /\ \E el \in DOMAIN l: el = "NULL"
 
+EmptyList == 
+    [NULL |-> [next |-> NULL, value |-> NULL]]
 
 LinkedLists(Nodes) ==   
     IF NULL \in Nodes THEN Assert(FALSE, "Null cannot be in Nodes") 
@@ -55,7 +57,7 @@ ll(Nodes) ==
         THEN Assert(FALSE, "Null cannot be in Nodes") 
     ELSE
         IF Nodes \subseteq {}
-            THEN [NULL |-> [next |-> NULL, value |-> NULL]]
+            THEN EmptyList
         ELSE
             CHOOSE pm \in PointerMaps(Nodes) : isll(pm)
 

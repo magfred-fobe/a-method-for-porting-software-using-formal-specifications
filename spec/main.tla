@@ -1,12 +1,13 @@
 -------------------------------- MODULE main --------------------------------
-EXTENDS TLC, FiniteSets, Sequences, Integers
+EXTENDS FiniteSets, Sequences, Integers
+LOCAL INSTANCE TLC
 CONSTANTS NULL, VALUE
 INSTANCE LinkedList
                               
 (* --algorithm List
 variables 
 i = 0,
-list = [a |-> [next |-> "b", value |-> NULL]],
+list = ll({}),
 characters = {"x", "y", "z"},
 domain = {"a", "b"},
 old = [a |-> NULL, b |-> "c", c |-> "a"],
@@ -14,7 +15,7 @@ temp = NULL
 define
 head2 == CHOOSE h \in DOMAIN old: ~\E el \in DOMAIN old: old[el] = h
 
-HasLast == \E el \in DOMAIN list: list[el]["next"] = NULL \* invariant for all lists
+HasLast == Empty(list) \/ \E el \in DOMAIN list: list[el]["next"] = NULL \* invariant for all lists
 
 NewLabel ==
     CHOOSE label \in {x \o z: x \in DOMAIN list, z \in characters}: label \notin DOMAIN list
@@ -26,79 +27,53 @@ InsertHead(val) ==
    ELSE
     list @@ (CHOOSE x \in [{NewLabel} -> [next: {First(list)}, value: {1}]]:TRUE)
 
-Remove(label) ==  
+\* Find a function from the domain of list excluding the removed element, the new function returns the same value as list,
+\* except if the list pointed to the removed elemnt, in which case the fuction returns list[label]["next"]
+Remove ==  
+    IF Empty(list) THEN
+        list
+    ELSE IF DOMAIN list = {First(list)}
+     THEN 
+     EmptyList
+     ELSE
     \*CHOOSE l \in [DOMAIN list \ {label} -> [value: VALUE, next: Range(list) \ {label}]]: \A d \in DOMAIN list \ label: l[d]["next"]: 
-       CHOOSE l \in [(DOMAIN list) \ {label} -> [value: VALUE, next: Range(list) \ {label}]]:
+       LET label == CHOOSE x \in DOMAIN list: TRUE
+       IN CHOOSE l \in [(DOMAIN list) \ {label} -> [value: VALUE, next: Range(list) \ {label}]]:
         \A d \in ((DOMAIN list) \ {label}): (l[d]["next"] = list[d]["next"] \/ (list[d]["next"] = label /\ l[d]["next"] = list[list[d]["next"]]["next"]))
 
 
 end define
 begin
-    PRESTART:
-    list := ll({"f", "g", "h"});
-    print "BEFORE";
-    print list;
-    print "REMOVED";
-    REMOVE:
-    list := Remove("h");
-    print list;
-    
-    print "===";
     \* Perform with a non empty and empty list 
     START:
     either
     list := ll({"f", "g", "h"});
     or
-    list := ll({})
+    skip;\*list := ll({})
     end either;
 LOOP:
- while i < 2 do
+ while i < 5 do
     either 
-       \*Concat:
-       skip;
-    or
-       \*InsertAfter:
-       skip;
-    or
        list := InsertHead(2)
     or
-        \*Next2:
-        skip;
-    or
-        \*Remove:
-        skip;
-    or
-        \*RemoveAfter:
-        skip;
-    or
-        \*RemoveHead:
-        skip;
-    or
-        \*RemovePrev:
-        skip;
-    or
-        \*Swap:
-        skip; 
-    or
-        \*End:
-        skip;
-    or
-        \*First2:
-        skip;
+       list := Remove;
     end either;
 INCREMENT:
    i := i+1;
+print "=== LIST IS ===";
 print list;
+\* This should also be an invariant
+assert HasLast;
 end while;
     
 end algorithm;*)
-\* BEGIN TRANSLATION (chksum(pcal) = "ff3b7a44" /\ chksum(tla) = "33bacec")
+\* BEGIN TRANSLATION (chksum(pcal) = "92497c27" /\ chksum(tla) = "8e8b0ed3")
 VARIABLES i, list, characters, domain, old, temp, pc
 
 (* define statement *)
 head2 == CHOOSE h \in DOMAIN old: ~\E el \in DOMAIN old: old[el] = h
 
-HasLast == \E el \in DOMAIN list: list[el]["next"] = NULL
+HasLast == Empty(list) \/ \E el \in DOMAIN list: list[el]["next"] = NULL
 
 NewLabel ==
     CHOOSE label \in {x \o z: x \in DOMAIN list, z \in characters}: label \notin DOMAIN list
@@ -110,9 +85,18 @@ InsertHead(val) ==
    ELSE
     list @@ (CHOOSE x \in [{NewLabel} -> [next: {First(list)}, value: {1}]]:TRUE)
 
-Remove(label) ==
 
-       CHOOSE l \in [(DOMAIN list) \ {label} -> [value: VALUE, next: Range(list) \ {label}]]:
+
+Remove ==
+    IF Empty(list) THEN
+        list
+    ELSE IF DOMAIN list = {First(list)}
+     THEN
+     EmptyList
+     ELSE
+
+       LET label == CHOOSE x \in DOMAIN list: TRUE
+       IN CHOOSE l \in [(DOMAIN list) \ {label} -> [value: VALUE, next: Range(list) \ {label}]]:
         \A d \in ((DOMAIN list) \ {label}): (l[d]["next"] = list[d]["next"] \/ (list[d]["next"] = label /\ l[d]["next"] = list[list[d]["next"]]["next"]))
 
 
@@ -120,57 +104,24 @@ vars == << i, list, characters, domain, old, temp, pc >>
 
 Init == (* Global variables *)
         /\ i = 0
-        /\ list = [a |-> [next |-> "b", value |-> NULL]]
+        /\ list = ll({})
         /\ characters = {"x", "y", "z"}
         /\ domain = {"a", "b"}
         /\ old = [a |-> NULL, b |-> "c", c |-> "a"]
         /\ temp = NULL
-        /\ pc = "PRESTART"
-
-PRESTART == /\ pc = "PRESTART"
-            /\ list' = ll({"f", "g", "h"})
-            /\ PrintT("BEFORE")
-            /\ PrintT(list')
-            /\ PrintT("REMOVED")
-            /\ pc' = "REMOVE"
-            /\ UNCHANGED << i, characters, domain, old, temp >>
-
-REMOVE == /\ pc = "REMOVE"
-          /\ list' = Remove("h")
-          /\ PrintT(list')
-          /\ PrintT("===")
-          /\ pc' = "START"
-          /\ UNCHANGED << i, characters, domain, old, temp >>
+        /\ pc = "START"
 
 START == /\ pc = "START"
          /\ \/ /\ list' = ll({"f", "g", "h"})
-            \/ /\ list' = ll({})
+            \/ /\ TRUE
+               /\ list' = list
          /\ pc' = "LOOP"
          /\ UNCHANGED << i, characters, domain, old, temp >>
 
 LOOP == /\ pc = "LOOP"
-        /\ IF i < 2
-              THEN /\ \/ /\ TRUE
-                         /\ list' = list
-                      \/ /\ TRUE
-                         /\ list' = list
-                      \/ /\ list' = InsertHead(2)
-                      \/ /\ TRUE
-                         /\ list' = list
-                      \/ /\ TRUE
-                         /\ list' = list
-                      \/ /\ TRUE
-                         /\ list' = list
-                      \/ /\ TRUE
-                         /\ list' = list
-                      \/ /\ TRUE
-                         /\ list' = list
-                      \/ /\ TRUE
-                         /\ list' = list
-                      \/ /\ TRUE
-                         /\ list' = list
-                      \/ /\ TRUE
-                         /\ list' = list
+        /\ IF i < 5
+              THEN /\ \/ /\ list' = InsertHead(2)
+                      \/ /\ list' = Remove
                    /\ pc' = "INCREMENT"
               ELSE /\ pc' = "Done"
                    /\ list' = list
@@ -178,14 +129,16 @@ LOOP == /\ pc = "LOOP"
 
 INCREMENT == /\ pc = "INCREMENT"
              /\ i' = i+1
+             /\ PrintT("=== LIST IS ===")
              /\ PrintT(list)
+             /\ Assert(HasLast, "Failure of assertion at line 66, column 1.")
              /\ pc' = "LOOP"
              /\ UNCHANGED << list, characters, domain, old, temp >>
 
 (* Allow infinite stuttering to prevent deadlock on termination. *)
 Terminating == pc = "Done" /\ UNCHANGED vars
 
-Next == PRESTART \/ REMOVE \/ START \/ LOOP \/ INCREMENT
+Next == START \/ LOOP \/ INCREMENT
            \/ Terminating
 
 Spec == Init /\ [][Next]_vars
