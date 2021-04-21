@@ -29,17 +29,21 @@ InsertHead(val) ==
    ELSE
     list @@ (CHOOSE x \in [{NewLabel} -> [next: {First(list)}, value: {1}]]:TRUE)
 
+\* with next[label] == list[label]["next"]
+\* Find a function so that each element lab in the domain of the list U an arbitrary new label
+\* maps to list[lab] except, for list[label] which maps to the new label, and new label which maps to list[label] 
 InsertAfter(label) == 
     IF label \notin DOMAIN list THEN
         Assert("FALSE", "CAN NOT INSERT AFTER ELEMENT NOT IN LIST")
     ELSE
         LET nl == {NewLabel}
+        next(lab) == list[lab]["next"]
         IN
         CHOOSE l \in [DOMAIN list \union nl -> [value: VALUE, next: Range(list) \union nl]]:
             \A d \in DOMAIN list \union nl:
                 (d = label /\ l[d]["next"] \in nl)
-            \/  (d \in nl /\ l[d]["next"] = list[label]["next"])
-            \/  (d \notin {label} \union nl  /\ l[d]["next"] = list[d]["next"])
+            \/  (d \in nl /\ l[d]["next"] = next(label))
+            \/  (d \notin {label} \union nl  /\ l[d]["next"] = next(d))
 
 \* Find a function from the domain of list excluding the removed element, the new function returns the same value as list,
 \* except if the list pointed to the removed elemnt, in which case the fuction returns list[label]["next"]
@@ -95,7 +99,7 @@ assert HasLast;
 end while;
     
 end algorithm;*)
-\* BEGIN TRANSLATION (chksum(pcal) = "bb447818" /\ chksum(tla) = "115f657c")
+\* BEGIN TRANSLATION (chksum(pcal) = "801629e3" /\ chksum(tla) = "efbec0c2")
 VARIABLES i, list, characters, domain, old, temp, pc
 
 (* define statement *)
@@ -115,17 +119,21 @@ InsertHead(val) ==
    ELSE
     list @@ (CHOOSE x \in [{NewLabel} -> [next: {First(list)}, value: {1}]]:TRUE)
 
+
+
+
 InsertAfter(label) ==
     IF label \notin DOMAIN list THEN
         Assert("FALSE", "CAN NOT INSERT AFTER ELEMENT NOT IN LIST")
     ELSE
         LET nl == {NewLabel}
+        next(lab) == list[lab]["next"]
         IN
         CHOOSE l \in [DOMAIN list \union nl -> [value: VALUE, next: Range(list) \union nl]]:
             \A d \in DOMAIN list \union nl:
                 (d = label /\ l[d]["next"] \in nl)
-            \/  (d \in nl /\ l[d]["next"] = list[label]["next"])
-            \/  (d \notin {label} \union nl  /\ l[d]["next"] = list[d]["next"])
+            \/  (d \in nl /\ l[d]["next"] = next(label))
+            \/  (d \notin {label} \union nl  /\ l[d]["next"] = next(d))
 
 
 
@@ -173,7 +181,7 @@ c == /\ pc = "c"
 
 d == /\ pc = "d"
      /\ PrintT("=====DEBUG DONE=====")
-     /\ Assert(FALSE, "Failure of assertion at line 73, column 5.")
+     /\ Assert(FALSE, "Failure of assertion at line 77, column 5.")
      /\ \/ /\ list' = ll({"f", "g", "h"})
         \/ /\ TRUE
            /\ list' = list
@@ -194,7 +202,7 @@ INCREMENT == /\ pc = "INCREMENT"
              /\ i' = i+1
              /\ PrintT("=== LIST IS ===")
              /\ PrintT(list)
-             /\ Assert(HasLast, "Failure of assertion at line 94, column 1.")
+             /\ Assert(HasLast, "Failure of assertion at line 98, column 1.")
              /\ pc' = "LOOP"
              /\ UNCHANGED << list, characters, domain, old, temp >>
 
