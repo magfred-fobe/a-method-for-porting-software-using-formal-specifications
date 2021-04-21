@@ -54,7 +54,7 @@ ll(Nodes) ==
     IF NULL \in Nodes 
         THEN Assert(FALSE, "Null cannot be in Nodes") 
      ELSE IF Nodes \subseteq {}
-            THEN <<>>
+            THEN [NULL |-> [value |-> NULL, next |-> NULL]]
         ELSE
             CHOOSE pm \in PointerMaps(Nodes) : isll(pm)
 

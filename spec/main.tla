@@ -6,8 +6,12 @@ INSTANCE LinkedList
 (* --algorithm List
                         
 variables 
-list = [NULL |-> [next |-> NULL, value |-> NULL]],
-domain = 1..4
+list = [NULL |-> [value |-> NULL, next |-> NULL]],
+domain = 1..4,
+values \in 1..10,
+i = 0,
+characters = {"a", "b", "c", "d"},
+char
 
 define
 \* invariant for all lists
@@ -21,39 +25,74 @@ isllinv ==
      \A el \in ((DOMAIN list \union {NULL}) \ {First(list)}): \E x \in DOMAIN list : list[x]["next"] = el  /\ el /= x
 
 Empty(l) == 
-    Cardinality(DOMAIN l) = 0
+    Cardinality(DOMAIN l) = 1 /\ \E el \in DOMAIN l: el = "NULL"
 
-InsertHead(val) == 
+NewLabel ==
+    CHOOSE label \in {x \o z: x \in DOMAIN list, z \in characters}: label \notin DOMAIN list
+
+InsertHead2(val) == 
    IF Empty(list)
    THEN \* create a new list with 1 element 
     <<[next |-> NULL, value |-> val ]>>
    ELSE \* link a new element in as head of list
     Append(list, [next |-> First(list), value |-> val])
     
-\* head2 == CHOOSE h \in DOMAIN old: ~\E el \in DOMAIN old: old[el] = h  
 end define
 
 
 begin  
-  (*  print isll(list);   
-    \* Perform with a non empty and empty list
+LOOP:
+ while i < 2 do
     either 
-    list := ll({"a", "b", "c"});
+       Concat:
+       skip;
     or
-    list := ll({})
+       InsertAfter:
+       skip;
+    or
+       InsertHead:
+       if Empty(list) then goto B else goto C end if;
+         B:
+          list := CHOOSE x \in [{NewLabel} -> [next: {NULL}, value: {1}]]: TRUE;
+         C:
+          list :=  list @@ (CHOOSE x \in [{NewLabel} -> [next: {First(list)}, value: {1}]]:TRUE);   
+    or
+        Next2:
+        skip;
+    or
+        Remove:
+        skip;
+    or
+        RemoveAfter:
+        skip;
+    or
+        RemoveHead:
+        skip;
+    or
+        RemovePrev:
+        skip;
+    or
+        Swap:
+        skip; 
+    or
+        End:
+        skip;
+    or
+        First2:
+        skip;       
     end either;
-    print isll(list);
-    print list;*)
-    list := ll({});
-    print Empty(list);
-    list := InsertHead(1);
-    print list;
-    print InsertHead(2);
-    print Append(<<[next |-> NULL, value |-> 1]>>,[next |-> NULL, value |-> 1]);
-    print DOMAIN list;
+    
+INCREMENT:
+   i := i+1;
+        
+PRINT: 
+   print list;
+   
+end while  
 end algorithm;*)
-\* BEGIN TRANSLATION (chksum(pcal) = "80d72a87" /\ chksum(tla) = "7550f151")
-VARIABLES list, domain, pc
+\* BEGIN TRANSLATION (chksum(pcal) = "307ff922" /\ chksum(tla) = "c8803241")
+CONSTANT defaultInitValue
+VARIABLES list, domain, values, i, characters, char, pc
 
 (* define statement *)
 HasLast ==
@@ -66,9 +105,12 @@ isllinv ==
      \A el \in ((DOMAIN list \union {NULL}) \ {First(list)}): \E x \in DOMAIN list : list[x]["next"] = el  /\ el /= x
 
 Empty(l) ==
-    Cardinality(DOMAIN l) = 0
+    Cardinality(DOMAIN l) = 1 /\ \E el \in DOMAIN l: el = "NULL"
 
-InsertHead(val) ==
+NewLabel ==
+    CHOOSE label \in {x \o z: x \in DOMAIN list, z \in characters}: label \notin DOMAIN list
+
+InsertHead2(val) ==
    IF Empty(list)
    THEN
     <<[next |-> NULL, value |-> val ]>>
@@ -76,32 +118,115 @@ InsertHead(val) ==
     Append(list, [next |-> First(list), value |-> val])
 
 
-vars == << list, domain, pc >>
+vars == << list, domain, values, i, characters, char, pc >>
 
 Init == (* Global variables *)
-        /\ list = [NULL |-> [next |-> NULL, value |-> NULL]]
+        /\ list = [NULL |-> [value |-> NULL, next |-> NULL]]
         /\ domain = 1..4
-        /\ pc = "Lbl_1"
+        /\ values \in 1..10
+        /\ i = 0
+        /\ characters = {"a", "b", "c", "d"}
+        /\ char = defaultInitValue
+        /\ pc = "LOOP"
 
-Lbl_1 == /\ pc = "Lbl_1"
-         /\ list' = ll({})
-         /\ PrintT(Empty(list'))
-         /\ pc' = "Lbl_2"
-         /\ UNCHANGED domain
+LOOP == /\ pc = "LOOP"
+        /\ IF i < 2
+              THEN /\ \/ /\ pc' = "Concat"
+                      \/ /\ pc' = "InsertAfter"
+                      \/ /\ pc' = "InsertHead"
+                      \/ /\ pc' = "Next2"
+                      \/ /\ pc' = "Remove"
+                      \/ /\ pc' = "RemoveAfter"
+                      \/ /\ pc' = "RemoveHead"
+                      \/ /\ pc' = "RemovePrev"
+                      \/ /\ pc' = "Swap"
+                      \/ /\ pc' = "End"
+                      \/ /\ pc' = "First2"
+              ELSE /\ pc' = "Done"
+        /\ UNCHANGED << list, domain, values, i, characters, char >>
 
-Lbl_2 == /\ pc = "Lbl_2"
-         /\ list' = InsertHead(1)
-         /\ PrintT(list')
-         /\ PrintT(InsertHead(2))
-         /\ PrintT(Append(<<[next |-> NULL, value |-> 1]>>,[next |-> NULL, value |-> 1]))
-         /\ PrintT(DOMAIN list')
-         /\ pc' = "Done"
-         /\ UNCHANGED domain
+INCREMENT == /\ pc = "INCREMENT"
+             /\ i' = i+1
+             /\ pc' = "PRINT"
+             /\ UNCHANGED << list, domain, values, characters, char >>
+
+PRINT == /\ pc = "PRINT"
+         /\ PrintT(list)
+         /\ pc' = "LOOP"
+         /\ UNCHANGED << list, domain, values, i, characters, char >>
+
+Concat == /\ pc = "Concat"
+          /\ TRUE
+          /\ pc' = "INCREMENT"
+          /\ UNCHANGED << list, domain, values, i, characters, char >>
+
+InsertAfter == /\ pc = "InsertAfter"
+               /\ TRUE
+               /\ pc' = "INCREMENT"
+               /\ UNCHANGED << list, domain, values, i, characters, char >>
+
+InsertHead == /\ pc = "InsertHead"
+              /\ IF Empty(list)
+                    THEN /\ pc' = "B"
+                    ELSE /\ pc' = "C"
+              /\ UNCHANGED << list, domain, values, i, characters, char >>
+
+B == /\ pc = "B"
+     /\ list' = (CHOOSE x \in [{NewLabel} -> [next: {NULL}, value: {1}]]: TRUE)
+     /\ pc' = "C"
+     /\ UNCHANGED << domain, values, i, characters, char >>
+
+C == /\ pc = "C"
+     /\ list' = list @@ (CHOOSE x \in [{NewLabel} -> [next: {First(list)}, value: {1}]]:TRUE)
+     /\ pc' = "INCREMENT"
+     /\ UNCHANGED << domain, values, i, characters, char >>
+
+Next2 == /\ pc = "Next2"
+         /\ TRUE
+         /\ pc' = "INCREMENT"
+         /\ UNCHANGED << list, domain, values, i, characters, char >>
+
+Remove == /\ pc = "Remove"
+          /\ TRUE
+          /\ pc' = "INCREMENT"
+          /\ UNCHANGED << list, domain, values, i, characters, char >>
+
+RemoveAfter == /\ pc = "RemoveAfter"
+               /\ TRUE
+               /\ pc' = "INCREMENT"
+               /\ UNCHANGED << list, domain, values, i, characters, char >>
+
+RemoveHead == /\ pc = "RemoveHead"
+              /\ TRUE
+              /\ pc' = "INCREMENT"
+              /\ UNCHANGED << list, domain, values, i, characters, char >>
+
+RemovePrev == /\ pc = "RemovePrev"
+              /\ TRUE
+              /\ pc' = "INCREMENT"
+              /\ UNCHANGED << list, domain, values, i, characters, char >>
+
+Swap == /\ pc = "Swap"
+        /\ TRUE
+        /\ pc' = "INCREMENT"
+        /\ UNCHANGED << list, domain, values, i, characters, char >>
+
+End == /\ pc = "End"
+       /\ TRUE
+       /\ pc' = "INCREMENT"
+       /\ UNCHANGED << list, domain, values, i, characters, char >>
+
+First2 == /\ pc = "First2"
+          /\ TRUE
+          /\ pc' = "INCREMENT"
+          /\ UNCHANGED << list, domain, values, i, characters, char >>
 
 (* Allow infinite stuttering to prevent deadlock on termination. *)
 Terminating == pc = "Done" /\ UNCHANGED vars
 
-Next == Lbl_1 \/ Lbl_2
+Next == LOOP \/ INCREMENT \/ PRINT \/ Concat \/ InsertAfter \/ InsertHead
+           \/ B \/ C \/ Next2 \/ Remove \/ RemoveAfter \/ RemoveHead
+           \/ RemovePrev \/ Swap \/ End \/ First2
            \/ Terminating
 
 Spec == Init /\ [][Next]_vars
@@ -110,6 +235,7 @@ Termination == <>(pc = "Done")
 
 \* END TRANSLATION 
 
+\* END TRANSLATION 
 
 
 
