@@ -18,14 +18,14 @@ Ring(LL)  ==
     (DOMAIN  LL  =  Range(LL))
 
 IsNull(v) == 
-    v \in {NULL, "NULL"}
+    v \in {0, NULL}
     
 First(LL) ==
     IF Ring(LL)THEN Assert(FALSE, "A Linked List Cannot be a ring")  
     ELSE CHOOSE node \in DOMAIN LL:node \notin Range(LL)
     
 Cyclic(LL) == 
-    NULL \notin Range(LL)
+    0 \notin Range(LL)
     
 isLinkedList(PointerMap) ==
     LET nodes == DOMAIN PointerMap 
@@ -41,17 +41,17 @@ isLinkedList(PointerMap) ==
 isll(PointerMap) ==
        Cyclic(PointerMap) = FALSE 
     /\ Ring(PointerMap) = FALSE
-    /\ \A el \in ((DOMAIN PointerMap \union {NULL}) \ {First(PointerMap)}): \E x \in DOMAIN PointerMap : PointerMap[x]["next"] = el  /\ el /= x
+    /\ \A el \in ((DOMAIN PointerMap \union {0}) \ {First(PointerMap)}): \E x \in DOMAIN PointerMap : PointerMap[x]["next"] = el  /\ el /= x
 
 
 LinkedLists(Nodes) ==   
-    IF NULL \in Nodes THEN Assert(FALSE, "Null cannot be in Nodes") 
+    IF 0 \in Nodes THEN Assert(FALSE, "Null cannot be in Nodes") 
     ELSE 
     CHOOSE pm \in PointerMaps(Nodes) : isLinkedList(pm)
     
 \* empty domain gives an empty list
 ll(Nodes) == 
-    IF NULL \in Nodes 
+    IF 0 \in Nodes 
         THEN Assert(FALSE, "Null cannot be in Nodes") 
      ELSE IF Nodes \subseteq {}
             THEN [NULL |-> [value |-> NULL, next |-> NULL]]

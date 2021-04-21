@@ -4,7 +4,6 @@ EXTENDS TLC, FiniteSets, Sequences, Integers
 CONSTANTS VALUE, NULL
 INSTANCE LinkedList
 (* --algorithm List
-                        
 variables 
 list = [NULL |-> [value |-> NULL, next |-> NULL]],
 domain = 1..4,
@@ -22,7 +21,8 @@ HasLast ==
 isllinv ==
      Cyclic(list) = FALSE /\
      Ring(list) = FALSE /\
-     \A el \in ((DOMAIN list \union {NULL}) \ {First(list)}): \E x \in DOMAIN list : list[x]["next"] = el  /\ el /= x
+     \A el \in ((DOMAIN list \union {0}) \ {First(list)}): \E x \in DOMAIN list : list[x]["next"] = el  /\ el /= x
+
 
 Empty(l) == 
     Cardinality(DOMAIN l) = 1 /\ \E el \in DOMAIN l: el = "NULL"
@@ -36,7 +36,9 @@ InsertHead2(val) ==
     <<[next |-> NULL, value |-> val ]>>
    ELSE \* link a new element in as head of list
     Append(list, [next |-> First(list), value |-> val])
-    
+
+
+
 end define
 
 
@@ -90,7 +92,7 @@ PRINT:
    
 end while  
 end algorithm;*)
-\* BEGIN TRANSLATION (chksum(pcal) = "307ff922" /\ chksum(tla) = "c8803241")
+\* BEGIN TRANSLATION (chksum(pcal) = "acb1a6ef" /\ chksum(tla) = "71309034")
 CONSTANT defaultInitValue
 VARIABLES list, domain, values, i, characters, char, pc
 
@@ -102,7 +104,8 @@ HasLast ==
 isllinv ==
      Cyclic(list) = FALSE /\
      Ring(list) = FALSE /\
-     \A el \in ((DOMAIN list \union {NULL}) \ {First(list)}): \E x \in DOMAIN list : list[x]["next"] = el  /\ el /= x
+     \A el \in ((DOMAIN list \union {0}) \ {First(list)}): \E x \in DOMAIN list : list[x]["next"] = el  /\ el /= x
+
 
 Empty(l) ==
     Cardinality(DOMAIN l) = 1 /\ \E el \in DOMAIN l: el = "NULL"
@@ -234,9 +237,6 @@ Spec == Init /\ [][Next]_vars
 Termination == <>(pc = "Done")
 
 \* END TRANSLATION 
-
-\* END TRANSLATION 
-
 
 
 
