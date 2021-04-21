@@ -9,7 +9,8 @@ i = 0,
 list = [a |-> [next |-> "b", value |-> NULL]],
 characters = {"x", "y", "z"},
 domain = {"a", "b"},
-old = [a |-> NULL, b |-> "c", c |-> "a"]
+old = [a |-> NULL, b |-> "c", c |-> "a"],
+temp = NULL
 define
 head2 == CHOOSE h \in DOMAIN old: ~\E el \in DOMAIN old: old[el] = h
 
@@ -25,9 +26,13 @@ InsertHead(val) ==
    ELSE
     list @@ (CHOOSE x \in [{NewLabel} -> [next: {First(list)}, value: {1}]]:TRUE)
 
+    
 
 end define
 begin
+    PRESTART:
+    list := ll({"a", "b", "c"});
+    print list["b"];
     \* Perform with a non empty and empty list 
     START:
     either
@@ -76,8 +81,8 @@ print list;
 end while;
     
 end algorithm;*)
-\* BEGIN TRANSLATION (chksum(pcal) = "e5178769" /\ chksum(tla) = "2e2ef562")
-VARIABLES i, list, characters, domain, old, pc
+\* BEGIN TRANSLATION (chksum(pcal) = "74dc5efc" /\ chksum(tla) = "1a57d133")
+VARIABLES i, list, characters, domain, old, temp, pc
 
 (* define statement *)
 head2 == CHOOSE h \in DOMAIN old: ~\E el \in DOMAIN old: old[el] = h
@@ -95,7 +100,7 @@ InsertHead(val) ==
     list @@ (CHOOSE x \in [{NewLabel} -> [next: {First(list)}, value: {1}]]:TRUE)
 
 
-vars == << i, list, characters, domain, old, pc >>
+vars == << i, list, characters, domain, old, temp, pc >>
 
 Init == (* Global variables *)
         /\ i = 0
@@ -103,13 +108,20 @@ Init == (* Global variables *)
         /\ characters = {"x", "y", "z"}
         /\ domain = {"a", "b"}
         /\ old = [a |-> NULL, b |-> "c", c |-> "a"]
-        /\ pc = "START"
+        /\ temp = NULL
+        /\ pc = "PRESTART"
+
+PRESTART == /\ pc = "PRESTART"
+            /\ list' = ll({"a", "b", "c"})
+            /\ PrintT(list'["b"])
+            /\ pc' = "START"
+            /\ UNCHANGED << i, characters, domain, old, temp >>
 
 START == /\ pc = "START"
          /\ \/ /\ list' = ll({"a", "b", "c"})
             \/ /\ list' = ll({})
          /\ pc' = "LOOP"
-         /\ UNCHANGED << i, characters, domain, old >>
+         /\ UNCHANGED << i, characters, domain, old, temp >>
 
 LOOP == /\ pc = "LOOP"
         /\ IF i < 2
@@ -137,18 +149,18 @@ LOOP == /\ pc = "LOOP"
                    /\ pc' = "INCREMENT"
               ELSE /\ pc' = "Done"
                    /\ list' = list
-        /\ UNCHANGED << i, characters, domain, old >>
+        /\ UNCHANGED << i, characters, domain, old, temp >>
 
 INCREMENT == /\ pc = "INCREMENT"
              /\ i' = i+1
              /\ PrintT(list)
              /\ pc' = "LOOP"
-             /\ UNCHANGED << list, characters, domain, old >>
+             /\ UNCHANGED << list, characters, domain, old, temp >>
 
 (* Allow infinite stuttering to prevent deadlock on termination. *)
 Terminating == pc = "Done" /\ UNCHANGED vars
 
-Next == START \/ LOOP \/ INCREMENT
+Next == PRESTART \/ START \/ LOOP \/ INCREMENT
            \/ Terminating
 
 Spec == Init /\ [][Next]_vars
