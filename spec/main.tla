@@ -20,12 +20,26 @@ HasLast == Empty(list) \/ \E el \in DOMAIN list: list[el]["next"] = NULL \* inva
 NewLabel ==
     CHOOSE label \in {x \o z: x \in DOMAIN list, z \in characters}: label \notin DOMAIN list
 
+
+
 InsertHead(val) ==
    IF Empty(list)
    THEN
     CHOOSE x \in [{"a"} -> [next: {NULL}, value: {1}]]: TRUE
    ELSE
     list @@ (CHOOSE x \in [{NewLabel} -> [next: {First(list)}, value: {1}]]:TRUE)
+
+InsertAfter(label) == 
+    IF label \notin DOMAIN list THEN
+        Assert("FALSE", "CAN NOT INSERT AFTER ELEMENT NOT IN LIST")
+    ELSE
+        LET nl == {NewLabel}
+        IN
+        CHOOSE l \in [DOMAIN list \union nl -> [value: VALUE, next: Range(list) \union nl]]:
+            \A d \in DOMAIN list \union nl:
+                (d = label /\ l[d]["next"] \in nl)
+            \/  (d \in nl /\ l[d]["next"] = list[label]["next"])
+            \/  (d \notin {label} \union nl  /\ l[d]["next"] = list[d]["next"])
 
 \* Find a function from the domain of list excluding the removed element, the new function returns the same value as list,
 \* except if the list pointed to the removed elemnt, in which case the fuction returns list[label]["next"]
@@ -46,6 +60,17 @@ end define
 begin
     \* Perform with a non empty and empty list 
     START:
+    list := ll({"f", "g", "h"});
+    a:
+    print list;
+    list := InsertAfter("g");
+    print list;
+    c:
+    list := InsertAfter("h");
+    print list;
+    d:
+    print "=====DEBUG DONE=====";
+    assert FALSE;
     either
     list := ll({"f", "g", "h"});
     or
@@ -57,6 +82,9 @@ LOOP:
        list := InsertHead(2)
     or
        list := Remove;
+    or
+       \* this will fail if list is empty, needs to check here if it is valid
+       list := InsertAfter(CHOOSE x \in DOMAIN list: TRUE)
     end either;
 INCREMENT:
    i := i+1;
@@ -67,7 +95,7 @@ assert HasLast;
 end while;
     
 end algorithm;*)
-\* BEGIN TRANSLATION (chksum(pcal) = "92497c27" /\ chksum(tla) = "8e8b0ed3")
+\* BEGIN TRANSLATION (chksum(pcal) = "bb447818" /\ chksum(tla) = "115f657c")
 VARIABLES i, list, characters, domain, old, temp, pc
 
 (* define statement *)
@@ -78,12 +106,26 @@ HasLast == Empty(list) \/ \E el \in DOMAIN list: list[el]["next"] = NULL
 NewLabel ==
     CHOOSE label \in {x \o z: x \in DOMAIN list, z \in characters}: label \notin DOMAIN list
 
+
+
 InsertHead(val) ==
    IF Empty(list)
    THEN
     CHOOSE x \in [{"a"} -> [next: {NULL}, value: {1}]]: TRUE
    ELSE
     list @@ (CHOOSE x \in [{NewLabel} -> [next: {First(list)}, value: {1}]]:TRUE)
+
+InsertAfter(label) ==
+    IF label \notin DOMAIN list THEN
+        Assert("FALSE", "CAN NOT INSERT AFTER ELEMENT NOT IN LIST")
+    ELSE
+        LET nl == {NewLabel}
+        IN
+        CHOOSE l \in [DOMAIN list \union nl -> [value: VALUE, next: Range(list) \union nl]]:
+            \A d \in DOMAIN list \union nl:
+                (d = label /\ l[d]["next"] \in nl)
+            \/  (d \in nl /\ l[d]["next"] = list[label]["next"])
+            \/  (d \notin {label} \union nl  /\ l[d]["next"] = list[d]["next"])
 
 
 
@@ -112,16 +154,37 @@ Init == (* Global variables *)
         /\ pc = "START"
 
 START == /\ pc = "START"
-         /\ \/ /\ list' = ll({"f", "g", "h"})
-            \/ /\ TRUE
-               /\ list' = list
-         /\ pc' = "LOOP"
+         /\ list' = ll({"f", "g", "h"})
+         /\ pc' = "a"
          /\ UNCHANGED << i, characters, domain, old, temp >>
+
+a == /\ pc = "a"
+     /\ PrintT(list)
+     /\ list' = InsertAfter("g")
+     /\ PrintT(list')
+     /\ pc' = "c"
+     /\ UNCHANGED << i, characters, domain, old, temp >>
+
+c == /\ pc = "c"
+     /\ list' = InsertAfter("h")
+     /\ PrintT(list')
+     /\ pc' = "d"
+     /\ UNCHANGED << i, characters, domain, old, temp >>
+
+d == /\ pc = "d"
+     /\ PrintT("=====DEBUG DONE=====")
+     /\ Assert(FALSE, "Failure of assertion at line 73, column 5.")
+     /\ \/ /\ list' = ll({"f", "g", "h"})
+        \/ /\ TRUE
+           /\ list' = list
+     /\ pc' = "LOOP"
+     /\ UNCHANGED << i, characters, domain, old, temp >>
 
 LOOP == /\ pc = "LOOP"
         /\ IF i < 5
               THEN /\ \/ /\ list' = InsertHead(2)
                       \/ /\ list' = Remove
+                      \/ /\ list' = InsertAfter(CHOOSE x \in DOMAIN list: TRUE)
                    /\ pc' = "INCREMENT"
               ELSE /\ pc' = "Done"
                    /\ list' = list
@@ -131,14 +194,14 @@ INCREMENT == /\ pc = "INCREMENT"
              /\ i' = i+1
              /\ PrintT("=== LIST IS ===")
              /\ PrintT(list)
-             /\ Assert(HasLast, "Failure of assertion at line 66, column 1.")
+             /\ Assert(HasLast, "Failure of assertion at line 94, column 1.")
              /\ pc' = "LOOP"
              /\ UNCHANGED << list, characters, domain, old, temp >>
 
 (* Allow infinite stuttering to prevent deadlock on termination. *)
 Terminating == pc = "Done" /\ UNCHANGED vars
 
-Next == START \/ LOOP \/ INCREMENT
+Next == START \/ a \/ c \/ d \/ LOOP \/ INCREMENT
            \/ Terminating
 
 Spec == Init /\ [][Next]_vars
