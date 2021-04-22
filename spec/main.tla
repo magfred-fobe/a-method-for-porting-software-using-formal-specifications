@@ -30,7 +30,7 @@ NewLabel ==
     "node" \o ToString(HighestNode+1)
     
 NewDomain(len) ==
-    {"node" \o ToString(x): x \in HighestNode+1..HighestNode+1+len}
+    {"node" \o ToString(x): x \in HighestNode+1..HighestNode+len}
 
 InsertHead(val) ==
    IF Empty(list)
@@ -72,7 +72,6 @@ Remove ==
 
 end define
 begin
-    \* Perform with a non empty and empty list 
     START:
     either
     list := ll(NewDomain(2));
@@ -86,7 +85,7 @@ LOOP:
     or
        list := Remove;
     or
-       list := InsertHead(CHOOSE value \in 1..1: TRUE);
+       list := InsertAfter(CHOOSE value \in DOMAIN list: TRUE);
     end either;
 INCREMENT:
    i := i+1;
@@ -97,7 +96,7 @@ assert HasLast;
 end while;
     
 end algorithm;*)
-\* BEGIN TRANSLATION (chksum(pcal) = "45431037" /\ chksum(tla) = "9fcc6df")
+\* BEGIN TRANSLATION (chksum(pcal) = "48df3d47" /\ chksum(tla) = "c998b4e7")
 VARIABLES i, list, characters, domain, old, temp, pc
 
 (* define statement *)
@@ -118,7 +117,7 @@ NewLabel ==
     "node" \o ToString(HighestNode+1)
 
 NewDomain(len) ==
-    {"node" \o ToString(x): x \in HighestNode+1..HighestNode+1+len}
+    {"node" \o ToString(x): x \in HighestNode+1..HighestNode+len}
 
 InsertHead(val) ==
    IF Empty(list)
@@ -180,7 +179,7 @@ LOOP == /\ pc = "LOOP"
         /\ IF i < 3
               THEN /\ \/ /\ list' = InsertHead(CHOOSE value \in 1..1: TRUE)
                       \/ /\ list' = Remove
-                      \/ /\ list' = InsertHead(CHOOSE value \in 1..1: TRUE)
+                      \/ /\ list' = InsertAfter(CHOOSE value \in DOMAIN list: TRUE)
                    /\ pc' = "INCREMENT"
               ELSE /\ pc' = "Done"
                    /\ list' = list
@@ -190,7 +189,7 @@ INCREMENT == /\ pc = "INCREMENT"
              /\ i' = i+1
              /\ PrintT("=== LIST IS ===")
              /\ PrintT(list)
-             /\ Assert(HasLast, "Failure of assertion at line 96, column 1.")
+             /\ Assert(HasLast, "Failure of assertion at line 95, column 1.")
              /\ pc' = "LOOP"
              /\ UNCHANGED << list, characters, domain, old, temp >>
 
