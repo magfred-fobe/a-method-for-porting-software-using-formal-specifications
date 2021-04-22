@@ -10,8 +10,7 @@ i = 0,
 list = ll({}),
 characters = {"x", "y", "z"},
 domain = {"a", "b"},
-old = [a |-> NULL, b |-> "c", c |-> "a"],
-temp = 0
+old = [a |-> NULL, b |-> "c", c |-> "a"]
 define
 
 HasLast == Empty(list) \/ \E el \in DOMAIN list: list[el]["next"] = NULL \* invariant for all lists
@@ -56,32 +55,55 @@ InsertAfter(label) ==
             \/  (d \in nl /\ l[d]["next"] = next(label))
             \/  (d \notin {label} \union nl  /\ l[d]["next"] = next(d))
 
+
 \* Find a function from the domain of list excluding the removed element, the new function returns the same value as list,
 \* except if the list pointed to the removed elemnt, in which case the fuction returns list[label]["next"]
-Remove(label) ==  
-    IF Empty(list) \/ label \notin DOMAIN list THEN
+Remove(label, llist) ==  
+    IF Empty(llist) \/ label \notin DOMAIN llist THEN
        Assert("FALSE", "CANNOT REMOVE ELEMENT NOT IN LIST")
-    ELSE IF DOMAIN list = {label} THEN 
+    ELSE IF DOMAIN llist = {label} THEN 
        EmptyList
     ELSE
-     CHOOSE l \in [(DOMAIN list) \ {label} -> [value: VALUE, next: Range(list) \ {label}]]:
-        \A d \in ((DOMAIN list) \ {label}): (l[d]["next"] = list[d]["next"] \/ (list[d]["next"] = label /\ l[d]["next"] = list[list[d]["next"]]["next"]))
+     CHOOSE l \in [(DOMAIN llist) \ {label} -> [value: VALUE, next: Range(llist) \ {label}]]:
+        \A d \in ((DOMAIN llist) \ {label}): (l[d]["next"] = llist[d]["next"] \/ (llist[d]["next"] = label /\ l[d]["next"] = llist[llist[d]["next"]]["next"]))
+(*
+RemoveHead ==
+    IF Empty(list) THEN
+        Assert("FALSE", "NO HEAD IN LIST")
+    ELSE
+        Remove(First(list))
 
 RemoveAfter(label) ==
+    IF Cardinality(DOMAIN list) < 2 THEN
+        Assert("FALSE", "NEXT ELEMENT IS NULL OR THE LIST IS EMPTY")
+    ELSE
         Remove(list[label]["next"])
+        
+RemovePrev(label) ==
+    IF Cardinality(DOMAIN list) < 2 THEN
+        Assert("FALSE", "THERE IS NO ELEMENT BEFORE THE CHOSEN ELEMENT")
+    ELSE
+        Remove(CHOOSE l \in DOMAIN list: list[l]["next"] = label) 
+*)
+GetNext(label) ==
+    list[label]["next"]
+    
+Swap(list2) ==
+    LET
+      head2 == First(list2)
+      temp == Remove(First(list), list)
+    IN
+     temp @@ CHOOSE l \in [{head2} -> {[next |-> First(temp), value |-> list2[head2]["value"]]}]: TRUE  
 
 end define
 begin
     START:
-    list := ll(characters);
+    list := ll(NewDomain(3));
     print list;
     NEXT:
-     list := RemoveAfter("y");
-     print list;
- (*   NEXT2:
-    list := Remove("node1");
-    print list;
-     NEXT3:
+    print Swap(ll(NewDomain(2)));
+  
+ (*    NEXT3:
     list := Remove("node1");
     print list;
    either
@@ -96,6 +118,14 @@ LOOP:
        list := Remove;
     or
        list := InsertAfter(CHOOSE value \in DOMAIN list: TRUE);
+    or
+       list := RemoveAfter(CHOOSE l \in DOMAIN list: list[l]["next"] \in DOMAIN list);
+    or
+       list := RemoveHead;
+    or
+       list := RemovePrev(CHOOSE l \in DOMAIN list: list[l]["next"] \in Range(list));
+    or
+       GetNext(CHOOSE l \in DOMAIN list: TRUE)
     end either;
 INCREMENT:
    i := i+1;
@@ -106,8 +136,8 @@ assert HasLast;
 end while;
  *)   
 end algorithm;*)
-\* BEGIN TRANSLATION (chksum(pcal) = "6eaebe8b" /\ chksum(tla) = "e27c7d7b")
-VARIABLES i, list, characters, domain, old, temp, pc
+\* BEGIN TRANSLATION (chksum(pcal) = "efbcb0ac" /\ chksum(tla) = "291050ed")
+VARIABLES i, list, characters, domain, old, pc
 
 (* define statement *)
 HasLast == Empty(list) \/ \E el \in DOMAIN list: list[el]["next"] = NULL
@@ -154,20 +184,46 @@ InsertAfter(label) ==
 
 
 
-Remove(label) ==
-    IF Empty(list) \/ label \notin DOMAIN list THEN
+
+Remove(label, llist) ==
+    IF Empty(llist) \/ label \notin DOMAIN llist THEN
        Assert("FALSE", "CANNOT REMOVE ELEMENT NOT IN LIST")
-    ELSE IF DOMAIN list = {label} THEN
+    ELSE IF DOMAIN llist = {label} THEN
        EmptyList
     ELSE
-     CHOOSE l \in [(DOMAIN list) \ {label} -> [value: VALUE, next: Range(list) \ {label}]]:
-        \A d \in ((DOMAIN list) \ {label}): (l[d]["next"] = list[d]["next"] \/ (list[d]["next"] = label /\ l[d]["next"] = list[list[d]["next"]]["next"]))
-
-RemoveAfter(label) ==
-        Remove(list[label]["next"])
+     CHOOSE l \in [(DOMAIN llist) \ {label} -> [value: VALUE, next: Range(llist) \ {label}]]:
+        \A d \in ((DOMAIN llist) \ {label}): (l[d]["next"] = llist[d]["next"] \/ (llist[d]["next"] = label /\ l[d]["next"] = llist[llist[d]["next"]]["next"]))
 
 
-vars == << i, list, characters, domain, old, temp, pc >>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+GetNext(label) ==
+    list[label]["next"]
+
+Swap(list2) ==
+    LET
+      head2 == First(list2)
+      temp == Remove(First(list), list)
+    IN
+     temp @@ CHOOSE l \in [{head2} -> {[next |-> First(temp), value |-> list2[head2]["value"]]}]: TRUE
+
+
+vars == << i, list, characters, domain, old, pc >>
 
 Init == (* Global variables *)
         /\ i = 0
@@ -175,20 +231,18 @@ Init == (* Global variables *)
         /\ characters = {"x", "y", "z"}
         /\ domain = {"a", "b"}
         /\ old = [a |-> NULL, b |-> "c", c |-> "a"]
-        /\ temp = 0
         /\ pc = "START"
 
 START == /\ pc = "START"
-         /\ list' = ll(characters)
+         /\ list' = ll(NewDomain(3))
          /\ PrintT(list')
          /\ pc' = "NEXT"
-         /\ UNCHANGED << i, characters, domain, old, temp >>
+         /\ UNCHANGED << i, characters, domain, old >>
 
 NEXT == /\ pc = "NEXT"
-        /\ list' = RemoveAfter("y")
-        /\ PrintT(list')
+        /\ PrintT(Swap(ll(NewDomain(2))))
         /\ pc' = "Done"
-        /\ UNCHANGED << i, characters, domain, old, temp >>
+        /\ UNCHANGED << i, list, characters, domain, old >>
 
 (* Allow infinite stuttering to prevent deadlock on termination. *)
 Terminating == pc = "Done" /\ UNCHANGED vars
@@ -201,7 +255,6 @@ Spec == Init /\ [][Next]_vars
 Termination == <>(pc = "Done")
 
 \* END TRANSLATION 
-
 
 
 
