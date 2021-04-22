@@ -13,7 +13,6 @@ domain = {"a", "b"},
 old = [a |-> NULL, b |-> "c", c |-> "a"],
 temp = 0
 define
-head2 == CHOOSE h \in DOMAIN old: ~\E el \in DOMAIN old: old[el] = h
 
 HasLast == Empty(list) \/ \E el \in DOMAIN list: list[el]["next"] = NULL \* invariant for all lists
 
@@ -45,9 +44,10 @@ InsertHead(val) ==
 InsertAfter(label) == 
     IF Empty(list) /\ label \notin DOMAIN list THEN
         list \* just for testing
-        \* Assert("FALSE", "CAN NOT INSERT AFTER ELEMENT NOT IN LIST")
+        \* Assert("FALSE", "CANNOT INSERT AFTER ELEMENT NOT IN LIST")
     ELSE
-        LET nl == {NewLabel}
+        LET 
+        nl == {NewLabel}
         next(lab) == list[lab]["next"]
         IN
         CHOOSE l \in [DOMAIN list \union nl -> [value: VALUE, next: Range(list) \union nl]]:
@@ -58,23 +58,33 @@ InsertAfter(label) ==
 
 \* Find a function from the domain of list excluding the removed element, the new function returns the same value as list,
 \* except if the list pointed to the removed elemnt, in which case the fuction returns list[label]["next"]
-Remove ==  
-    IF Empty(list) THEN
-        list
-    ELSE IF DOMAIN list = {First(list)}
-     THEN 
-     EmptyList
-     ELSE
-    \*CHOOSE l \in [DOMAIN list \ {label} -> [value: VALUE, next: Range(list) \ {label}]]: \A d \in DOMAIN list \ label: l[d]["next"]: 
-       LET label == CHOOSE x \in DOMAIN list: TRUE
-       IN CHOOSE l \in [(DOMAIN list) \ {label} -> [value: VALUE, next: Range(list) \ {label}]]:
+Remove(label) ==  
+    IF Empty(list) \/ label \notin DOMAIN list THEN
+       Assert("FALSE", "CANNOT REMOVE ELEMENT NOT IN LIST")
+    ELSE IF DOMAIN list = {label} THEN 
+       EmptyList
+    ELSE
+     CHOOSE l \in [(DOMAIN list) \ {label} -> [value: VALUE, next: Range(list) \ {label}]]:
         \A d \in ((DOMAIN list) \ {label}): (l[d]["next"] = list[d]["next"] \/ (list[d]["next"] = label /\ l[d]["next"] = list[list[d]["next"]]["next"]))
+
+RemoveAfter(label) ==
+        Remove(list[label]["next"])
 
 end define
 begin
     START:
-    either
-    list := ll(NewDomain(2));
+    list := ll(characters);
+    print list;
+    NEXT:
+     list := RemoveAfter("y");
+     print list;
+ (*   NEXT2:
+    list := Remove("node1");
+    print list;
+     NEXT3:
+    list := Remove("node1");
+    print list;
+   either
     or
     list := ll({});
     end either;
@@ -94,14 +104,12 @@ print list;
 \* This should also be an invariant
 assert HasLast;
 end while;
-    
+ *)   
 end algorithm;*)
-\* BEGIN TRANSLATION (chksum(pcal) = "48df3d47" /\ chksum(tla) = "c998b4e7")
+\* BEGIN TRANSLATION (chksum(pcal) = "6eaebe8b" /\ chksum(tla) = "e27c7d7b")
 VARIABLES i, list, characters, domain, old, temp, pc
 
 (* define statement *)
-head2 == CHOOSE h \in DOMAIN old: ~\E el \in DOMAIN old: old[el] = h
-
 HasLast == Empty(list) \/ \E el \in DOMAIN list: list[el]["next"] = NULL
 
 validList == isll(list)
@@ -134,7 +142,8 @@ InsertAfter(label) ==
         list
 
     ELSE
-        LET nl == {NewLabel}
+        LET
+        nl == {NewLabel}
         next(lab) == list[lab]["next"]
         IN
         CHOOSE l \in [DOMAIN list \union nl -> [value: VALUE, next: Range(list) \union nl]]:
@@ -145,17 +154,17 @@ InsertAfter(label) ==
 
 
 
-Remove ==
-    IF Empty(list) THEN
-        list
-    ELSE IF DOMAIN list = {First(list)}
-     THEN
-     EmptyList
-     ELSE
-
-       LET label == CHOOSE x \in DOMAIN list: TRUE
-       IN CHOOSE l \in [(DOMAIN list) \ {label} -> [value: VALUE, next: Range(list) \ {label}]]:
+Remove(label) ==
+    IF Empty(list) \/ label \notin DOMAIN list THEN
+       Assert("FALSE", "CANNOT REMOVE ELEMENT NOT IN LIST")
+    ELSE IF DOMAIN list = {label} THEN
+       EmptyList
+    ELSE
+     CHOOSE l \in [(DOMAIN list) \ {label} -> [value: VALUE, next: Range(list) \ {label}]]:
         \A d \in ((DOMAIN list) \ {label}): (l[d]["next"] = list[d]["next"] \/ (list[d]["next"] = label /\ l[d]["next"] = list[list[d]["next"]]["next"]))
+
+RemoveAfter(label) ==
+        Remove(list[label]["next"])
 
 
 vars == << i, list, characters, domain, old, temp, pc >>
@@ -170,33 +179,21 @@ Init == (* Global variables *)
         /\ pc = "START"
 
 START == /\ pc = "START"
-         /\ \/ /\ list' = ll(NewDomain(2))
-            \/ /\ list' = ll({})
-         /\ pc' = "LOOP"
+         /\ list' = ll(characters)
+         /\ PrintT(list')
+         /\ pc' = "NEXT"
          /\ UNCHANGED << i, characters, domain, old, temp >>
 
-LOOP == /\ pc = "LOOP"
-        /\ IF i < 3
-              THEN /\ \/ /\ list' = InsertHead(CHOOSE value \in 1..1: TRUE)
-                      \/ /\ list' = Remove
-                      \/ /\ list' = InsertAfter(CHOOSE value \in DOMAIN list: TRUE)
-                   /\ pc' = "INCREMENT"
-              ELSE /\ pc' = "Done"
-                   /\ list' = list
+NEXT == /\ pc = "NEXT"
+        /\ list' = RemoveAfter("y")
+        /\ PrintT(list')
+        /\ pc' = "Done"
         /\ UNCHANGED << i, characters, domain, old, temp >>
-
-INCREMENT == /\ pc = "INCREMENT"
-             /\ i' = i+1
-             /\ PrintT("=== LIST IS ===")
-             /\ PrintT(list)
-             /\ Assert(HasLast, "Failure of assertion at line 95, column 1.")
-             /\ pc' = "LOOP"
-             /\ UNCHANGED << list, characters, domain, old, temp >>
 
 (* Allow infinite stuttering to prevent deadlock on termination. *)
 Terminating == pc = "Done" /\ UNCHANGED vars
 
-Next == START \/ LOOP \/ INCREMENT
+Next == START \/ NEXT
            \/ Terminating
 
 Spec == Init /\ [][Next]_vars
