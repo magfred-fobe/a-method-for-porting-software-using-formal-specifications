@@ -73,31 +73,20 @@ Remove ==
 end define
 begin
     \* Perform with a non empty and empty list 
-    PRESTART:
-    list := ll(NewDomain(4));
-    aa:
-    list := InsertHead(2);
-    print list;
-    a:
-    list := InsertAfter(CHOOSE x \in DOMAIN list:TRUE);
-    print "=====DEBUG DONE=====";
-    \*assert FALSE;
     START:
     either
-    temp := 4;
-    list := ll(NewDomain(3));
+    list := ll(NewDomain(2));
     or
-    \*skip; 
-    list := EmptyList;
+    list := ll({});
     end either;
 LOOP:
- while i < 6 do
+ while i < 3 do
     either 
-    insertH:
-       list := InsertHead(2);
+       list := InsertHead(CHOOSE value \in 1..1: TRUE);
     or
-    insertH2:
-       list := InsertHead(1);
+       list := Remove;
+    or
+       list := InsertHead(CHOOSE value \in 1..1: TRUE);
     end either;
 INCREMENT:
    i := i+1;
@@ -108,7 +97,7 @@ assert HasLast;
 end while;
     
 end algorithm;*)
-\* BEGIN TRANSLATION (chksum(pcal) = "a64bfb7c" /\ chksum(tla) = "84eac67b")
+\* BEGIN TRANSLATION (chksum(pcal) = "45431037" /\ chksum(tla) = "9fcc6df")
 VARIABLES i, list, characters, domain, old, temp, pc
 
 (* define statement *)
@@ -179,64 +168,36 @@ Init == (* Global variables *)
         /\ domain = {"a", "b"}
         /\ old = [a |-> NULL, b |-> "c", c |-> "a"]
         /\ temp = 0
-        /\ pc = "PRESTART"
-
-PRESTART == /\ pc = "PRESTART"
-            /\ list' = ll(NewDomain(4))
-            /\ pc' = "aa"
-            /\ UNCHANGED << i, characters, domain, old, temp >>
-
-aa == /\ pc = "aa"
-      /\ list' = InsertHead(2)
-      /\ PrintT(list')
-      /\ pc' = "a"
-      /\ UNCHANGED << i, characters, domain, old, temp >>
-
-a == /\ pc = "a"
-     /\ list' = InsertAfter(CHOOSE x \in DOMAIN list:TRUE)
-     /\ PrintT("=====DEBUG DONE=====")
-     /\ pc' = "START"
-     /\ UNCHANGED << i, characters, domain, old, temp >>
+        /\ pc = "START"
 
 START == /\ pc = "START"
-         /\ \/ /\ temp' = 4
-               /\ list' = ll(NewDomain(3))
-            \/ /\ list' = EmptyList
-               /\ temp' = temp
+         /\ \/ /\ list' = ll(NewDomain(2))
+            \/ /\ list' = ll({})
          /\ pc' = "LOOP"
-         /\ UNCHANGED << i, characters, domain, old >>
+         /\ UNCHANGED << i, characters, domain, old, temp >>
 
 LOOP == /\ pc = "LOOP"
-        /\ IF i < 6
-              THEN /\ \/ /\ pc' = "insertH"
-                      \/ /\ pc' = "insertH2"
+        /\ IF i < 3
+              THEN /\ \/ /\ list' = InsertHead(CHOOSE value \in 1..1: TRUE)
+                      \/ /\ list' = Remove
+                      \/ /\ list' = InsertHead(CHOOSE value \in 1..1: TRUE)
+                   /\ pc' = "INCREMENT"
               ELSE /\ pc' = "Done"
-        /\ UNCHANGED << i, list, characters, domain, old, temp >>
+                   /\ list' = list
+        /\ UNCHANGED << i, characters, domain, old, temp >>
 
 INCREMENT == /\ pc = "INCREMENT"
              /\ i' = i+1
              /\ PrintT("=== LIST IS ===")
              /\ PrintT(list)
-             /\ Assert(HasLast, 
-                       "Failure of assertion at line 107, column 1.")
+             /\ Assert(HasLast, "Failure of assertion at line 96, column 1.")
              /\ pc' = "LOOP"
              /\ UNCHANGED << list, characters, domain, old, temp >>
-
-insertH == /\ pc = "insertH"
-           /\ list' = InsertHead(2)
-           /\ pc' = "INCREMENT"
-           /\ UNCHANGED << i, characters, domain, old, temp >>
-
-insertH2 == /\ pc = "insertH2"
-            /\ list' = InsertHead(1)
-            /\ pc' = "INCREMENT"
-            /\ UNCHANGED << i, characters, domain, old, temp >>
 
 (* Allow infinite stuttering to prevent deadlock on termination. *)
 Terminating == pc = "Done" /\ UNCHANGED vars
 
-Next == PRESTART \/ aa \/ a \/ START \/ LOOP \/ INCREMENT \/ insertH
-           \/ insertH2
+Next == START \/ LOOP \/ INCREMENT
            \/ Terminating
 
 Spec == Init /\ [][Next]_vars
