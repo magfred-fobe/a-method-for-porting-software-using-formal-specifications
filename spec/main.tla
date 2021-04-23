@@ -32,7 +32,7 @@ begin
     START2:
     list2 := LinkedList(NewDomain(2, list));
     print list2;
-    NeXT:
+    NEXT:
     either
     A:
     list := Concat(list, list2);
@@ -41,11 +41,6 @@ begin
     end either;
     PRINT:
     print list;
-    after:
-    list := InsertAfter(CHOOSE x \in DOMAIN list: TRUE, list);
-    print "==AFTER==";
-    print list;
-    print "DONE";
  
  (*       
 LOOP:
@@ -81,7 +76,7 @@ assert HasLast;
 end while;
  *)   
 end algorithm;*)
-\* BEGIN TRANSLATION (chksum(pcal) = "321823aa" /\ chksum(tla) = "6a6fb99f")
+\* BEGIN TRANSLATION (chksum(pcal) = "fe628fbc" /\ chksum(tla) = "4f0ff812")
 VARIABLES i, list, list2, characters, domain, old, pc
 
 (* define statement *)
@@ -110,10 +105,10 @@ START == /\ pc = "START"
 START2 == /\ pc = "START2"
           /\ list2' = LinkedList(NewDomain(2, list))
           /\ PrintT(list2')
-          /\ pc' = "NeXT"
+          /\ pc' = "NEXT"
           /\ UNCHANGED << i, list, characters, domain, old >>
 
-NeXT == /\ pc = "NeXT"
+NEXT == /\ pc = "NEXT"
         /\ \/ /\ pc' = "A"
               /\ list' = list
            \/ /\ list' = InsertHead(NewLabel(list), list)
@@ -127,21 +122,13 @@ A == /\ pc = "A"
 
 PRINT == /\ pc = "PRINT"
          /\ PrintT(list)
-         /\ pc' = "after"
-         /\ UNCHANGED << i, list, list2, characters, domain, old >>
-
-after == /\ pc = "after"
-         /\ list' = InsertAfter(CHOOSE x \in DOMAIN list: TRUE, list)
-         /\ PrintT("==AFTER==")
-         /\ PrintT(list')
-         /\ PrintT("DONE")
          /\ pc' = "Done"
-         /\ UNCHANGED << i, list2, characters, domain, old >>
+         /\ UNCHANGED << i, list, list2, characters, domain, old >>
 
 (* Allow infinite stuttering to prevent deadlock on termination. *)
 Terminating == pc = "Done" /\ UNCHANGED vars
 
-Next == START \/ START2 \/ NeXT \/ A \/ PRINT \/ after
+Next == START \/ START2 \/ NEXT \/ A \/ PRINT
            \/ Terminating
 
 Spec == Init /\ [][Next]_vars

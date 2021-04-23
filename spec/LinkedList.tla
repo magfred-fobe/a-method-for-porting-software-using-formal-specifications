@@ -91,7 +91,7 @@ InsertHead(val, list) ==
 
 \* Find a function so that each element lab in the domain of the list U an arbitrary new label
 \* maps to lext[lab] except, for label which maps to the new label, and new label which maps to next[label] 
-InsertAfter_slow_and(label, list) == 
+InsertAfter_slow_and (label, list) == 
     IF Empty(list) /\ label \notin DOMAIN list THEN
         list \* just for testing
         \* Assert("FALSE", "CANNOT INSERT AFTER ELEMENT NOT IN LIST")
