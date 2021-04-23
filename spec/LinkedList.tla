@@ -159,7 +159,7 @@ GetNext(label, list) ==
 Swap(list, list2) ==
       <<list2, list>>
 
-\*Concatenates two lists into one. The next value of the last element of "list" needs to point at the first element of "list".
+\* Concatenates two lists into one. The next value of the last element of "list" needs to point at the first element of "list".
 Concat(list, list2) ==
     IF Empty(list) THEN
         <<list2, list>>
@@ -170,6 +170,10 @@ Concat(list, list2) ==
             CHOOSE x \in [{Last(list)} -> [value: VALUE, next: {First(list2)}]]:TRUE
         IN
         <<(newLast @@ list) @@ list2, EmptyList>>
+        
+\* For a list, transform every elements value according to some operator.
+ForEach(list, operator(_)) == 
+    [x \in DOMAIN list |-> [next: {list[x]["next"]}, value: {operator(list[x]["value"])}]]    
 ============================================================================
 
 

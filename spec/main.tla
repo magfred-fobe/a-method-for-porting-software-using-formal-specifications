@@ -31,6 +31,8 @@ begin
     list := LinkedList(NewDomain(3, list));
     print list;
     START2:
+    \* ForEach usage
+    \*print ForEach(list, LAMBDA x: x*2);
     list2 := LinkedList(NewDomain(2, list));
     print list2;
     NEXT:
