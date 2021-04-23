@@ -21,7 +21,7 @@ define
 
 HasLast == Empty(list) \/ \E el \in DOMAIN list: list[el]["next"] = NULL \* invariant for all lists
 
-validList == IsLinkedList(list)
+validList == IsLinkedList(list) /\ IsLinkedList(list2)
 
 end define
 
@@ -129,13 +129,13 @@ assert HasLast;
 end while;
  *)   
 end algorithm;*)
-\* BEGIN TRANSLATION (chksum(pcal) = "8da779f4" /\ chksum(tla) = "6b0aeb71")
+\* BEGIN TRANSLATION (chksum(pcal) = "14ad1842" /\ chksum(tla) = "1026fa5d")
 VARIABLES i, list, list2, characters, domain, old, temp, pc
 
 (* define statement *)
 HasLast == Empty(list) \/ \E el \in DOMAIN list: list[el]["next"] = NULL
 
-validList == IsLinkedList(list)
+validList == IsLinkedList(list) /\ IsLinkedList(list2)
 
 
 vars == << i, list, list2, characters, domain, old, temp, pc >>
