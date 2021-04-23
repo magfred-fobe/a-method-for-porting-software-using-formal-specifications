@@ -157,18 +157,19 @@ GetNext(label, list) ==
 
 \* Swaps the head of the two list arguments.    
 Swap(list, list2) ==
-    LET
-      head2 == First(list2)
-      temp == Remove(First(list), list)
-    IN
-     temp @@ CHOOSE l \in [{head2} -> {[next |-> First(temp), value |-> list2[head2]["value"]]}]: TRUE  
+      <<list2, list>>
 
 \*Concatenates two lists into one. The next value of the last element of "list" needs to point at the first element of "list".
 Concat(list, list2) ==
-    LET newLast ==
-        CHOOSE x \in [{Last(list)} -> [value: VALUE, next: {First(list2)}]]:TRUE
-    IN
-    (newLast @@ list) @@ list2
+    IF Empty(list) THEN
+        <<list2, list>>
+    ELSE IF Empty(list2) THEN
+        <<list, list2>>
+    ELSE
+        LET newLast ==
+            CHOOSE x \in [{Last(list)} -> [value: VALUE, next: {First(list2)}]]:TRUE
+        IN
+        <<(newLast @@ list) @@ list2, EmptyList>>
 ============================================================================
 
 
