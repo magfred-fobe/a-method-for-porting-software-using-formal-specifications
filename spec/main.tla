@@ -10,6 +10,7 @@ INSTANCE LinkedList
 variables 
 i = 0,
 list = LinkedList({}),
+list2 = LinkedList({}),
 characters = {"x", "y", "z"},
 domain = {"a", "b"},
 old = [a |-> NULL, b |-> "c", c |-> "a"]
@@ -28,15 +29,21 @@ begin
     START:
     list := LinkedList(NewDomain(3, list));
     print list;
-    NEXT:
-    list := Remove("node3", list);
+    START2:
+    list2 := LinkedList(NewDomain(2, list));
+    print list2;
+    NeXT:
+    either
+    A:
+    list[Last(list)]["next"] := First(list2);
+    B:
+    list := Concat(list, list2);
+    or
+    list := InsertHead(NewLabel(list), list);
+    end either;
+    PRINT:
     print list;
-    NeXt:
-    list := Swap(list, LinkedList(NewDomain(2, list)));
-    print list;
-    NExt:
-    list := InsertAfter("node4", list);
-    print list;
+ 
  (*       
 LOOP:
  while i < 3 do
@@ -56,6 +63,11 @@ LOOP:
        GetNext(CHOOSE l \in DOMAIN list: TRUE)
     or
        Swap(list, LinkedList(NewDomain(2, list)));
+    or
+       UpdatingLast:
+        list[Last(list)]["next"] := First(list2);
+       Concatenating:
+        list := Concat(list, list2)
     end either;
 INCREMENT:
    i := i+1;
@@ -66,8 +78,8 @@ assert HasLast;
 end while;
  *)   
 end algorithm;*)
-\* BEGIN TRANSLATION (chksum(pcal) = "651d7c54" /\ chksum(tla) = "54a2916c")
-VARIABLES i, list, characters, domain, old, pc
+\* BEGIN TRANSLATION (chksum(pcal) = "9f6d5f59" /\ chksum(tla) = "279dda71")
+VARIABLES i, list, list2, characters, domain, old, pc
 
 (* define statement *)
 HasLast == Empty(list) \/ \E el \in DOMAIN list: list[el]["next"] = NULL
@@ -75,11 +87,12 @@ HasLast == Empty(list) \/ \E el \in DOMAIN list: list[el]["next"] = NULL
 validList == IsLinkedList(list)
 
 
-vars == << i, list, characters, domain, old, pc >>
+vars == << i, list, list2, characters, domain, old, pc >>
 
 Init == (* Global variables *)
         /\ i = 0
         /\ list = LinkedList({})
+        /\ list2 = LinkedList({})
         /\ characters = {"x", "y", "z"}
         /\ domain = {"a", "b"}
         /\ old = [a |-> NULL, b |-> "c", c |-> "a"]
@@ -88,31 +101,41 @@ Init == (* Global variables *)
 START == /\ pc = "START"
          /\ list' = LinkedList(NewDomain(3, list))
          /\ PrintT(list')
-         /\ pc' = "NEXT"
-         /\ UNCHANGED << i, characters, domain, old >>
+         /\ pc' = "START2"
+         /\ UNCHANGED << i, list2, characters, domain, old >>
 
-NEXT == /\ pc = "NEXT"
-        /\ list' = Remove("node3", list)
-        /\ PrintT(list')
-        /\ pc' = "NeXt"
-        /\ UNCHANGED << i, characters, domain, old >>
+START2 == /\ pc = "START2"
+          /\ list2' = LinkedList(NewDomain(2, list))
+          /\ PrintT(list2')
+          /\ pc' = "NeXT"
+          /\ UNCHANGED << i, list, characters, domain, old >>
 
-NeXt == /\ pc = "NeXt"
-        /\ list' = Swap(list, LinkedList(NewDomain(2, list)))
-        /\ PrintT(list')
-        /\ pc' = "NExt"
-        /\ UNCHANGED << i, characters, domain, old >>
+NeXT == /\ pc = "NeXT"
+        /\ \/ /\ pc' = "A"
+              /\ list' = list
+           \/ /\ list' = InsertHead(NewLabel(list), list)
+              /\ pc' = "PRINT"
+        /\ UNCHANGED << i, list2, characters, domain, old >>
 
-NExt == /\ pc = "NExt"
-        /\ list' = InsertAfter("node4", list)
-        /\ PrintT(list')
-        /\ pc' = "Done"
-        /\ UNCHANGED << i, characters, domain, old >>
+A == /\ pc = "A"
+     /\ list' = [list EXCEPT ![Last(list)]["next"] = First(list2)]
+     /\ pc' = "B"
+     /\ UNCHANGED << i, list2, characters, domain, old >>
+
+B == /\ pc = "B"
+     /\ list' = Concat(list, list2)
+     /\ pc' = "PRINT"
+     /\ UNCHANGED << i, list2, characters, domain, old >>
+
+PRINT == /\ pc = "PRINT"
+         /\ PrintT(list)
+         /\ pc' = "Done"
+         /\ UNCHANGED << i, list, list2, characters, domain, old >>
 
 (* Allow infinite stuttering to prevent deadlock on termination. *)
 Terminating == pc = "Done" /\ UNCHANGED vars
 
-Next == START \/ NEXT \/ NeXt \/ NExt
+Next == START \/ START2 \/ NeXT \/ A \/ B \/ PRINT
            \/ Terminating
 
 Spec == Init /\ [][Next]_vars

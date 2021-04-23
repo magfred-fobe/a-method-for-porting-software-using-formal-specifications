@@ -9,6 +9,7 @@ CONSTANTS NULL, VALUE
 
 \* == Operators creating lists and verifying their correctness ==
 
+
 \* Returns every possible permutation created with the domain argument           
 PointerMaps(domain) == 
     [domain -> [value: VALUE, next: domain \union {NULL}]]
@@ -29,6 +30,9 @@ Cyclic(LL) ==
 First(LL) ==
     IF Ring(LL)THEN Assert(FALSE, "A Linked List Cannot be a ring")  
     ELSE CHOOSE node \in DOMAIN LL:node \notin Range(LL)
+
+Last(list) == 
+    CHOOSE n \in DOMAIN list: list[n]["next"] = NULL
 
 \* A list may not contain cyclic references
 IsLinkedList(PointerMap) ==
@@ -73,6 +77,8 @@ NewDomain(len, list) ==
             
            
 \* == Operators based on the functionalities of the linked list the model is based on ==
+
+
 
 \* Inserts a new head in the linked list
 InsertHead(val, list) ==
@@ -144,5 +150,20 @@ Swap(list, list2) ==
     IN
      temp @@ CHOOSE l \in [{head2} -> {[next |-> First(temp), value |-> list2[head2]["value"]]}]: TRUE  
 
-
+\*Concatenates two lists into one. The next value of the last element of "list" needs to point at the first element of "list".
+Concat(list, list2) ==
+    IF NULL \in Range(list) THEN
+        Assert("FALSE", "THE LAST ELEMENT OF LIST POINTS TO NULL")
+    ELSE         
+    list @@ list2 
 ============================================================================
+
+
+
+
+
+
+
+
+
+
