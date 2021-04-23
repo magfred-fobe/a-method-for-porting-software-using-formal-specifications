@@ -91,7 +91,7 @@ InsertHead(val, list) ==
 
 \* Find a function so that each element lab in the domain of the list U an arbitrary new label
 \* maps to lext[lab] except, for label which maps to the new label, and new label which maps to next[label] 
-InsertAfter(label, list) == 
+InsertAfter_slow_and(label, list) == 
     IF Empty(list) /\ label \notin DOMAIN list THEN
         list \* just for testing
         \* Assert("FALSE", "CANNOT INSERT AFTER ELEMENT NOT IN LIST")
@@ -105,6 +105,19 @@ InsertAfter(label, list) ==
                 (d = label /\ l[d]["next"] \in nl)
             \/  (d \in nl /\ l[d]["next"] = next(label))
             \/  (d \notin {label} \union nl  /\ l[d]["next"] = next(d))
+            
+InsertAfter(label, list) ==
+    IF Empty(list) /\ label \notin DOMAIN list THEN
+        list \* just for testing
+        \* Assert("FALSE", "CANNOT INSERT AFTER ELEMENT NOT IN LIST")
+    ELSE
+        LET 
+        nl == {NewLabel(list)}
+        newBefore == CHOOSE x \in [{label} -> [value: VALUE, next: nl]]:TRUE
+        next(lab) == list[lab]["next"]
+        newNode == CHOOSE x \in [nl -> [value: VALUE, next: {next(label)}]]:TRUE
+        IN
+        (newNode @@ newBefore) @@ list 
 
 \* Find a function from the domain of list excluding the removed element, the new function returns the same value as list,
 \* except if the list pointed to the removed elemnt, in which case the fuction returns list[label]["next"]

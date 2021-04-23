@@ -41,6 +41,11 @@ begin
     end either;
     PRINT:
     print list;
+    after:
+    list := InsertAfter(CHOOSE x \in DOMAIN list: TRUE, list);
+    print "==AFTER==";
+    print list;
+    print "DONE";
  
  (*       
 LOOP:
@@ -76,7 +81,7 @@ assert HasLast;
 end while;
  *)   
 end algorithm;*)
-\* BEGIN TRANSLATION (chksum(pcal) = "ea968b66" /\ chksum(tla) = "32206cb7")
+\* BEGIN TRANSLATION (chksum(pcal) = "321823aa" /\ chksum(tla) = "6a6fb99f")
 VARIABLES i, list, list2, characters, domain, old, pc
 
 (* define statement *)
@@ -122,13 +127,21 @@ A == /\ pc = "A"
 
 PRINT == /\ pc = "PRINT"
          /\ PrintT(list)
-         /\ pc' = "Done"
+         /\ pc' = "after"
          /\ UNCHANGED << i, list, list2, characters, domain, old >>
+
+after == /\ pc = "after"
+         /\ list' = InsertAfter(CHOOSE x \in DOMAIN list: TRUE, list)
+         /\ PrintT("==AFTER==")
+         /\ PrintT(list')
+         /\ PrintT("DONE")
+         /\ pc' = "Done"
+         /\ UNCHANGED << i, list2, characters, domain, old >>
 
 (* Allow infinite stuttering to prevent deadlock on termination. *)
 Terminating == pc = "Done" /\ UNCHANGED vars
 
-Next == START \/ START2 \/ NeXT \/ A \/ PRINT
+Next == START \/ START2 \/ NeXT \/ A \/ PRINT \/ after
            \/ Terminating
 
 Spec == Init /\ [][Next]_vars
