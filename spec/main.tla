@@ -35,8 +35,6 @@ begin
     NeXT:
     either
     A:
-    list[Last(list)]["next"] := First(list2);
-    B:
     list := Concat(list, list2);
     or
     list := InsertHead(NewLabel(list), list);
@@ -78,7 +76,7 @@ assert HasLast;
 end while;
  *)   
 end algorithm;*)
-\* BEGIN TRANSLATION (chksum(pcal) = "9f6d5f59" /\ chksum(tla) = "279dda71")
+\* BEGIN TRANSLATION (chksum(pcal) = "ea968b66" /\ chksum(tla) = "32206cb7")
 VARIABLES i, list, list2, characters, domain, old, pc
 
 (* define statement *)
@@ -118,11 +116,6 @@ NeXT == /\ pc = "NeXT"
         /\ UNCHANGED << i, list2, characters, domain, old >>
 
 A == /\ pc = "A"
-     /\ list' = [list EXCEPT ![Last(list)]["next"] = First(list2)]
-     /\ pc' = "B"
-     /\ UNCHANGED << i, list2, characters, domain, old >>
-
-B == /\ pc = "B"
      /\ list' = Concat(list, list2)
      /\ pc' = "PRINT"
      /\ UNCHANGED << i, list2, characters, domain, old >>
@@ -135,7 +128,7 @@ PRINT == /\ pc = "PRINT"
 (* Allow infinite stuttering to prevent deadlock on termination. *)
 Terminating == pc = "Done" /\ UNCHANGED vars
 
-Next == START \/ START2 \/ NeXT \/ A \/ B \/ PRINT
+Next == START \/ START2 \/ NeXT \/ A \/ PRINT
            \/ Terminating
 
 Spec == Init /\ [][Next]_vars

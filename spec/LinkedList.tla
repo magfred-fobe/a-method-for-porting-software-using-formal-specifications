@@ -152,10 +152,10 @@ Swap(list, list2) ==
 
 \*Concatenates two lists into one. The next value of the last element of "list" needs to point at the first element of "list".
 Concat(list, list2) ==
-    IF NULL \in Range(list) THEN
-        Assert("FALSE", "THE LAST ELEMENT OF LIST POINTS TO NULL")
-    ELSE         
-    list @@ list2 
+    LET newLast ==
+        CHOOSE x \in [{Last(list)} -> [value: VALUE, next: {First(list2)}]]:TRUE
+    IN
+    (newLast @@ list) @@ list2
 ============================================================================
 
 
