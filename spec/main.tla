@@ -9,23 +9,29 @@ INSTANCE LinkedList
 \* Global variables
 variables 
 i = 0,
+from = 1,
 list = LinkedList({}),
 list2 = LinkedList({}),
 characters = {"x", "y", "z"},
 domain = {"a", "b"},
 old = [a |-> NULL, b |-> "c", c |-> "a"],
-temp = NULL
+temp = NULL,
+arg = {},
+lab = NULL,
+index = NULL
 
 \* Global and local invariants the model is based on 
 define
 
 HasLast == Empty(list) \/ \E el \in DOMAIN list: list[el]["next"] = NULL \* invariant for all lists
 
-validList == IsLinkedList(list) /\ IsLinkedList(list2)
+ValidList == IsLinkedList(list) /\ IsLinkedList(list2)
+
+ForEachOperator(x) == x*2
 
 end define
 
-\* The model checking alogithm
+\* The model checking alogrithm
 begin
     \* with either list1 empty or a list of size 1 to 3
     PRECONDITIONS:
@@ -34,7 +40,7 @@ begin
         list := LinkedList(NewDomain(size2, list))
         end with;
         list2 := LinkedList(NewDomain(size1, list))
-        end with;
+    end with;
         
         \* Do the following from each starting state
         \* Also do it in a loop
@@ -61,39 +67,31 @@ begin
                 REMOVEEMPTY:
                 skip;
             end if;
+        or 
+            FOREACHFROM:
+            \* just to make it work with empty lists as well
+            if Empty(list) = FALSE then
+                FOREACHNOTEMPTY:
+                  lab := First(list);
+                  arg := {lab};
+                FOREACHFROMLOOP:
+                  while from < 1 do
+                    lab := list[lab]["next"];
+                    arg := arg \union {lab};
+                    from := from + 1;
+                  end while; 
+                FOREACHFROMRUN:
+                  list := ForEachFrom(list, {el \in DOMAIN list: el \notin arg}, ForEachOperator);
+                  from := 1;
+            else 
+                skip;
+            end if;
     end either;
     
     END:
     print "===LIST IS===";
     print list;
     
-    
-    (*    
-    list := LinkedList(NewDomain(3, list));
-    print list;
-    START2:
-    \* ForEach usage    
-    \*print ForEach(list, LAMBDA x: x*2);
-    list2 := LinkedList(NewDomain(2, list));
-    print list2;
-    NEXT:
-    either
-    A:
-    temp := Concat(list, list2);
-    list := temp[1];
-    list2:= temp[2];
-    or
-    B:
-    list := InsertHead(NewLabel(list), list);
-    or
-    C:
-    temp := Swap(list, list2);
-    list := temp[1];
-    list2:= temp[2];
-    end either;
-    PRINT:
-    print list;
-    *)
  
  (*       
 LOOP:
@@ -129,25 +127,33 @@ assert HasLast;
 end while;
  *)   
 end algorithm;*)
-\* BEGIN TRANSLATION (chksum(pcal) = "14ad1842" /\ chksum(tla) = "1026fa5d")
-VARIABLES i, list, list2, characters, domain, old, temp, pc
+\* BEGIN TRANSLATION (chksum(pcal) = "1e266b9f" /\ chksum(tla) = "fb0e229f")
+VARIABLES i, from, list, list2, characters, domain, old, temp, arg, lab, 
+          index, pc
 
 (* define statement *)
 HasLast == Empty(list) \/ \E el \in DOMAIN list: list[el]["next"] = NULL
 
-validList == IsLinkedList(list) /\ IsLinkedList(list2)
+ValidList == IsLinkedList(list) /\ IsLinkedList(list2)
+
+ForEachOperator(x) == x*2
 
 
-vars == << i, list, list2, characters, domain, old, temp, pc >>
+vars == << i, from, list, list2, characters, domain, old, temp, arg, lab, 
+           index, pc >>
 
 Init == (* Global variables *)
         /\ i = 0
+        /\ from = 1
         /\ list = LinkedList({})
         /\ list2 = LinkedList({})
         /\ characters = {"x", "y", "z"}
         /\ domain = {"a", "b"}
         /\ old = [a |-> NULL, b |-> "c", c |-> "a"]
         /\ temp = NULL
+        /\ arg = {}
+        /\ lab = NULL
+        /\ index = NULL
         /\ pc = "PRECONDITIONS"
 
 PRECONDITIONS == /\ pc = "PRECONDITIONS"
@@ -159,54 +165,95 @@ PRECONDITIONS == /\ pc = "PRECONDITIONS"
                     \/ /\ pc' = "CONCAT"
                     \/ /\ pc' = "SWAP"
                     \/ /\ pc' = "REMOVE"
-                 /\ UNCHANGED << i, characters, domain, old, temp >>
+                    \/ /\ pc' = "FOREACHFROM"
+                 /\ UNCHANGED << i, from, characters, domain, old, temp, arg, 
+                                 lab, index >>
 
 INSERTHEAD == /\ pc = "INSERTHEAD"
               /\ list' = InsertHead(NewLabel(list), list)
               /\ pc' = "END"
-              /\ UNCHANGED << i, list2, characters, domain, old, temp >>
+              /\ UNCHANGED << i, from, list2, characters, domain, old, temp, 
+                              arg, lab, index >>
 
 CONCAT == /\ pc = "CONCAT"
           /\ temp' = Concat(list, list2)
           /\ list' = temp'[1]
           /\ list2' = temp'[2]
           /\ pc' = "END"
-          /\ UNCHANGED << i, characters, domain, old >>
+          /\ UNCHANGED << i, from, characters, domain, old, arg, lab, index >>
 
 SWAP == /\ pc = "SWAP"
         /\ temp' = Swap(list, list2)
         /\ list' = temp'[1]
         /\ list2' = temp'[2]
         /\ pc' = "END"
-        /\ UNCHANGED << i, characters, domain, old >>
+        /\ UNCHANGED << i, from, characters, domain, old, arg, lab, index >>
 
 REMOVE == /\ pc = "REMOVE"
           /\ IF Empty(list) = FALSE
                 THEN /\ pc' = "REMOVENOTEMPTY"
                 ELSE /\ pc' = "REMOVEEMPTY"
-          /\ UNCHANGED << i, list, list2, characters, domain, old, temp >>
+          /\ UNCHANGED << i, from, list, list2, characters, domain, old, temp, 
+                          arg, lab, index >>
 
 REMOVENOTEMPTY == /\ pc = "REMOVENOTEMPTY"
                   /\ list' = Remove(CHOOSE x \in DOMAIN list:TRUE, list)
                   /\ pc' = "END"
-                  /\ UNCHANGED << i, list2, characters, domain, old, temp >>
+                  /\ UNCHANGED << i, from, list2, characters, domain, old, 
+                                  temp, arg, lab, index >>
 
 REMOVEEMPTY == /\ pc = "REMOVEEMPTY"
                /\ TRUE
                /\ pc' = "END"
-               /\ UNCHANGED << i, list, list2, characters, domain, old, temp >>
+               /\ UNCHANGED << i, from, list, list2, characters, domain, old, 
+                               temp, arg, lab, index >>
+
+FOREACHFROM == /\ pc = "FOREACHFROM"
+               /\ IF Empty(list) = FALSE
+                     THEN /\ pc' = "FOREACHNOTEMPTY"
+                     ELSE /\ TRUE
+                          /\ pc' = "END"
+               /\ UNCHANGED << i, from, list, list2, characters, domain, old, 
+                               temp, arg, lab, index >>
+
+FOREACHNOTEMPTY == /\ pc = "FOREACHNOTEMPTY"
+                   /\ lab' = First(list)
+                   /\ arg' = {lab'}
+                   /\ pc' = "FOREACHFROMLOOP"
+                   /\ UNCHANGED << i, from, list, list2, characters, domain, 
+                                   old, temp, index >>
+
+FOREACHFROMLOOP == /\ pc = "FOREACHFROMLOOP"
+                   /\ IF from < 1
+                         THEN /\ lab' = list[lab]["next"]
+                              /\ arg' = (arg \union {lab'})
+                              /\ from' = from + 1
+                              /\ pc' = "FOREACHFROMLOOP"
+                         ELSE /\ pc' = "FOREACHFROMRUN"
+                              /\ UNCHANGED << from, arg, lab >>
+                   /\ UNCHANGED << i, list, list2, characters, domain, old, 
+                                   temp, index >>
+
+FOREACHFROMRUN == /\ pc = "FOREACHFROMRUN"
+                  /\ list' = ForEachFrom(list, {el \in DOMAIN list: el \notin arg}, ForEachOperator)
+                  /\ from' = 1
+                  /\ pc' = "END"
+                  /\ UNCHANGED << i, list2, characters, domain, old, temp, arg, 
+                                  lab, index >>
 
 END == /\ pc = "END"
        /\ PrintT("===LIST IS===")
        /\ PrintT(list)
        /\ pc' = "Done"
-       /\ UNCHANGED << i, list, list2, characters, domain, old, temp >>
+       /\ UNCHANGED << i, from, list, list2, characters, domain, old, temp, 
+                       arg, lab, index >>
 
 (* Allow infinite stuttering to prevent deadlock on termination. *)
 Terminating == pc = "Done" /\ UNCHANGED vars
 
 Next == PRECONDITIONS \/ INSERTHEAD \/ CONCAT \/ SWAP \/ REMOVE
-           \/ REMOVENOTEMPTY \/ REMOVEEMPTY \/ END
+           \/ REMOVENOTEMPTY \/ REMOVEEMPTY \/ FOREACHFROM \/ FOREACHNOTEMPTY
+           \/ FOREACHFROMLOOP \/ FOREACHFROMRUN \/ END
            \/ Terminating
 
 Spec == Init /\ [][Next]_vars
@@ -214,6 +261,7 @@ Spec == Init /\ [][Next]_vars
 Termination == <>(pc = "Done")
 
 \* END TRANSLATION 
+
 
 
 =============================================================================

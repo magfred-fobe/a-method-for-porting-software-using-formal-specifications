@@ -173,12 +173,25 @@ Concat(list, list2) ==
         
 \* For a list, transform every elements value according to some operator.
 ForEach(list, operator(_)) == 
-    [x \in DOMAIN list |-> [next: {list[x]["next"]}, value: {operator(list[x]["value"])}]]
+    [x \in DOMAIN list |-> CHOOSE y \in [next: {list[x]["next"]}, value: {operator(list[x]["value"])}]: TRUE]
     
 ForEachFrom(list, from, operator(_)) == 
-    LET
-    part1 == list \* some operation that gives part before from 
-    part2 == list \* some operation that gives part from from including from 
-    IN 
-    part2 @@ part1
+   ForEach([el \in from |-> CHOOSE x \in [next: {list[el]["next"]}, value: {(list[el]["value"])}]: TRUE], operator) @@ list
+   
 ============================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
