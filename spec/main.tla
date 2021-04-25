@@ -47,6 +47,12 @@ ElementRemoved == lab \notin DOMAIN list
 
 ElementAfterRemoved == preRemoveSize - 1 = Cardinality(DOMAIN list) /\ lab2 \notin DOMAIN list /\ lab2 /= list[lab]["next"]
 
+RemovedHead == IF Empty(list) THEN preRemoveSize - 1 = 0 /\ lab \notin DOMAIN list 
+               ELSE preRemoveSize - 1 = Cardinality(DOMAIN list) /\ lab \notin DOMAIN list /\ lab /= First(list)
+
+RemovedPrev == lab2 \notin DOMAIN list /\ preRemoveSize - 1 = Cardinality(DOMAIN list)
+
+NextGotten == list[lab]["next"] = lab2 /\ lab2 \in Range(list)
 
 (*A helper operator for providing proof of concept of what the ForEach functionality could do. The return 
   value x*2 could be replaced by anything the implementor wants but for example x² would break the ForEach 
@@ -76,7 +82,7 @@ begin
     end with;
         
         \* Do the following from each starting state
-        \* Also do it in a loop
+        LOOP:
         either
             INSERTHEAD:
             set_preInsertSize();
@@ -146,6 +152,39 @@ begin
             ASSERTREMOVEAFTER:
             assert ElementAfterRemoved;
             end if;
+        or  
+            REMOVEHEAD:
+            
+            if Empty(list) then
+            skip;
+            else
+            lab := First(list);
+            preRemoveSize := Cardinality(DOMAIN list);
+            list := RemoveHead(list);
+            
+            ASSERTREMOVEHEAD:
+            assert RemovedHead;
+            end if;
+        or  
+            REMOVEPREV:
+            if Cardinality(DOMAIN list) < 2 then
+            skip;
+            else
+            preRemoveSize := Cardinality(DOMAIN list);
+            lab := CHOOSE l \in DOMAIN list: list[l]["next"] \in Range(list);
+            lab2 := CHOOSE l \in DOMAIN list: list[l]["next"] = lab;
+            list := RemovePrev(lab, list);
+            
+            ASSERTREMOVEPREV:
+            assert RemovedPrev;
+            end if;
+        or
+            GETNEXT:
+            lab := CHOOSE l \in DOMAIN list: TRUE;
+            lab2 := GetNext(lab, list);
+            
+            GOTNEXT:
+            assert NextGotten;
         or 
             FOREACHFROM:
             \* just to make it work with empty lists as well
@@ -166,41 +205,14 @@ begin
                 skip;
             end if;
     end either;
-    
-   \* END:
-   \* print "===LIST IS===";
-  \*  print list;
-    
  
- (*       
-LOOP:
- while i < 3 do
-    either 
-       list := RemoveAfter(CHOOSE l \in DOMAIN list: list[l]["next"] \in DOMAIN list);
-    or
-       list := RemoveHead;
-    or
-       list := RemovePrev(CHOOSE l \in DOMAIN list: list[l]["next"] \in Range(list));
-    or
-       GetNext(CHOOSE l \in DOMAIN list: TRUE)
-    or
-       Swap(list, LinkedList(NewDomain(2, list)));
-    or
-       UpdatingLast:
-        list[Last(list)]["next"] := First(list2);
-       Concatenating:
-        list := Concat(list, list2)
-    end either;
-INCREMENT:
-   i := i+1;
-print "=== LIST IS ===";
-print list;
-\* This should also be an invariant
-assert HasLast;
-end while;
- *)   
+
+    INCREMENT:
+    i := i+1;
+
+ 
 end algorithm;*)
-\* BEGIN TRANSLATION (chksum(pcal) = "42a90341" /\ chksum(tla) = "adbbf156")
+\* BEGIN TRANSLATION (chksum(pcal) = "7c83e4ed" /\ chksum(tla) = "f98f1419")
 VARIABLES i, from, list, list2, temp, arg, lab, lab2, index, preInsertSize, 
           preRemoveSize, nl, l1, l2, pc
 
@@ -225,6 +237,12 @@ ElementRemoved == lab \notin DOMAIN list
 
 ElementAfterRemoved == preRemoveSize - 1 = Cardinality(DOMAIN list) /\ lab2 \notin DOMAIN list /\ lab2 /= list[lab]["next"]
 
+RemovedHead == IF Empty(list) THEN preRemoveSize - 1 = 0 /\ lab \notin DOMAIN list
+               ELSE preRemoveSize - 1 = Cardinality(DOMAIN list) /\ lab \notin DOMAIN list /\ lab /= First(list)
+
+RemovedPrev == lab2 \notin DOMAIN list /\ preRemoveSize - 1 = Cardinality(DOMAIN list)
+
+NextGotten == list[lab]["next"] = lab2 /\ lab2 \in Range(list)
 
 
 
@@ -257,15 +275,23 @@ PRECONDITIONS == /\ pc = "PRECONDITIONS"
                       /\ \E size2 \in 0..3:
                            list' = LinkedList(NewDomain(size2, list))
                       /\ list2' = LinkedList(NewDomain(size1, list'))
-                 /\ \/ /\ pc' = "INSERTHEAD"
-                    \/ /\ pc' = "INSERTAFTER"
-                    \/ /\ pc' = "CONCAT"
-                    \/ /\ pc' = "SWAP"
-                    \/ /\ pc' = "REMOVE"
-                    \/ /\ pc' = "REMOVEAFTER"
-                    \/ /\ pc' = "FOREACHFROM"
+                 /\ pc' = "LOOP"
                  /\ UNCHANGED << i, from, temp, arg, lab, lab2, index, 
                                  preInsertSize, preRemoveSize, nl, l1, l2 >>
+
+LOOP == /\ pc = "LOOP"
+        /\ \/ /\ pc' = "INSERTHEAD"
+           \/ /\ pc' = "INSERTAFTER"
+           \/ /\ pc' = "CONCAT"
+           \/ /\ pc' = "SWAP"
+           \/ /\ pc' = "REMOVE"
+           \/ /\ pc' = "REMOVEAFTER"
+           \/ /\ pc' = "REMOVEHEAD"
+           \/ /\ pc' = "REMOVEPREV"
+           \/ /\ pc' = "GETNEXT"
+           \/ /\ pc' = "FOREACHFROM"
+        /\ UNCHANGED << i, from, list, list2, temp, arg, lab, lab2, index, 
+                        preInsertSize, preRemoveSize, nl, l1, l2 >>
 
 INSERTHEAD == /\ pc = "INSERTHEAD"
               /\ IF Empty(list)
@@ -279,8 +305,8 @@ INSERTHEAD == /\ pc = "INSERTHEAD"
 
 ASSERTINSERTHEAD == /\ pc = "ASSERTINSERTHEAD"
                     /\ Assert(HeadElementInserted, 
-                              "Failure of assertion at line 87, column 13.")
-                    /\ pc' = "Done"
+                              "Failure of assertion at line 93, column 13.")
+                    /\ pc' = "INCREMENT"
                     /\ UNCHANGED << i, from, list, list2, temp, arg, lab, lab2, 
                                     index, preInsertSize, preRemoveSize, nl, 
                                     l1, l2 >>
@@ -288,7 +314,7 @@ ASSERTINSERTHEAD == /\ pc = "ASSERTINSERTHEAD"
 INSERTAFTER == /\ pc = "INSERTAFTER"
                /\ IF Empty(list)
                      THEN /\ TRUE
-                          /\ pc' = "Done"
+                          /\ pc' = "INCREMENT"
                           /\ UNCHANGED << list, temp, lab, lab2, preInsertSize >>
                      ELSE /\ IF Empty(list)
                                 THEN /\ preInsertSize' = 0
@@ -303,8 +329,8 @@ INSERTAFTER == /\ pc = "INSERTAFTER"
 
 ASSERTINSERTAFTER == /\ pc = "ASSERTINSERTAFTER"
                      /\ Assert(ElementInsertedAfter, 
-                               "Failure of assertion at line 100, column 13.")
-                     /\ pc' = "Done"
+                               "Failure of assertion at line 106, column 13.")
+                     /\ pc' = "INCREMENT"
                      /\ UNCHANGED << i, from, list, list2, temp, arg, lab, 
                                      lab2, index, preInsertSize, preRemoveSize, 
                                      nl, l1, l2 >>
@@ -321,8 +347,8 @@ CONCAT == /\ pc = "CONCAT"
 
 ASSERTCONCAT == /\ pc = "ASSERTCONCAT"
                 /\ Assert(ListsConcatenated, 
-                          "Failure of assertion at line 111, column 13.")
-                /\ pc' = "Done"
+                          "Failure of assertion at line 117, column 13.")
+                /\ pc' = "INCREMENT"
                 /\ UNCHANGED << i, from, list, list2, temp, arg, lab, lab2, 
                                 index, preInsertSize, preRemoveSize, nl, l1, 
                                 l2 >>
@@ -339,8 +365,8 @@ SWAP == /\ pc = "SWAP"
 
 ASSERTSWAP == /\ pc = "ASSERTSWAP"
               /\ Assert(ListsSwapped, 
-                        "Failure of assertion at line 121, column 13.")
-              /\ pc' = "Done"
+                        "Failure of assertion at line 127, column 13.")
+              /\ pc' = "INCREMENT"
               /\ UNCHANGED << i, from, list, list2, temp, arg, lab, lab2, 
                               index, preInsertSize, preRemoveSize, nl, l1, l2 >>
 
@@ -360,22 +386,22 @@ REMOVENOTEMPTY == /\ pc = "REMOVENOTEMPTY"
 
 ASSERTREMOVE == /\ pc = "ASSERTREMOVE"
                 /\ Assert(ElementRemoved, 
-                          "Failure of assertion at line 131, column 17.")
-                /\ pc' = "Done"
+                          "Failure of assertion at line 137, column 17.")
+                /\ pc' = "INCREMENT"
                 /\ UNCHANGED << i, from, list, list2, temp, arg, lab, lab2, 
                                 index, preInsertSize, preRemoveSize, nl, l1, 
                                 l2 >>
 
 REMOVEEMPTY == /\ pc = "REMOVEEMPTY"
                /\ TRUE
-               /\ pc' = "Done"
+               /\ pc' = "INCREMENT"
                /\ UNCHANGED << i, from, list, list2, temp, arg, lab, lab2, 
                                index, preInsertSize, preRemoveSize, nl, l1, l2 >>
 
 REMOVEAFTER == /\ pc = "REMOVEAFTER"
                /\ IF Cardinality(DOMAIN list) < 2
                      THEN /\ TRUE
-                          /\ pc' = "Done"
+                          /\ pc' = "INCREMENT"
                           /\ UNCHANGED << list, lab, lab2, preRemoveSize >>
                      ELSE /\ preRemoveSize' = Cardinality(DOMAIN list)
                           /\ lab' = (CHOOSE l \in DOMAIN list: list[l]["next"] \in DOMAIN list)
@@ -387,17 +413,72 @@ REMOVEAFTER == /\ pc = "REMOVEAFTER"
 
 ASSERTREMOVEAFTER == /\ pc = "ASSERTREMOVEAFTER"
                      /\ Assert(ElementAfterRemoved, 
-                               "Failure of assertion at line 147, column 13.")
-                     /\ pc' = "Done"
+                               "Failure of assertion at line 153, column 13.")
+                     /\ pc' = "INCREMENT"
                      /\ UNCHANGED << i, from, list, list2, temp, arg, lab, 
                                      lab2, index, preInsertSize, preRemoveSize, 
                                      nl, l1, l2 >>
+
+REMOVEHEAD == /\ pc = "REMOVEHEAD"
+              /\ IF Empty(list)
+                    THEN /\ TRUE
+                         /\ pc' = "INCREMENT"
+                         /\ UNCHANGED << list, lab, preRemoveSize >>
+                    ELSE /\ lab' = First(list)
+                         /\ preRemoveSize' = Cardinality(DOMAIN list)
+                         /\ list' = RemoveHead(list)
+                         /\ pc' = "ASSERTREMOVEHEAD"
+              /\ UNCHANGED << i, from, list2, temp, arg, lab2, index, 
+                              preInsertSize, nl, l1, l2 >>
+
+ASSERTREMOVEHEAD == /\ pc = "ASSERTREMOVEHEAD"
+                    /\ Assert(RemovedHead, 
+                              "Failure of assertion at line 166, column 13.")
+                    /\ pc' = "INCREMENT"
+                    /\ UNCHANGED << i, from, list, list2, temp, arg, lab, lab2, 
+                                    index, preInsertSize, preRemoveSize, nl, 
+                                    l1, l2 >>
+
+REMOVEPREV == /\ pc = "REMOVEPREV"
+              /\ IF Cardinality(DOMAIN list) < 2
+                    THEN /\ TRUE
+                         /\ pc' = "INCREMENT"
+                         /\ UNCHANGED << list, lab, lab2, preRemoveSize >>
+                    ELSE /\ preRemoveSize' = Cardinality(DOMAIN list)
+                         /\ lab' = (CHOOSE l \in DOMAIN list: list[l]["next"] \in Range(list))
+                         /\ lab2' = (CHOOSE l \in DOMAIN list: list[l]["next"] = lab')
+                         /\ list' = RemovePrev(lab', list)
+                         /\ pc' = "ASSERTREMOVEPREV"
+              /\ UNCHANGED << i, from, list2, temp, arg, index, preInsertSize, 
+                              nl, l1, l2 >>
+
+ASSERTREMOVEPREV == /\ pc = "ASSERTREMOVEPREV"
+                    /\ Assert(RemovedPrev, 
+                              "Failure of assertion at line 179, column 13.")
+                    /\ pc' = "INCREMENT"
+                    /\ UNCHANGED << i, from, list, list2, temp, arg, lab, lab2, 
+                                    index, preInsertSize, preRemoveSize, nl, 
+                                    l1, l2 >>
+
+GETNEXT == /\ pc = "GETNEXT"
+           /\ lab' = (CHOOSE l \in DOMAIN list: TRUE)
+           /\ lab2' = GetNext(lab', list)
+           /\ pc' = "GOTNEXT"
+           /\ UNCHANGED << i, from, list, list2, temp, arg, index, 
+                           preInsertSize, preRemoveSize, nl, l1, l2 >>
+
+GOTNEXT == /\ pc = "GOTNEXT"
+           /\ Assert(NextGotten, 
+                     "Failure of assertion at line 187, column 13.")
+           /\ pc' = "INCREMENT"
+           /\ UNCHANGED << i, from, list, list2, temp, arg, lab, lab2, index, 
+                           preInsertSize, preRemoveSize, nl, l1, l2 >>
 
 FOREACHFROM == /\ pc = "FOREACHFROM"
                /\ IF Empty(list) = FALSE
                      THEN /\ pc' = "FOREACHNOTEMPTY"
                      ELSE /\ TRUE
-                          /\ pc' = "Done"
+                          /\ pc' = "INCREMENT"
                /\ UNCHANGED << i, from, list, list2, temp, arg, lab, lab2, 
                                index, preInsertSize, preRemoveSize, nl, l1, l2 >>
 
@@ -422,18 +503,26 @@ FOREACHFROMLOOP == /\ pc = "FOREACHFROMLOOP"
 FOREACHFROMRUN == /\ pc = "FOREACHFROMRUN"
                   /\ list' = ForEachFrom(list, {el \in DOMAIN list: el \notin arg}, ForEachOperator)
                   /\ from' = 1
-                  /\ pc' = "Done"
+                  /\ pc' = "INCREMENT"
                   /\ UNCHANGED << i, list2, temp, arg, lab, lab2, index, 
                                   preInsertSize, preRemoveSize, nl, l1, l2 >>
+
+INCREMENT == /\ pc = "INCREMENT"
+             /\ i' = i+1
+             /\ pc' = "Done"
+             /\ UNCHANGED << from, list, list2, temp, arg, lab, lab2, index, 
+                             preInsertSize, preRemoveSize, nl, l1, l2 >>
 
 (* Allow infinite stuttering to prevent deadlock on termination. *)
 Terminating == pc = "Done" /\ UNCHANGED vars
 
-Next == PRECONDITIONS \/ INSERTHEAD \/ ASSERTINSERTHEAD \/ INSERTAFTER
-           \/ ASSERTINSERTAFTER \/ CONCAT \/ ASSERTCONCAT \/ SWAP \/ ASSERTSWAP
-           \/ REMOVE \/ REMOVENOTEMPTY \/ ASSERTREMOVE \/ REMOVEEMPTY
-           \/ REMOVEAFTER \/ ASSERTREMOVEAFTER \/ FOREACHFROM \/ FOREACHNOTEMPTY
-           \/ FOREACHFROMLOOP \/ FOREACHFROMRUN
+Next == PRECONDITIONS \/ LOOP \/ INSERTHEAD \/ ASSERTINSERTHEAD
+           \/ INSERTAFTER \/ ASSERTINSERTAFTER \/ CONCAT \/ ASSERTCONCAT \/ SWAP
+           \/ ASSERTSWAP \/ REMOVE \/ REMOVENOTEMPTY \/ ASSERTREMOVE
+           \/ REMOVEEMPTY \/ REMOVEAFTER \/ ASSERTREMOVEAFTER \/ REMOVEHEAD
+           \/ ASSERTREMOVEHEAD \/ REMOVEPREV \/ ASSERTREMOVEPREV \/ GETNEXT
+           \/ GOTNEXT \/ FOREACHFROM \/ FOREACHNOTEMPTY \/ FOREACHFROMLOOP
+           \/ FOREACHFROMRUN \/ INCREMENT
            \/ Terminating
 
 Spec == Init /\ [][Next]_vars
