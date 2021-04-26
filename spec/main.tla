@@ -47,7 +47,22 @@ InsertInvariant == IF Empty(list) THEN First(InsertHead(NewLabel(list), list)) =
                      /\ Cardinality(DOMAIN InsertAfter(CHOOSE el \in DOMAIN list: TRUE, list)) = (Cardinality(DOMAIN list) + 1)
                      /\ \E el \in DOMAIN InsertAfter(CHOOSE el \in DOMAIN list: TRUE, list): el \notin DOMAIN list
 
-
+ConcatInvariant == IF Empty(list) THEN Concat(list, list2)[1] = list2 /\ Empty(Concat(list, list2)[2]) 
+                   ELSE IF Empty(list2) THEN Concat(list2, list)[1] = list /\ Empty(Concat(list2, list)[2])
+                   ELSE /\ DOMAIN list \subseteq DOMAIN Concat(list, list2)[1] 
+                        /\ Empty(Concat(list, list2)[2])
+                        /\ DOMAIN list \subseteq DOMAIN Concat(list2, list)[1] 
+                        /\ Empty(Concat(list2, list)[2])
+                        /\ DOMAIN list2 \subseteq DOMAIN Concat(list, list2)[1] 
+                        /\ DOMAIN list2 \subseteq DOMAIN Concat(list2, list)[1]
+                        
+SwapInvariant == IF Empty(list) THEN Swap(list, list2)[1] = list2 /\ Empty(Swap(list, list2)[2])
+                 ELSE IF Empty(list2) THEN Empty(Swap(list, list2)[1]) /\ Swap(list, list2)[2] = list
+                 ELSE /\ Swap(list, list2)[1] = list2 
+                      /\ Swap(list, list2)[2] = list
+                      /\ Swap(list2, list)[1] = list
+                      /\ Swap(list2, list)[2] = list2
+                      
 \* Assertion operators called when respective functionality has been applied on the list.
 HeadElementInserted == Cardinality(DOMAIN list) = (preInsertSize + 1) /\ nl \in DOMAIN list /\ nl = First(list)
 
@@ -256,7 +271,7 @@ begin
     end while;
  
 end algorithm;*)
-\* BEGIN TRANSLATION (chksum(pcal) = "d0767784" /\ chksum(tla) = "bf8fde79")
+\* BEGIN TRANSLATION (chksum(pcal) = "1153b0d2" /\ chksum(tla) = "90db7556")
 VARIABLES depth, index, i, from, list, list2, temp, arg, lab, lab2, 
           preInsertSize, preRemoveSize, nl, l1, l2, pc
 
@@ -280,6 +295,21 @@ InsertInvariant == IF Empty(list) THEN First(InsertHead(NewLabel(list), list)) =
                      /\ Cardinality(DOMAIN InsertAfter(CHOOSE el \in DOMAIN list: TRUE, list)) = (Cardinality(DOMAIN list) + 1)
                      /\ \E el \in DOMAIN InsertAfter(CHOOSE el \in DOMAIN list: TRUE, list): el \notin DOMAIN list
 
+ConcatInvariant == IF Empty(list) THEN Concat(list, list2)[1] = list2 /\ Empty(Concat(list, list2)[2])
+                   ELSE IF Empty(list2) THEN Concat(list2, list)[1] = list /\ Empty(Concat(list2, list)[2])
+                   ELSE /\ DOMAIN list \subseteq DOMAIN Concat(list, list2)[1]
+                        /\ Empty(Concat(list, list2)[2])
+                        /\ DOMAIN list \subseteq DOMAIN Concat(list2, list)[1]
+                        /\ Empty(Concat(list2, list)[2])
+                        /\ DOMAIN list2 \subseteq DOMAIN Concat(list, list2)[1]
+                        /\ DOMAIN list2 \subseteq DOMAIN Concat(list2, list)[1]
+
+SwapInvariant == IF Empty(list) THEN Swap(list, list2)[1] = list2 /\ Empty(Swap(list, list2)[2])
+                 ELSE IF Empty(list2) THEN Empty(Swap(list, list2)[1]) /\ Swap(list, list2)[2] = list
+                 ELSE /\ Swap(list, list2)[1] = list2
+                      /\ Swap(list, list2)[2] = list
+                      /\ Swap(list2, list)[1] = list
+                      /\ Swap(list2, list)[2] = list2
 
 
 HeadElementInserted == Cardinality(DOMAIN list) = (preInsertSize + 1) /\ nl \in DOMAIN list /\ nl = First(list)
@@ -378,7 +408,7 @@ INSERTHEAD == /\ pc = "INSERTHEAD"
 
 ASSERTINSERTHEAD == /\ pc = "ASSERTINSERTHEAD"
                     /\ Assert(HeadElementInserted, 
-                              "Failure of assertion at line 112, column 13.")
+                              "Failure of assertion at line 127, column 13.")
                     /\ pc' = "INCREMENT"
                     /\ UNCHANGED << depth, index, i, from, list, list2, temp, 
                                     arg, lab, lab2, preInsertSize, 
@@ -402,7 +432,7 @@ INSERTAFTER == /\ pc = "INSERTAFTER"
 
 ASSERTINSERTAFTER == /\ pc = "ASSERTINSERTAFTER"
                      /\ Assert(ElementInsertedAfter, 
-                               "Failure of assertion at line 125, column 13.")
+                               "Failure of assertion at line 140, column 13.")
                      /\ pc' = "INCREMENT"
                      /\ UNCHANGED << depth, index, i, from, list, list2, temp, 
                                      arg, lab, lab2, preInsertSize, 
@@ -427,7 +457,7 @@ CONCAT == /\ pc = "CONCAT"
 
 ASSERTCONCAT == /\ pc = "ASSERTCONCAT"
                 /\ Assert(ListsConcatenated, 
-                          "Failure of assertion at line 141, column 13.")
+                          "Failure of assertion at line 156, column 13.")
                 /\ pc' = "INCREMENT"
                 /\ UNCHANGED << depth, index, i, from, list, list2, temp, arg, 
                                 lab, lab2, preInsertSize, preRemoveSize, nl, 
@@ -452,7 +482,7 @@ SWAP == /\ pc = "SWAP"
 
 ASSERTSWAP == /\ pc = "ASSERTSWAP"
               /\ Assert(ListsSwapped, 
-                        "Failure of assertion at line 156, column 13.")
+                        "Failure of assertion at line 171, column 13.")
               /\ pc' = "INCREMENT"
               /\ UNCHANGED << depth, index, i, from, list, list2, temp, arg, 
                               lab, lab2, preInsertSize, preRemoveSize, nl, l1, 
@@ -475,7 +505,7 @@ REMOVENOTEMPTY == /\ pc = "REMOVENOTEMPTY"
 
 ASSERTREMOVE == /\ pc = "ASSERTREMOVE"
                 /\ Assert(ElementRemoved, 
-                          "Failure of assertion at line 166, column 17.")
+                          "Failure of assertion at line 181, column 17.")
                 /\ pc' = "INCREMENT"
                 /\ UNCHANGED << depth, index, i, from, list, list2, temp, arg, 
                                 lab, lab2, preInsertSize, preRemoveSize, nl, 
@@ -503,7 +533,7 @@ REMOVEAFTER == /\ pc = "REMOVEAFTER"
 
 ASSERTREMOVEAFTER == /\ pc = "ASSERTREMOVEAFTER"
                      /\ Assert(ElementAfterRemoved, 
-                               "Failure of assertion at line 182, column 13.")
+                               "Failure of assertion at line 197, column 13.")
                      /\ pc' = "INCREMENT"
                      /\ UNCHANGED << depth, index, i, from, list, list2, temp, 
                                      arg, lab, lab2, preInsertSize, 
@@ -523,7 +553,7 @@ REMOVEHEAD == /\ pc = "REMOVEHEAD"
 
 ASSERTREMOVEHEAD == /\ pc = "ASSERTREMOVEHEAD"
                     /\ Assert(RemovedHead, 
-                              "Failure of assertion at line 194, column 13.")
+                              "Failure of assertion at line 209, column 13.")
                     /\ pc' = "INCREMENT"
                     /\ UNCHANGED << depth, index, i, from, list, list2, temp, 
                                     arg, lab, lab2, preInsertSize, 
@@ -544,7 +574,7 @@ REMOVEPREV == /\ pc = "REMOVEPREV"
 
 ASSERTREMOVEPREV == /\ pc = "ASSERTREMOVEPREV"
                     /\ Assert(RemovedPrev, 
-                              "Failure of assertion at line 207, column 13.")
+                              "Failure of assertion at line 222, column 13.")
                     /\ pc' = "INCREMENT"
                     /\ UNCHANGED << depth, index, i, from, list, list2, temp, 
                                     arg, lab, lab2, preInsertSize, 
@@ -559,7 +589,7 @@ GETNEXT == /\ pc = "GETNEXT"
 
 GOTNEXT == /\ pc = "GOTNEXT"
            /\ Assert(NextGotten, 
-                     "Failure of assertion at line 215, column 13.")
+                     "Failure of assertion at line 230, column 13.")
            /\ pc' = "INCREMENT"
            /\ UNCHANGED << depth, index, i, from, list, list2, temp, arg, lab, 
                            lab2, preInsertSize, preRemoveSize, nl, l1, l2 >>
@@ -577,7 +607,7 @@ FOREACH == /\ pc = "FOREACH"
 
 ASSERTFOREACH == /\ pc = "ASSERTFOREACH"
                  /\ Assert(ForEachedList, 
-                           "Failure of assertion at line 225, column 13.")
+                           "Failure of assertion at line 240, column 13.")
                  /\ pc' = "INCREMENT"
                  /\ UNCHANGED << depth, index, i, from, list, list2, temp, arg, 
                                  lab, lab2, preInsertSize, preRemoveSize, nl, 
@@ -613,7 +643,7 @@ FOREACHFROMRUN == /\ pc = "FOREACHFROMRUN"
 
 ASSERTFOREACHFROM == /\ pc = "ASSERTFOREACHFROM"
                      /\ Assert(ForEachedFromList, 
-                               "Failure of assertion at line 250, column 13.")
+                               "Failure of assertion at line 265, column 13.")
                      /\ pc' = "INCREMENT"
                      /\ UNCHANGED << depth, index, i, from, list, list2, temp, 
                                      arg, lab, lab2, preInsertSize, 
