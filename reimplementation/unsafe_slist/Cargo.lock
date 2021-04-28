@@ -37,6 +37,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "lazy_static"
+version = "1.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
+
+[[package]]
 name = "libc"
 version = "0.2.94"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -104,11 +110,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "24d5f089152e60f62d28b835fbff2cd2e8dc0baf1ac13343bef92ab7eed84548"
 
 [[package]]
-name = "unsafe_slist"
+name = "singly_linked_list"
 version = "0.1.0"
 dependencies = [
+ "lazy_static",
  "quickcheck",
+ "singly_linked_list_unsafe",
 ]
+
+[[package]]
+name = "singly_linked_list_unsafe"
+version = "0.1.0"
 
 [[package]]
 name = "wasi"
