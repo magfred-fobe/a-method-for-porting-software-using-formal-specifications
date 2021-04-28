@@ -35,32 +35,12 @@ pub fn insert_head(identifier: i32, value: i32) -> i32 {
 }
 
 pub fn insert_after(identifier: i32, index: i32, value: i32) -> i32 {
-    let mut node = LISTS.lock().unwrap();
-    let node = node.get_mut(&identifier).unwrap();
-    let node = node.head.as_ref();
-    
-    let mut found_node = node;
-    
     let mut list = LISTS.lock().unwrap();
-    let list = match list.get_mut(&identifier) {
-        None => {return -1},
-        Some(val) => val
-    };
-    
-    let node = match node {
-        None => {return -1},
-        Some(val) => val
-    };
-    
-    
-    for _i in 0..index {
-        let some = node.next.as_ref().unwrap();
-        found_node = Some(some);
+    if let Some(x) = list.get_mut(&1) {
+        x.insert_head(1);
     }
-    //let y =
-    //node.next;
-     
-    list.insert_after(found_node.unwrap(), value);
+    //let &mut list = *list.get_mut(&identifier).unwrap();
+    //list.insert_after(index, value);
     0
 }
 
@@ -72,7 +52,7 @@ fn test_test() {
     ll.insert_head(1);
     ll.insert_head(2);
     let x = ll.get_head_addr();
-    ll.insert_after(x, 1);
+    //ll.insert_after(x, 1);
 } 
 
 

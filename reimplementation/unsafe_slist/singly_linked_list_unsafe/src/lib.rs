@@ -8,17 +8,22 @@ pub mod singly_linked_list_unsafe {
     }
 
     impl <T: Copy> Node<T> {
-        pub fn insert_after(&mut self, new_node: *const Node<T>, val: T) {
-                let self_addr = self as *const _;
+        pub fn insert_after(mut self, steps_left: i32, val: T) {
                 
-                if self_addr == new_node {
-                    let after_me = Node{next: self.next.clone(), value: val};
+            match steps_left {
+                0 => {
+                    let after_me = Node{next: self.next, value: val};
                     self.next = Some(Box::new(Node{next: Some(Box::new(after_me)), value: val }));
-                } else  {
-                    self.next.clone().unwrap().insert_after(new_node, val)
-                }
+                },
+                _ => {
+                    match self.next {
+                        Some(node) => {node.insert_after(steps_left-1, val)},
+                        None => {panic!("Can not insert after end of list")}
+                    }              
+                } 
             }  
         }
+    }
 
 
     pub struct LinkedList<T: Copy> {
@@ -39,10 +44,11 @@ pub mod singly_linked_list_unsafe {
             self.head = Some(new_head); 
         }
 
-        pub fn insert_after(self, node: *const Node<T>, val: T) {
-                let mut head_or_not = self.head.clone().unwrap();
-                //let unsafe_head = &mut headOrNot as *mut Node<T>;
-                head_or_not.insert_after(node, val);
+        pub fn insert_after(self, index: i32, val: T) {
+                match self.head {
+                    None => {panic!("Can not insert after in empty list")},
+                    Some(node) => node.insert_after(index, val)
+                }
         }
         
         pub fn new() -> LinkedList<T> {
