@@ -6,7 +6,7 @@ use std::sync::Mutex;
 use lazy_static::lazy_static;
 use std::collections::HashMap;
 //Use the crate containing the version to test-
-use singly_linked_list_unsafe::singly_linked_list_unsafe as list_impl;
+use singly_linked_list_unsafe::singly_linked_list_unsafe_array as list_impl;
 use list_impl::LinkedList;
 use list_impl::Node;
 
@@ -34,27 +34,22 @@ pub fn insert_head(identifier: i32, value: i32) -> i32 {
     }
 }
 
-pub fn insert_after(identifier: i32, index: i32, value: i32) -> i32 {
+pub fn insert_after(identifier: i32, index: usize, value: i32) -> i32 {
     let mut list = LISTS.lock().unwrap();
-    if let Some(x) = list.get_mut(&1) {
-        x.insert_head(1);
+    let list = list.get_mut(&identifier);
+    if list.is_some() {
+        let list  = list.unwrap();
+        match list.node_at_index(index) {
+            None => -1, 
+            Some(node) => {
+                list.insert_after(node, value);
+                0
+            }
+        }
+    } else {
+        -1
     }
-    //let &mut list = *list.get_mut(&identifier).unwrap();
-    //list.insert_after(index, value);
-    0
 }
-
-
-
-#[test]
-fn test_test() {
-    let mut ll: LinkedList<i32> = LinkedList::new();
-    ll.insert_head(1);
-    ll.insert_head(2);
-    let x = ll.get_head_addr();
-    //ll.insert_after(x, 1);
-} 
-
 
 //extern crate singly_linked_list_unsafe;
 //use singly_linked_list_unsafe::*;
