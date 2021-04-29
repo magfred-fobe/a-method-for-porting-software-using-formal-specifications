@@ -4,7 +4,7 @@ RUST_SOURCE_PATH="../reimplementation/unsafe_slist"
 RUST_HEADER_PATH="rust_lib.h"
 RUST_LIB_PATH="target/debug/libsingly_linked_list_rust.a"
 RUST_DEBUG_PATH="target/debug/libsingly_linked_list_rust.d"
-mkdir lib
+mkdir -p lib
 cd ${RUST_SOURCE_PATH}
 echo "Building library"
 ./gen_lib_bindings.sh 1>/dev/null

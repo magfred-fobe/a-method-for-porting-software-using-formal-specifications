@@ -26,7 +26,7 @@ mod my_library {
     }
 
     #[no_mangle]
-    pub extern "C" fn empty(identifier: u32) -> i32 {
+    pub extern "C" fn rlib_empty(identifier: u32) -> i32 {
         let list = LISTS.lock().unwrap();
         match list.get(identifier as usize) {
             Some(val) => val.is_empty() as i32,
