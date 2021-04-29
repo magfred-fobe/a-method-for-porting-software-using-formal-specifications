@@ -270,7 +270,7 @@ pub mod singly_linked_list_unsafe_array {
         }
     }
 
-    pub fn linked_list_from<T: LinkedListValue>(from: Vec<T>) -> LinkedList<T> {
+    pub fn linked_list_from<T: LinkedListValue>(from: &Vec<T>) -> LinkedList<T> {
         if from.len() == 0 {
             return LinkedList::new();
         } 
@@ -329,7 +329,7 @@ pub mod singly_linked_list_unsafe_array {
             if list.len() == 0 {
                 return true;
             }
-            let mut linked_list = linked_list_from(list);
+            let mut linked_list = linked_list_from(&list);
             let size = linked_list.size();
             let index_in_range = index % size;
             
@@ -346,7 +346,7 @@ pub mod singly_linked_list_unsafe_array {
         } 
 
         fn prop_insert_head(list: Vec<i32>, new_elem: i32) -> bool {
-            let mut linked_list = linked_list_from(list);
+            let mut linked_list = linked_list_from(&list);
             linked_list.insert_head(new_elem);
             if let Some(head_node) = linked_list.head() {
                 head_node.value == new_elem
@@ -357,7 +357,7 @@ pub mod singly_linked_list_unsafe_array {
 
         fn prop_is_empty(list: Vec<i32>) -> bool {
             
-            let linked_list = linked_list_from(list);
+            let linked_list = linked_list_from(&list);
                     
             if list.len() == 0 {
                 linked_list.is_empty()
