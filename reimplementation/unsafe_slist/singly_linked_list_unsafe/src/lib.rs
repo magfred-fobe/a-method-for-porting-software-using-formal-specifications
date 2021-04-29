@@ -287,8 +287,8 @@ pub mod singly_linked_list_unsafe_array {
         use super::*;
 
         /*  Invariants. These are defined by the model
-            and should be true at every step of the algorithm
-        */
+         *  and should be true at every step of the algorithm
+         */
         fn remove_invariant(_ll: &LinkedList<i32>) -> bool {
             true
         }
@@ -328,25 +328,18 @@ pub mod singly_linked_list_unsafe_array {
             let mut linked_list = linked_list_from(list);
             let size = linked_list.size();
             let index_in_range = index % size;
-            match linked_list.node_at_index(index_in_range)  {
-                Err(_) => false, 
-                Ok(None) => false,
-                Ok(Some(node)) =>  {
-                    match linked_list.insert_after(node, new_elem) {
-                        Err(_) => false,
-                        Ok(_) => match linked_list.node_at_index(index % size) {
-                            Err(_) => false,
-                            Ok(None) => false,
-                            Ok(Some(node)) => {    
-                                match linked_list.next(node) {
-                                None => false,
-                                Some(node) => node.value == new_elem && check_invariants(&linked_list)  
-                                }                   
-                            },
+
+            
+            if let Ok(Some(node)) =  linked_list.node_at_index(index_in_range)  {
+                if let Ok(_) = linked_list.insert_after(node, new_elem) {            
+                    if let Ok(Some(node)) = linked_list.node_at_index(index_in_range) {
+                            if let Some(node) =  linked_list.next(node) {
+                            return node.value == new_elem && check_invariants(&linked_list)                     
                         }
                     }
-                },
+                }
             }
+            false
         } 
 
         fn prop_insert_head(list: Vec<i32>, new_elem: i32) -> bool {
