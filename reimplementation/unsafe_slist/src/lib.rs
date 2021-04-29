@@ -7,7 +7,7 @@ mod my_library {
 
     use std::sync::Mutex;
     use lazy_static::lazy_static;
-    
+
     //Use the crate containing the version to test-
     use singly_linked_list_unsafe::singly_linked_list_unsafe_array as list_impl;
     use list_impl::LinkedList;
@@ -24,7 +24,25 @@ mod my_library {
             Err(_) => -1
         }
     }
+
+    #[no_mangle]
+    pub extern "C" fn empty() -> i32 {
+        let mut list = LISTS.lock().unwrap();
+        list.get_mut(identifier as usize) match {
+            Some(val) => val.empty(),
+            -1
+        } 
+    }
     
+    #[no_mangle]
+    pub extern "C" fn head(identifier: u32) -> i32 {
+        let mut list = LISTS.lock().unwrap();
+        list.get_mut(identifier as usize) match {
+            Some(val) => val.head(),
+            -1
+        } 
+    }
+
     #[no_mangle]
     pub extern "C" fn rlib_insert_head(identifier: u32, value: i32) -> i32 {
         let mut list = LISTS.lock().unwrap();
