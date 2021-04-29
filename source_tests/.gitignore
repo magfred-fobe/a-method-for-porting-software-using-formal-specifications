@@ -4,6 +4,12 @@
 # Manual CMake generated files
 build/*
 
+# Generated libs
+lib/*
+
+# Generated bindings
+test/lib_impl/rust_lib.h
+
 # User-specific stuff
 .idea/**/workspace.xml
 .idea/**/tasks.xml
