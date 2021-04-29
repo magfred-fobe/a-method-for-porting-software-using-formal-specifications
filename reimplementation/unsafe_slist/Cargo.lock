@@ -121,6 +121,9 @@ dependencies = [
 [[package]]
 name = "singly_linked_list_unsafe"
 version = "0.1.0"
+dependencies = [
+ "quickcheck",
+]
 
 [[package]]
 name = "wasi"
