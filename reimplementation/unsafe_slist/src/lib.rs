@@ -26,21 +26,22 @@ mod my_library {
     }
 
     #[no_mangle]
-    pub extern "C" fn empty() -> i32 {
-        let mut list = LISTS.lock().unwrap();
-        list.get_mut(identifier as usize) match {
-            Some(val) => val.empty(),
-            -1
-        } 
+    pub extern "C" fn empty(identifier: u32) -> i32 {
+        let list = LISTS.lock().unwrap();
+        match list.get(identifier as usize) {
+            Some(val) => val.is_empty() as i32,
+            None => -1
+        }
     }
     
     #[no_mangle]
+    ///TODO: head()/first() should be implemented
     pub extern "C" fn head(identifier: u32) -> i32 {
-        let mut list = LISTS.lock().unwrap();
-        list.get_mut(identifier as usize) match {
-            Some(val) => val.head(),
-            -1
-        } 
+        let list = LISTS.lock().unwrap();
+        match list.get(identifier as usize) {
+            Some(_val) => 0,
+            None => -1
+        }
     }
 
     #[no_mangle]

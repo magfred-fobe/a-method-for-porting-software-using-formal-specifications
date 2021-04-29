@@ -236,7 +236,7 @@ pub mod singly_linked_list_unsafe_array {
             Ok(Some(node))
         }
 
-        pub fn is_empty(self)-> bool{
+        pub fn is_empty(&self)-> bool{
             self.size == 0
         }
 
