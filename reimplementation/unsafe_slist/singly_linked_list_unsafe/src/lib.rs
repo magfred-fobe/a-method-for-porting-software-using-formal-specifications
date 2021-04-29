@@ -55,7 +55,7 @@ pub mod singly_linked_list_unsafe {
                 LinkedList{ head: None }
             }
         
-    }
+        }
 
         pub fn linked_list_from<T: Copy>(from: Vec<T>) -> LinkedList<T> {
             if from.len() > 0 {
@@ -236,6 +236,10 @@ pub mod singly_linked_list_unsafe_array {
             Ok(Some(node))
         }
 
+        pub fn is_empty(self)-> bool{
+            self.size == 0
+        }
+
         pub fn insert_head(&mut self, val: T) { 
             let old_head = self.head;
             let next_index = self.nodes.len();
@@ -351,6 +355,17 @@ pub mod singly_linked_list_unsafe_array {
             }
         }
 
+        fn prop_is_empty(list: Vec<i32>) -> bool {
+            
+            let linked_list = linked_list_from(list);
+                    
+            if list.len() == 0 {
+                linked_list.is_empty()
+            }else{
+                linked_list.is_empty() == false
+            }
+        }
+
         #[test]
         fn test_insert_after_prop() {
             quickcheck(prop_insert_after as fn(Vec<i32>, i32, usize) -> bool);
@@ -358,6 +373,11 @@ pub mod singly_linked_list_unsafe_array {
         #[test]
         fn test_insert_head_prop() {
             quickcheck(prop_insert_head as fn(Vec<i32>, i32) -> bool);
+        }
+
+        #[test]
+        fn test_is_empty_prop() {
+            quickcheck(prop_is_empty as fn(list: Vec<i32>)-> bool);
         }
     }
 }
