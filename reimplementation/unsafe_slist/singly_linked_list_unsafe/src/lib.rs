@@ -8,7 +8,7 @@ pub mod singly_linked_list_unsafe {
         }
 
         impl <T: Copy> Node<T> {
-            pub fn insert_after(mut self, steps_left: i32, val: T) {
+            pub fn insert_after(mut self, steps_left: i32, val: T){
 
                 match steps_left {
                     0 => {
@@ -149,7 +149,24 @@ pub mod singly_linked_list_unsafe {
 
 
 pub mod singly_linked_list_unsafe_array {
-    use std::fmt::{Debug};
+    ///TODO: Clean up the messy Ok, Err, Some, None branches. There must be a nicer way.
+    use std::fmt::{Debug, Display};
+    use std::error::Error;
+
+
+    #[derive(Debug, Clone)]
+    pub struct LinkedListError {
+        message: String
+    }
+
+    impl Error for LinkedListError {
+}
+
+    impl Display for LinkedListError {
+        fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+            write!(f, "{}", self.message)
+        }
+    }
 
     pub trait LinkedListValue: Debug + Copy + Clone {}
     impl<T> LinkedListValue for T where T: Debug + Copy + Clone {}
@@ -203,19 +220,20 @@ pub mod singly_linked_list_unsafe_array {
             }
         }
 
-        pub fn node_at_index(&self, index: usize) -> Option<Node<T>> {
+        fn node_at_index(&self, index: usize) -> Result<Option<Node<T>>, LinkedListError> {
             let mut node = match self.head {
-                 None => {panic!("Can not find node at index in empty list")}
+                 None => return Err(LinkedListError{message: String::from("Can not find node at index in empty list")}),
                  Some(val) => self.nodes[val] 
             };
 
+            //Use while let instead?
             for _i in 0..index {
                 node = match node.next {
                     Some(val) => self.nodes[val],
-                    None => panic!("Unexpected end of list index: {}, size: {}", index, self.size)
-                } 
+                    None => return Err(LinkedListError{message: String::from(format!("Unexpected end of list index: {}, size: {}", index, self.size))})
+                }
             }
-            Some(node)
+            Ok(Some(node))
         }
 
         pub fn insert_head(&mut self, val: T) { 
@@ -226,18 +244,21 @@ pub mod singly_linked_list_unsafe_array {
             self.size = self.size + 1;
         }
 
-        pub fn insert_after(&mut self, node: Node<T>, val: T) {
+        pub fn insert_after(&mut self, node: Node<T>, val: T) -> Result<(), LinkedListError> {
             if self.size == 0 {
-                panic!("Can not insert after in empty list");
-            }
-            let mut old_node = self.nodes[node.index];
-            let old_node_next = node.next;
+                return Err(LinkedListError{message: String::from("Can not insert into empty list.")});
+            } else {
 
-            let next_index = self.nodes.len();
-            old_node.next = Some(next_index);
-            self.nodes[old_node.index] = old_node;
-            self.nodes.push(Node{next: old_node_next, value: val, index: next_index});
-            self.size = self.size + 1;
+                let mut old_node = self.nodes[node.index];
+                let old_node_next = node.next;
+                
+                let next_index = self.nodes.len();
+                old_node.next = Some(next_index);
+                self.nodes[old_node.index] = old_node;
+                self.nodes.push(Node{next: old_node_next, value: val, index: next_index});
+                self.size = self.size + 1;
+            }
+            Ok(())
         }
 
         pub fn new() -> Self {
@@ -282,8 +303,9 @@ pub mod singly_linked_list_unsafe_array {
                 current = match current {
                     Some(node) =>  match node.next {
                         Some(ind) => Some(list.nodes[ind]),
-                        None => None},
-                    None => {return false;}
+                        None => None
+                    },
+                    None => return false
                 }
             }
             current.is_none()
@@ -307,21 +329,23 @@ pub mod singly_linked_list_unsafe_array {
             let size = linked_list.size();
             let index_in_range = index % size;
             match linked_list.node_at_index(index_in_range)  {
-                None => false,
-                Some(node) =>  {
-                    linked_list.insert_after(node, new_elem);
-                    
-                    match linked_list.node_at_index(index % size) {
-                        None => false,
-                        Some(node) => {
-                            
-                            match linked_list.next(node) {
+                Err(_) => false, 
+                Ok(None) => false,
+                Ok(Some(node)) =>  {
+                    match linked_list.insert_after(node, new_elem) {
+                        Err(_) => false,
+                        Ok(_) => match linked_list.node_at_index(index % size) {
+                            Err(_) => false,
+                            Ok(None) => false,
+                            Ok(Some(node)) => {    
+                                match linked_list.next(node) {
                                 None => false,
                                 Some(node) => node.value == new_elem && check_invariants(&linked_list)  
-                            }                   
+                                }                   
+                            },
                         }
                     }
-                }
+                },
             }
         } 
 
