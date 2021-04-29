@@ -328,7 +328,6 @@ pub mod singly_linked_list_unsafe_array {
             let mut linked_list = linked_list_from(list);
             let size = linked_list.size();
             let index_in_range = index % size;
-
             
             if let Ok(Some(node)) =  linked_list.node_at_index(index_in_range)  {
                 if let Ok(_) = linked_list.insert_after(node, new_elem) {            
