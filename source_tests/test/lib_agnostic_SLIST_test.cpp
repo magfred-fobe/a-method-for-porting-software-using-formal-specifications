@@ -14,6 +14,7 @@ struct SLIST_model {
     std::vector<int> list;
 };
 
+//Change this to change what lib is tested
 using CurListType = RustLib;
 
 ///TODO: add check for head value
