@@ -220,7 +220,7 @@ pub mod singly_linked_list_unsafe_array {
             }
         }
 
-        fn node_at_index(&self, index: usize) -> Result<Option<Node<T>>, LinkedListError> {
+        pub fn node_at_index(&self, index: usize) -> Result<Option<Node<T>>, LinkedListError> {
             let mut node = match self.head {
                  None => return Err(LinkedListError{message: String::from("Can not find node at index in empty list")}),
                  Some(val) => self.nodes[val] 
