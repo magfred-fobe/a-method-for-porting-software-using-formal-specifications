@@ -42,6 +42,10 @@ add_executable(project test/SLIST_test.cpp
         test/LIST_model_test.cpp
         test/STAILQ_model_test.cpp
         test/TAILQ_model_test.cpp
+        test/lib_agnostic_SLIST_test.cpp
+        test/lib_impl/LinkedListLib.h
+        test/lib_impl/rust_lib.h
+        test/lib_impl/RustLib.cpp
         )
 
 # Now link against gtest or gtest_main as needed. Eg
@@ -75,11 +79,39 @@ add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/rapidcheck-src/extras/gtest
 
 target_link_libraries(project rapidcheck_gtest rapidcheck)
 
+#Add the rust static lib
+
+ADD_LIBRARY(rust_static_lib STATIC IMPORTED)
+SET_TARGET_PROPERTIES(rust_static_lib PROPERTIES
+        IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/lib/libsingly_linked_list_rust.a
+        DEPENDS ${CMAKE_SOURCE_DIR}/lib/libsingly_linked_list_rust.a)
+TARGET_LINK_LIBRARIES(project rust_static_lib)
+
+#The rust static lib needs dlsym
+#and pthread
+target_link_libraries(project dl pthread)
+
 #this file needs to be linked to another path so Clion can give syntax highlighting
 add_custom_command(TARGET project POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E create_symlink
         ${CMAKE_CURRENT_BINARY_DIR}/rapidcheck-src/extras/gtest/include/rapidcheck/gtest.h
         ${CMAKE_CURRENT_BINARY_DIR}/rapidcheck-src/include/rapidcheck_gtest.h)
+
+#Create a rule to generate the dependencies
+#The libraries and the generated header files
+add_custom_command (
+        OUTPUT ${CMAKE_SOURCE_DIR}/lib/libsingly_linked_list_rust.a
+        OUTPUT ${CMAKE_SOURCE_DIR}/test/lib_impl/rust_lib.h
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/generate_lib.sh
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/)
+
+add_dependencies(rust_static_lib gen_dependencies)
+add_dependencies(project gen_dependencies)
+
+add_custom_target(
+        gen_dependencies
+        DEPENDS ${CMAKE_SOURCE_DIR}/lib/libsingly_linked_list_rust.a
+)
 
 project(project)
 

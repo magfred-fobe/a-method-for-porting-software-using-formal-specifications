@@ -317,4 +317,5 @@ TEST(SLIST_model, SLIST_sequenceTest){
                                 ,SLIST_foreach_from
                                 >());
     }));
-};
+}
+
