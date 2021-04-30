@@ -236,13 +236,10 @@ pub mod singly_linked_list_unsafe_array {
             Ok(Some(node))
         }
 
-<<<<<<< HEAD
-=======
         pub fn is_empty(&self)-> bool{
             self.size == 0
         }
 
->>>>>>> f8bd5fc2b4357a9031d503636c43c4e7479edb6b
         pub fn insert_head(&mut self, val: T) { 
             let old_head = self.head;
             let next_index = self.nodes.len();
@@ -268,9 +265,6 @@ pub mod singly_linked_list_unsafe_array {
             Ok(())
         }
 
-        pub fn is_empty(self)-> bool{
-            self.size == 0
-        }
 
         pub fn remove(&mut self, node: Node<T>) -> Result<(), LinkedListError>{
 
