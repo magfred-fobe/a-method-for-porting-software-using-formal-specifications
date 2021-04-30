@@ -110,7 +110,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "24d5f089152e60f62d28b835fbff2cd2e8dc0baf1ac13343bef92ab7eed84548"
 
 [[package]]
-name = "singly_linked_list_array"
+name = "singly_linked_list"
 version = "0.1.0"
 dependencies = [
  "quickcheck",
@@ -122,7 +122,7 @@ version = "0.1.0"
 dependencies = [
  "lazy_static",
  "quickcheck",
- "singly_linked_list_array",
+ "singly_linked_list",
 ]
 
 [[package]]

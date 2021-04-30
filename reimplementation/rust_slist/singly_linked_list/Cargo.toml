@@ -1,5 +1,5 @@
 [package]
-name = "singly_linked_list_array"
+name = "singly_linked_list"
 version = "0.1.0"
 authors = ["Magnus <krummelur@gmail.com>"]
 edition = "2018"

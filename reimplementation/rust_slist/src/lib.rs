@@ -3,13 +3,13 @@
  */
 
 
-mod LinkedListLib {
+mod linked_list_lib {
 
     use std::sync::Mutex;
     use lazy_static::lazy_static;
 
     //Use the crate containing the version to test-
-    use singly_linked_list_array::singly_linked_list_unsafe_array as list_impl;
+    use singly_linked_list::singly_linked_list_array as list_impl;
     use list_impl::LinkedList;
     
     lazy_static! { static ref LISTS: Mutex<Vec<LinkedList<i32>>> = Mutex::new(Vec::new());}
