@@ -1,1 +1,0 @@
-/home/fredrik/sourcecode/II142X_exjobb_project/reimplementation/unsafe_slist/target/debug/libsingly_linked_list_rust.a: /home/fredrik/sourcecode/II142X_exjobb_project/reimplementation/unsafe_slist/singly_linked_list_unsafe/src/lib.rs /home/fredrik/sourcecode/II142X_exjobb_project/reimplementation/unsafe_slist/src/lib.rs
