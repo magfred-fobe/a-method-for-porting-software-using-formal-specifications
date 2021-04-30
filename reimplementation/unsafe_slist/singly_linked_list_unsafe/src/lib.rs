@@ -182,7 +182,8 @@ pub mod singly_linked_list_unsafe_array {
     pub struct LinkedList<T: LinkedListValue> {
         nodes: Vec<Node<T>>,
         head: Option<usize>,
-        size: usize
+        size: usize,
+        freeindex: Vec<usize>
     }
     
     impl<T: LinkedListValue> Default for LinkedList<T> {
@@ -191,6 +192,7 @@ pub mod singly_linked_list_unsafe_array {
                 nodes: Vec::new(),
                 head: None,
                 size: 0,
+                freeindex: Vec::new()
             }
         }
     }
@@ -276,9 +278,29 @@ pub mod singly_linked_list_unsafe_array {
                 return Err(LinkedListError{message: String::from("Cannot remove element from index out of bounds.")}); 
             }
 
-            self.nodes[node.index] = Node{next: None , value: node.value, index: 10000};
+            if let Some(head) = self.head(){
+                if head.index == node.index{
+                    self.freeindex.push(node.index);     
+                    self.head = match node.next{
+                        Some(n)=> Some(n),
+                        None => None
+                    }                            
+                }
+            }else{
+                let mut newnextindex = 0;
+                for elem in &self.nodes {
+                if let Some(n) = elem.next{
+                        if n == node.index {
+                            newnextindex = elem.index;
+                            break;
+                        }
+                } 
+                }
+            
+                self.nodes[newnextindex].next = node.next;
+                
+            }
             self.size = self.size - 1;
-
             Ok(())
         }
 
@@ -396,14 +418,14 @@ pub mod singly_linked_list_unsafe_array {
             if let Ok(Some(node)) = linked_list.node_at_index(index_in_range){
                 if let Ok(_) = linked_list.remove(node){                  
                         let newsize = linked_list.size();
-                        
-                        for elem in linked_list.nodes {
-                    
-                            if elem == node {
-                                return false
+                        for  elem in linked_list.nodes {  
+                            if let Some(next) = elem.next {
+                                if next == node.index{
+                                    return false
+                                }
                             }
                         }
-
+                    
                     return newsize == size - 1
                 }
             }
