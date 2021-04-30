@@ -7,7 +7,7 @@ mod my_library {
 
     use std::sync::Mutex;
     use lazy_static::lazy_static;
-    
+
     //Use the crate containing the version to test-
     use singly_linked_list_unsafe::singly_linked_list_unsafe_array as list_impl;
     use list_impl::LinkedList;
@@ -24,7 +24,26 @@ mod my_library {
             Err(_) => -1
         }
     }
+
+    #[no_mangle]
+    pub extern "C" fn rlib_empty(identifier: u32) -> i32 {
+        let list = LISTS.lock().unwrap();
+        match list.get(identifier as usize) {
+            Some(val) => val.is_empty() as i32,
+            None => -1
+        }
+    }
     
+    #[no_mangle]
+    ///TODO: head()/first() should be implemented
+    pub extern "C" fn head(identifier: u32) -> i32 {
+        let list = LISTS.lock().unwrap();
+        match list.get(identifier as usize) {
+            Some(_val) => 0,
+            None => -1
+        }
+    }
+
     #[no_mangle]
     pub extern "C" fn rlib_insert_head(identifier: u32, value: i32) -> i32 {
         let mut list = LISTS.lock().unwrap();
