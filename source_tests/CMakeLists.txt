@@ -44,7 +44,6 @@ add_executable(project test/SLIST_test.cpp
         test/TAILQ_model_test.cpp
         test/lib_agnostic_SLIST_test.cpp
         test/lib_impl/LinkedListLib.h
-        test/lib_impl/rust_lib.h
         test/lib_impl/RustLib.cpp
         )
 

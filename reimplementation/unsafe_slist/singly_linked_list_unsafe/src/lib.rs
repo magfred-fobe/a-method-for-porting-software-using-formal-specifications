@@ -171,7 +171,7 @@ pub mod singly_linked_list_unsafe_array {
     pub trait LinkedListValue: Debug + Copy + Clone {}
     impl<T> LinkedListValue for T where T: Debug + Copy + Clone {}
 
-    #[derive(Debug, Copy, Clone)]
+    #[derive(Debug, Copy, Clone, PartialEq)]
     pub struct Node<T: LinkedListValue> {
         index: usize, 
         next: Option<usize>,
@@ -236,10 +236,6 @@ pub mod singly_linked_list_unsafe_array {
             Ok(Some(node))
         }
 
-        pub fn is_empty(self)-> bool{
-            self.size == 0
-        }
-
         pub fn insert_head(&mut self, val: T) { 
             let old_head = self.head;
             let next_index = self.nodes.len();
@@ -250,7 +246,7 @@ pub mod singly_linked_list_unsafe_array {
 
         pub fn insert_after(&mut self, node: Node<T>, val: T) -> Result<(), LinkedListError> {
             if self.size == 0 {
-                return Err(LinkedListError{message: String::from("Can not insert into empty list.")});
+                return Err(LinkedListError{message: String::from("Cannot insert into empty list.")});
             } else {
 
                 let mut old_node = self.nodes[node.index];
@@ -262,6 +258,26 @@ pub mod singly_linked_list_unsafe_array {
                 self.nodes.push(Node{next: old_node_next, value: val, index: next_index});
                 self.size = self.size + 1;
             }
+            Ok(())
+        }
+
+        pub fn is_empty(self)-> bool{
+            self.size == 0
+        }
+
+        pub fn remove(&mut self, node: Node<T>) -> Result<(), LinkedListError>{
+
+            if self.size() == 0 {
+                return Err(LinkedListError{message: String::from("Cannot remove element from empty list.")});
+            }
+
+            if node.index > self.nodes.len() {
+                return Err(LinkedListError{message: String::from("Cannot remove element from index out of bounds.")}); 
+            }
+
+            self.nodes[node.index] = Node{next: None , value: node.value, index: 10000};
+            self.size = self.size - 1;
+
             Ok(())
         }
 
@@ -366,6 +382,35 @@ pub mod singly_linked_list_unsafe_array {
             }
         }
 
+        fn prop_remove(list: Vec<i32>, index: usize) -> bool {
+            
+            if list.len() == 0 {
+                return true
+            }
+
+            let mut linked_list = linked_list_from(&list);
+            let size = linked_list.size();
+            let index_in_range = index % size;
+            
+            if let Ok(Some(node)) = linked_list.node_at_index(index_in_range){
+                if let Ok(_) = linked_list.remove(node){                  
+                        let newsize = linked_list.size();
+                        
+                        for elem in linked_list.nodes {
+                    
+                            if elem == node {
+                                return false
+                            }
+                        }
+
+                    return newsize == size - 1
+                }
+            }
+        
+
+            false  
+        }
+
         #[test]
         fn test_insert_after_prop() {
             quickcheck(prop_insert_after as fn(Vec<i32>, i32, usize) -> bool);
@@ -377,7 +422,12 @@ pub mod singly_linked_list_unsafe_array {
 
         #[test]
         fn test_is_empty_prop() {
-            quickcheck(prop_is_empty as fn(list: Vec<i32>)-> bool);
+            quickcheck(prop_is_empty as fn(Vec<i32>)-> bool);
+        }
+
+        #[test]
+        fn test_remove_prop() {
+            quickcheck(prop_remove as fn(Vec<i32>, usize) -> bool);
         }
     }
 }
