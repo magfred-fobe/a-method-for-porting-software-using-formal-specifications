@@ -122,34 +122,41 @@ impl<T: LinkedListValue> LinkedList<T> {
 
         if self.size() == 0 {
             return Err(LinkedListError{message: String::from("Cannot remove element from empty list.")});
-        }
-
-        if node.index > self.nodes.len() {
+        }else if node.index > self.nodes.len() {
             return Err(LinkedListError{message: String::from("Cannot remove element from index out of bounds.")}); 
         }
 
-        if let Some(head) = self.head(){
-            if head.index == node.index{
-                self.freeindex.push(node.index);     
-                self.head = match node.next{
-                    Some(n)=> Some(n),
-                    None => None
-                }                            
-            }
-        }else{
-            let mut newnextindex = 0;
+        let ishead = match self.head(){
+                Some(h) => if h.index == node.index {
+                                self.head = node.next;  
+                                self.nodes[h.index].next = None;
+                                true
+                            }else{
+                                false
+                            },
+                _ => false
+        };
+  
+        if !ishead {
+            let mut newnextindex: Option<usize> = None;
             for elem in &self.nodes {
-            if let Some(n) = elem.next{
+                if let Some(n) = elem.next{
                     if n == node.index {
-                        newnextindex = elem.index;
-                        break;
-                    }
-            } 
+                            newnextindex = Some(elem.index);
+                            break;
+                        }
+                }
             }
-        
-            self.nodes[newnextindex].next = node.next;
-            
+
+            match newnextindex {
+                 Some(index) => {self.nodes[index].next = node.next;
+                                 self.nodes[node.index].next = None;               
+                },
+                 None => {}
+            }
         }
+        
+        self.freeindex.push(node.index);   
         self.size = self.size - 1;
         Ok(())
     }
@@ -264,23 +271,23 @@ mod tests {
         let mut linked_list = linked_list_from(&list);
         let size = linked_list.size();
         let index_in_range = index % size;
-        
+       
         if let Ok(Some(node)) = linked_list.node_at_index(index_in_range){
             if let Ok(_) = linked_list.remove(node){                  
-                    let newsize = linked_list.size();
-                    for  elem in linked_list.nodes {  
-                        if let Some(next) = elem.next {
-                            if next == node.index{
-                                return false
-                            }
+                let newsize = linked_list.size();
+                for  elem in linked_list.nodes {  
+                    if let Some(next) = elem.next {
+                        if next == node.index{
+                            return false
+                        }else if linked_list.freeindex[0] != node.index{
+                            return false
                         }
                     }
-                
+                }
                 return newsize == size - 1
             }
         }
     
-
         false  
     }
 
