@@ -4,9 +4,15 @@
 
 #include <vector>
 #include "../queue_impl.h"
-#include "stdio.h"
-std::vector<mySinglyLinkedListHead> lists;
+#include <iostream>
+#include "../queue_impl.h";
+std::vector<mySinglyLinkedListHead*> lists;
 
-void test() {
-    printf("THIS IS A LIB");
+uint32_t clib_init_list() {
+    auto index = lists.size();
+    auto head = new mySinglyLinkedListHead();
+    SLIST_INIT_impl(head);
+    lists.push_back(head);
+    std::cout << "a new List should be created!";
+    return index;
 }
