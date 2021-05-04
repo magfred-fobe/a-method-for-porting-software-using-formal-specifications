@@ -12,6 +12,7 @@ public:
     virtual int32_t init_list() = 0;
     virtual int32_t insert_head(uint32_t identifier, int32_t value) = 0;
     virtual int32_t empty(uint32_t identifier) = 0;
+    virtual int32_t head(uint32_t identifier) = 0;
     virtual int32_t insert_after(uint32_t identifier, uintptr_t index, int32_t value) = 0;
     int32_t list_index;
 };
@@ -22,5 +23,6 @@ public:
     int32_t init_list() override;
     int32_t insert_head(uint32_t identifier, int32_t value) override;
     int32_t empty(uint32_t identifier) override;
+    int32_t head(uint32_t identifier) override;
     int32_t insert_after(uint32_t identifier, uintptr_t index, int32_t value) override;
 };
