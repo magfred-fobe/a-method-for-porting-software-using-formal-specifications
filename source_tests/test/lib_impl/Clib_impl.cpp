@@ -26,6 +26,6 @@ int32_t Clib::insert_head(uint32_t identifier, int32_t value) {
     return 0;
 }
 
-int32_t Clib    ::insert_after(uint32_t identifier, uintptr_t index, int32_t value) {
+int32_t Clib::insert_after(uint32_t identifier, uintptr_t index, int32_t value) {
     return 0;
 }

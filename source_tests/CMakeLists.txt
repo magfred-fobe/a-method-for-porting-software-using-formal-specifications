@@ -46,7 +46,7 @@ add_executable(project test/SLIST_test.cpp
         test/lib_impl/LinkedListLib.h
         test/lib_impl/RustLib.cpp
         test/lib_impl/Clib_impl.cpp
-        test/lib_impl/Clib_impl.h)
+        test/lib_impl/Clib_impl.h src/clibsrc/singly_linked_list_c.cpp src/clibsrc/singly_linked_list_c.h)
 
 # Now link against gtest or gtest_main as needed. Eg
 target_link_libraries(project gtest_main)
@@ -79,8 +79,15 @@ add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/rapidcheck-src/extras/gtest
 
 target_link_libraries(project rapidcheck_gtest rapidcheck)
 
-#Add the rust static lib
+#Add the c static lib
+ADD_LIBRARY(c_static_lib STATIC IMPORTED)
+SET_TARGET_PROPERTIES(c_static_lib PROPERTIES
+        IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/lib/libsingly_linked_list_c.a
+        DEPENDS ${CMAKE_SOURCE_DIR}/lib/libsingly_linked_list_c.a)
+TARGET_LINK_LIBRARIES(project c_static_lib)
 
+
+#Add the rust static lib
 ADD_LIBRARY(rust_static_lib STATIC IMPORTED)
 SET_TARGET_PROPERTIES(rust_static_lib PROPERTIES
         IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/lib/libsingly_linked_list_rust.a
@@ -97,6 +104,12 @@ add_custom_command(TARGET project POST_BUILD
         ${CMAKE_CURRENT_BINARY_DIR}/rapidcheck-src/extras/gtest/include/rapidcheck/gtest.h
         ${CMAKE_CURRENT_BINARY_DIR}/rapidcheck-src/include/rapidcheck_gtest.h)
 
+#Make sure that this command outputs the C static lib files
+add_custom_command (
+        OUTPUT ${CMAKE_SOURCE_DIR}/lib/libsingly_linked_list_c.a
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/generate_c_lib.sh
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/)
+
 #Create a rule to generate the dependencies
 #The libraries and the generated header files
 add_custom_command (
@@ -106,11 +119,13 @@ add_custom_command (
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/)
 
 add_dependencies(rust_static_lib gen_dependencies)
+add_dependencies(c_static_lib gen_dependencies)
 add_dependencies(project gen_dependencies)
 
 add_custom_target(
         gen_dependencies
         DEPENDS ${CMAKE_SOURCE_DIR}/lib/libsingly_linked_list_rust.a
+        DEPENDS ${CMAKE_SOURCE_DIR}/lib/libsingly_linked_list_c.a
 )
 
 project(project)
