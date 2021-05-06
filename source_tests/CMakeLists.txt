@@ -45,8 +45,8 @@ add_executable(project test/SLIST_test.cpp
         test/lib_agnostic_SLIST_test.cpp
         test/lib_impl/LinkedListLib.h
         test/lib_impl/RustLib.cpp
-        test/lib_impl/Clib_impl.cpp
-        test/lib_impl/Clib_impl.h src/clibsrc/singly_linked_list_c.cpp src/clibsrc/singly_linked_list_c.h)
+        test/lib_impl/C_lib.cpp
+        test/lib_impl/C_lib.h src/clibsrc/singly_linked_list_c.cpp src/clibsrc/singly_linked_list_c.h)
 
 # Now link against gtest or gtest_main as needed. Eg
 target_link_libraries(project gtest_main)
