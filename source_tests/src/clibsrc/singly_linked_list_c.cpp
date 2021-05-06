@@ -4,6 +4,7 @@
 
 #include <vector>
 #include "../queue_impl.h"
+#include "singly_linked_list_c.h"
 #include <iostream>
 std::vector<mySinglyLinkedListHead*> lists;
 
@@ -11,7 +12,7 @@ std::vector<mySinglyLinkedListHead*> lists;
 //void SLIST_REMOVE_PREVPTR_impl(IntegerSLISTEntry**, IntegerSLISTEntry*);
 //IntegerSLISTEntry* SLIST_END_impl(mySinglyLinkedListHead*);
 
-uint32_t clib_init_list() {
+uintptr_t clib_init_list() {
     auto index = lists.size();
     auto head = new mySinglyLinkedListHead();
     SLIST_INIT_impl(head);
@@ -20,12 +21,12 @@ uint32_t clib_init_list() {
     return index;
 }
 
-int32_t clib_empty(uint32_t identifier) {
+int32_t clib_empty(uintptr_t identifier) {
     auto head = lists.at(identifier);
     return SLIST_EMPTY_impl(head);
 }
 
-int32_t clib_next(uint32_t identifier, uint32_t index) {
+int32_t clib_next(uintptr_t identifier, uintptr_t index) {
     auto head = lists.at(identifier);
     auto prev = SLIST_FIRST_impl(head);
     if(prev->entries.sle_next == nullptr) {
@@ -34,7 +35,7 @@ int32_t clib_next(uint32_t identifier, uint32_t index) {
     return prev->entries.sle_next->data;
 }
 
-uint32_t clib_insert_after(uint32_t identifier, uint32_t index, int value) {
+int32_t clib_insert_after(uintptr_t identifier, uintptr_t index, int value) {
     auto head = lists.at(identifier);
     auto element_before_insertion = SLIST_FIRST_impl(head);
     for(int i = 0; i < index; i++)
@@ -45,7 +46,7 @@ uint32_t clib_insert_after(uint32_t identifier, uint32_t index, int value) {
     SLIST_INSERT_AFTER_impl(element_before_insertion, element_to_be_inserted);
 };
 
-int32_t clib_head(uint32_t identifier)  {
+int32_t clib_head(uintptr_t identifier)  {
     auto list = lists.at(identifier);
     return SLIST_FIRST_impl(list)->data;
 };
@@ -124,7 +125,7 @@ int32_t clib_foreach_sum(uintptr_t identifier_list_1) {
     return sum;
 }
 
-int32_t rlib_foreach_from_sum(uintptr_t identifier_list_1, uintptr_t index_from) {
+int32_t clib_foreach_from_sum(uintptr_t identifier_list_1, uintptr_t index_from) {
     auto head = lists.at(identifier_list_1);
     IntegerSLISTEntry *entry = SLIST_FIRST_impl(head);
     for (int current_index = 0; current_index <  index_from; current_index++) {
