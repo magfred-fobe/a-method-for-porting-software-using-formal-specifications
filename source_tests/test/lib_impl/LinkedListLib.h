@@ -20,9 +20,9 @@ public:
     virtual int32_t insert_head(uintptr_t identifier, int32_t value) = 0;
     virtual int32_t swap(uintptr_t identifier_list_1, uintptr_t identifier_list_2) = 0;
     virtual int32_t concatenate(uintptr_t identifier_list_1, uintptr_t identifier_list_2) = 0;
-    virtual int32_t remove_head(uintptr_t identifier_list_1, uintptr_t identifier_list_2) = 0;
-    virtual int32_t foreach_sum(uintptr_t identifier_list_1) = 0;
-    virtual int32_t foreach_from_sum(uintptr_t identifier_list_1, uintptr_t index_from) = 0;
+    virtual int32_t remove_head(uintptr_t identifier) = 0;
+    virtual int32_t foreach_sum(uintptr_t identifier) = 0;
+    virtual int32_t foreach_from_sum(uintptr_t identifier, uintptr_t index_from) = 0;
     int32_t list_index;
 };
 
@@ -40,9 +40,9 @@ public:
     int32_t insert_head(uintptr_t identifier, int32_t value) override;
     int32_t swap(uintptr_t identifier_list_1, uintptr_t identifier_list_2) override;
     int32_t concatenate(uintptr_t identifier_list_1, uintptr_t identifier_list_2) override;
-    int32_t remove_head(uintptr_t identifier_list_1, uintptr_t identifier_list_2) override;
-    int32_t foreach_sum(uintptr_t identifier_list_1) override;
-    int32_t foreach_from_sum(uintptr_t identifier_list_1, uintptr_t index_from) override;
+    int32_t remove_head(uintptr_t identifier) override;
+    int32_t foreach_sum(uintptr_t identifier) override;
+    int32_t foreach_from_sum(uintptr_t identifier, uintptr_t index_from) override;
 };
 
 class Clib : public LinkedListLib {
@@ -59,7 +59,7 @@ public:
     int32_t insert_head(uintptr_t identifier, int32_t value) override;
     int32_t swap(uintptr_t identifier_list_1, uintptr_t identifier_list_2) override;
     int32_t concatenate(uintptr_t identifier_list_1, uintptr_t identifier_list_2) override;
-    int32_t remove_head(uintptr_t identifier_list_1, uintptr_t identifier_list_2) override;
-    int32_t foreach_sum(uintptr_t identifier_list_1) override;
+    int32_t remove_head(uintptr_t identifier) override;
+    int32_t foreach_sum(uintptr_t identifier) override;
     int32_t foreach_from_sum(uintptr_t identifier_list_1, uintptr_t index_from) override;
 };

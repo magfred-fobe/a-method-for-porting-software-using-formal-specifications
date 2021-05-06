@@ -116,8 +116,8 @@ int32_t clib_concatenate(uintptr_t identifier_list_1, uintptr_t identifier_list_
     return 0;
 }
 
-int32_t clib_remove_head(uintptr_t identifier_list_1, uintptr_t identifier_list_2) {
-    auto head = lists.at(identifier_list_1);
+int32_t clib_remove_head(uintptr_t identifier) {
+    auto head = lists.at(identifier);
     SLIST_REMOVE_HEAD_impl(head);
     return 0;
 }

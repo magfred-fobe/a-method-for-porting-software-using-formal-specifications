@@ -50,7 +50,7 @@ int32_t RustLib::concatenate(uintptr_t identifier_list_1, uintptr_t identifier_l
     return -1;
 }
 
-int32_t RustLib::remove_head(uintptr_t identifier_list_1, uintptr_t identifier_list_2) {
+int32_t RustLib::remove_head(uintptr_t identifier_list_1) {
     return -1;
 }
 
