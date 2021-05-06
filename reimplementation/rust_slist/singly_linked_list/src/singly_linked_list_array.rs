@@ -122,7 +122,6 @@ impl<T: LinkedListValue> LinkedList<T> {
         }
     }
 
-
     pub fn remove(&mut self, node: Node<T>) -> LinkedListResult<()> {
         if self.size() == 0 {
             return Err(LinkedListError{message: String::from("Cannot remove element from empty list.")});

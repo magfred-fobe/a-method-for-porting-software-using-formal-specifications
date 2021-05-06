@@ -15,7 +15,7 @@ struct SLIST_model {
 };
 
 //Change this to change what lib is tested
-using CurListType = RustLib;
+using CurListType = Clib;
 
 ///TODO: add check for head value
 struct lib_first: rc::state::Command<SLIST_model, LinkedListLib> {
@@ -79,7 +79,6 @@ struct lib_insert_after : rc::state::Command<SLIST_model, LinkedListLib> {
     void show(std::ostream &os) const override {
         os << "SLIST_INSERT_AFTER INDEX: "<< index << ", VALUE: " << val;
     }
-
 };
 
 struct lib_remove_element : rc::state::Command<SLIST_model, LinkedListLib> {
@@ -96,9 +95,12 @@ struct lib_remove_element : rc::state::Command<SLIST_model, LinkedListLib> {
 
     void run(const SLIST_model &model, LinkedListLib &list) const override {
         unsigned int removeIndex = index % model.list.size();
-        int val = list.value_at_index(list.list_index, removeIndex);
+        int next_val = -1;
+        if (model.list.size() > removeIndex + 1) {
+            next_val = model.list.at(removeIndex + 1);
+        }
         list.remove(list.list_index, removeIndex);
-        RC_ASSERT(list.value_at_index(list.list_index, removeIndex) != val);
+        RC_ASSERT(list.value_at_index(list.list_index, removeIndex) == next_val);
     }
 
     void show(std::ostream &os) const override {
