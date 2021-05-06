@@ -268,13 +268,12 @@ struct lib_foreach : rc::state::Command<SLIST_model, LinkedListLib> {
 struct lib_foreach_from : rc::state::Command<SLIST_model, LinkedListLib> {
 
     void checkPreconditions(const SLIST_model &model) const override {
-        RC_PRE(model.list.size() > 1);
+        RC_PRE(!model.list.empty());
     }
 
     void run(const SLIST_model &model, LinkedListLib &list) const override {
         unsigned int from_index = *rc::gen::arbitrary<unsigned int>() % model.list.size();
         auto model_sum = 0;
-
         std::for_each(std::begin(model.list) + from_index, std::end(model.list), [&model_sum](int const& value) {
             model_sum += value;
         });
