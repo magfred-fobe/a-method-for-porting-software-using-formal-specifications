@@ -2,15 +2,16 @@
 ///TODO: Clean up the messy Ok, Err, Some, None branches. There must be a nicer way.
 use std::fmt::{Debug, Display};
 use std::error::Error;
+use std::mem;
 
 
 #[derive(Debug, Clone)]
 pub struct LinkedListError {
     message: String
 }
+impl Error for LinkedListError {}
 
-impl Error for LinkedListError {
-}
+type LinkedListResult<T> = Result<T, LinkedListError>;
 
 impl Display for LinkedListError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
@@ -54,6 +55,10 @@ impl<T: LinkedListValue> std::fmt::Display for Node<T> {
 }
 
 impl<T: LinkedListValue> LinkedList<T> {
+    pub fn remove_head(&mut self) -> LinkedListResult<()> {
+        Ok(())
+    }
+
     pub fn head(&self) -> Option<Node<T>> {
         match self.head {
             None => None,
@@ -71,8 +76,7 @@ impl<T: LinkedListValue> LinkedList<T> {
             Some(val) => Some(self.nodes[val])
         }
     }
-
-    pub fn node_at_index(&self, index: usize) -> Result<Option<Node<T>>, LinkedListError> {
+    pub fn node_at_index(&self, index: usize) -> LinkedListResult<Option<Node<T>>> {
         let mut node = match self.head {
                 None => return Err(LinkedListError{message: String::from("Can not find node at index in empty list")}),
                 Some(val) => self.nodes[val] 
@@ -100,7 +104,7 @@ impl<T: LinkedListValue> LinkedList<T> {
         self.size = self.size + 1;
     }
 
-    pub fn insert_after(&mut self, node: Node<T>, val: T) -> Result<(), LinkedListError> {
+    pub fn insert_after(&mut self, node: Node<T>, val: T) -> LinkedListResult<Node<T>> {
         if self.size == 0 {
             return Err(LinkedListError{message: String::from("Cannot insert into empty list.")});
         } else {
@@ -111,15 +115,15 @@ impl<T: LinkedListValue> LinkedList<T> {
             let next_index = self.nodes.len();
             old_node.next = Some(next_index);
             self.nodes[old_node.index] = old_node;
-            self.nodes.push(Node{next: old_node_next, value: val, index: next_index});
+            let node = Node{next: old_node_next, value: val, index: next_index};
+            self.nodes.push(node);
             self.size = self.size + 1;
+            Ok(node)
         }
-        Ok(())
     }
 
 
-    pub fn remove(&mut self, node: Node<T>) -> Result<(), LinkedListError>{
-
+    pub fn remove(&mut self, node: Node<T>) -> LinkedListResult<()> {
         if self.size() == 0 {
             return Err(LinkedListError{message: String::from("Cannot remove element from empty list.")});
         }else if node.index > self.nodes.len() {
@@ -158,6 +162,33 @@ impl<T: LinkedListValue> LinkedList<T> {
         
         self.freeindex.push(node.index);   
         self.size = self.size - 1;
+        Ok(())
+    }
+
+    
+    pub fn swap(list_1: &mut Self, list_2: &mut Self) {
+        mem::swap(list_1, list_2)
+    }
+
+    pub fn concat(list_1: &mut Self, list_2: &mut Self) -> LinkedListResult<()>  {    
+        let mut list_1_end = match list_1.node_at_index(list_1.size()) {
+            Ok(Some(node)) => node,
+            Ok(None) => {
+                mem::swap(list_1, list_2);
+                return Ok(())
+            },
+            Err(e) => return Err(e) 
+        };
+        
+        while let Some(next) = list_2.head() {
+            if let Ok(new_end) = list_1.insert_after(list_1_end, next.value) {
+                list_1_end = new_end; 
+                match list_2.remove_head() {
+                    Ok(_) => {},
+                    _ => return Err(LinkedListError{message: String::from("Error concatenating lists")})
+                }
+            }
+        }
         Ok(())
     }
 
