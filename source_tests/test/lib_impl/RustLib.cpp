@@ -25,4 +25,8 @@ int32_t RustLib::insert_after(uint32_t identifier, uintptr_t index, int32_t valu
     return rlib_insert_after(identifier, index, value);
 }
 
+int32_t RustLib::value_at_index(uintptr_t identifier, uintptr_t index) {
+    return rlib_value_at_index(identifier, index);
+};
+
 
