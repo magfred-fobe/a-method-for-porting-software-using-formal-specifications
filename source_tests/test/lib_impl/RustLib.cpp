@@ -9,7 +9,6 @@ int32_t RustLib::init_list() {
     return rlib_init_list();
 }
 
-
 int32_t RustLib::empty(uint32_t identifier) {
     return rlib_empty(identifier);
 }
