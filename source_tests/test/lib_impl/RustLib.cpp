@@ -14,6 +14,10 @@ int32_t RustLib::empty(uint32_t identifier) {
     return rlib_empty(identifier);
 }
 
+int32_t RustLib::head(uint32_t identifier) {
+    return rlib_head(identifier);
+}
+
 int32_t RustLib::insert_head(uint32_t identifier, int32_t value) {
     return rlib_insert_head(identifier, value);
 }

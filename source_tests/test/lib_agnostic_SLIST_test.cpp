@@ -39,13 +39,12 @@ struct lib_insert_head : rc::state::Command<SLIST_model, LinkedListLib> {
     int val = *rc::gen::arbitrary<int>();
     void apply(SLIST_model &model) const override {
         model.list.insert(model.list.begin(), 1, val);
-        assert(model.list.at(0) == val);
     }
 
     void run(const SLIST_model &model, LinkedListLib &list) const override {
         list.insert_head(list.list_index, val);
         RC_ASSERT(!list.empty(list.list_index));
-        //RC_ASSERT( LIST_FIRST_impl(&head)->data == val);
+        RC_ASSERT( list.head(list.list_index) == val);
     }
 
     void show(std::ostream &os) const override {
