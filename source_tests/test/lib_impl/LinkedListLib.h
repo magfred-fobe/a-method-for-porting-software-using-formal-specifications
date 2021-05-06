@@ -15,6 +15,7 @@ public:
     virtual int32_t head(uint32_t identifier) = 0;
     virtual int32_t insert_after(uint32_t identifier, uintptr_t index, int32_t value) = 0;
     virtual int32_t value_at_index(uintptr_t identifier, uintptr_t index) = 0;
+    virtual int32_t remove(uintptr_t indentifier, uintptr_t index) = 0;
     int32_t list_index;
 };
 
@@ -27,4 +28,5 @@ public:
     int32_t head(uint32_t identifier) override;
     int32_t insert_after(uint32_t identifier, uintptr_t index, int32_t value) override;
     int32_t value_at_index(uintptr_t identifier, uintptr_t index) override;
+    int32_t remove(uintptr_t identifies, uintptr_t index) override;
 };

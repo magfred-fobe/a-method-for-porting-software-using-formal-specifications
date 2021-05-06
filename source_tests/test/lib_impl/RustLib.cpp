@@ -29,4 +29,7 @@ int32_t RustLib::value_at_index(uintptr_t identifier, uintptr_t index) {
     return rlib_value_at_index(identifier, index);
 };
 
+int32_t RustLib::remove(uintptr_t identifier, uintptr_t index) {
+    return rlib_remove(identifier, index);
+};
 
