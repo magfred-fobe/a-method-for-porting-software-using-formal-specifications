@@ -17,7 +17,6 @@ uintptr_t clib_init_list() {
     auto head = new mySinglyLinkedListHead();
     SLIST_INIT_impl(head);
     lists.push_back(head);
-    std::cout << "a new List should be created!";
     return index;
 }
 
