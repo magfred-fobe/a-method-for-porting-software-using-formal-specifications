@@ -180,7 +180,7 @@ mod linked_list_lib {
     }
 
     #[no_mangle]
-    pub extern "C" fn rlib_foreach_from_sum(identifier_list_1: usize) -> i32 {
+    pub extern "C" fn rlib_foreach_from_sum(identifier_list_1: usize, index_from: usize) -> i32 {
         return 0;
     }
 }
