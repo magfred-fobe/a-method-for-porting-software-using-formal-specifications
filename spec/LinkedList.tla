@@ -93,8 +93,7 @@ InsertHead(val, list) ==
 \* maps to lext[lab] except, for label which maps to the new label, and new label which maps to next[label] 
 InsertAfter_slow_and (label, list) == 
     IF Empty(list) /\ label \notin DOMAIN list THEN
-        list \* just for testing
-        \* Assert("FALSE", "CANNOT INSERT AFTER ELEMENT NOT IN LIST")
+         Assert("FALSE", "CANNOT INSERT AFTER ELEMENT NOT IN LIST")
     ELSE
         LET 
         nl == {NewLabel(list)}
@@ -108,8 +107,7 @@ InsertAfter_slow_and (label, list) ==
             
 InsertAfter(label, list) ==
     IF Empty(list) /\ label \notin DOMAIN list THEN
-        list \* just for testing
-        \* Assert("FALSE", "CANNOT INSERT AFTER ELEMENT NOT IN LIST")
+       Assert("FALSE", "CANNOT INSERT AFTER ELEMENT NOT IN LIST")
     ELSE
         LET 
         nl == {NewLabel(list)}
