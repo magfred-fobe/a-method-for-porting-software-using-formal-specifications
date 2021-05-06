@@ -54,8 +54,16 @@ int32_t clib_head(uintptr_t identifier)  {
 int32_t clib_value_at_index(uintptr_t identifier, uintptr_t index)  {
     auto head = lists.at(identifier);
     auto element = SLIST_FIRST_impl(head);
-    for(int i = 0; i < index; i++)
+    for(int i = 0; i < index; i++) {
+        if(element == nullptr) {
+            return -1;
+        }
         element = SLIST_NEXT_impl(element);
+
+    }
+    if (element == nullptr) {
+        return -1;
+    }
     return element->data;
 };
 
@@ -80,7 +88,7 @@ int32_t clib_remove(uintptr_t identifier, uintptr_t index) {
     auto element_before_removal = SLIST_FIRST_impl(head);
     for(int i = 0; i < index; i++)
         element_before_removal = SLIST_NEXT_impl(element_before_removal);
-    if (element_before_removal == nullptr || element_before_removal->entries.sle_next == nullptr) {
+    if (element_before_removal == nullptr) {
         return -1;
     }
     SLIST_REMOVE_impl(head, element_before_removal);
