@@ -212,11 +212,80 @@ impl<T: LinkedListValue> LinkedList<T> {
         }
         Ok(())
     }
+    
+    pub fn iter(&self) -> Iter<T> {
+        Iter { head: self.head, len: self.size(), list: self }
+    }
 
     pub fn new() -> Self {
         LinkedList{ nodes: Vec::new(), head: None, ..Default::default()}
     }
 }
+
+
+
+
+#[derive(Debug)]
+pub struct IntoIter<T: LinkedListValue> {
+    list: LinkedList<T>
+}
+
+pub struct Iter<'a, T: LinkedListValue> {
+    head: Option<usize>,
+    len: usize,
+    list: &'a LinkedList<T>
+}
+
+impl<T: LinkedListValue> Iterator for Iter<'_, T> {
+    type Item = T;
+
+    #[inline]
+    fn next(&mut self) -> Option<T> {
+        if self.len == 0 {
+            None
+        } else {
+            if self.head.is_none() {
+                None
+            } else {
+                let next_index = self.head.unwrap();
+                let item = self.list.nodes[next_index];
+                self.head = item.next;
+                Some(item.value)
+            }
+        }
+    }
+
+    #[inline]
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        (self.len, Some(self.len))
+    }
+}
+
+/*
+impl<'a, T: LinkedListValue> IntoIterator for &'a mut LinkedList<T> {
+    type Item = &'a mut T;
+    type IntoIter = IterMut<'a, T>;
+
+    fn into_iter(self) -> IterMut<'a, T> {
+        self.iter_mut()
+    }
+}
+*/
+
+/*
+impl<T: LinkedListValue> Iterator for IntoIter<T> {
+    type Item = Node<T>;
+    fn next(&mut self) -> Option<Self::Item> {
+        if let Some(index) = self.next_index {
+            let next = self.nodes[index];
+                Some(next)
+        } else {
+            None
+        }
+    }
+}
+*/
+
 
 pub fn linked_list_from<T: LinkedListValue>(from: &Vec<T>) -> LinkedList<T> {
     if from.len() == 0 {
@@ -360,5 +429,18 @@ mod tests {
     #[test]
     fn test_remove_prop() {
         //quickcheck(prop_remove as fn(Vec<i32>, usize) -> bool);
+    }
+
+    #[test]
+    fn iterator_stuff() {
+        let mut list: LinkedList<i32> = LinkedList::new();
+        list.insert_head(1);
+        list.insert_head(2);
+        list.insert_head(3);
+        println!("=====WHOLLY SHIT!======");
+        for i in list.iter() {
+            println!("VALUE: {} \n", i);
+        }
+        println!("=====            ======");
     }
 }
