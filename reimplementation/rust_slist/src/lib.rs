@@ -194,8 +194,18 @@ mod linked_list_lib {
 
     ///TODO: yeah, what to do?
     #[no_mangle]
-    pub extern "C" fn rlib_foreach_sum(identifier_list_1: usize) -> i32 {
-        return 0;
+    pub extern "C" fn rlib_foreach_sum(identifier: usize) -> i32 {
+        let mut lists = LISTS.lock().unwrap();
+        return match lists.get(identifier) {
+            Some(list) => {
+                let mut i = 0;
+                for x in list.iter() {
+                    i += x;
+                }
+                i
+            }
+            None => -1
+        }
     }
 
     #[no_mangle]
