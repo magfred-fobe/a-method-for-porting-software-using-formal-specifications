@@ -34,11 +34,11 @@ mod linked_list_lib {
     lazy_static! { static ref LISTS: Mutex<Vec<LinkedList<i32>>> = Mutex::new(Vec::new());}
     
     #[no_mangle]
-    pub extern "C" fn rlib_init_list() -> i32 {
+    pub extern "C" fn rlib_init_list() -> usize {
         match LISTS.lock() {
             Ok(mut list) => {
                 list.push(LinkedList::new());
-                -1 + list.len() as i32
+                (-1 + list.len() as i32) as usize
             },
             Err(_) => -1
         }
