@@ -35,23 +35,23 @@ int32_t RustLib::remove(uintptr_t identifier, uintptr_t index) {
 }
 
 int32_t RustLib::next(uintptr_t identifier, uintptr_t index) {
-    return -1;
+    return rlib_next(identifier, index);
 }
 
 int32_t RustLib::remove_after(uintptr_t identifier, uintptr_t index) {
-    return -1;
+    return rlib_remove_after(identifier, index);
 }
 
 int32_t RustLib::swap(uintptr_t identifier_list_1, uintptr_t identifier_list_2) {
-    return -1;
+    return rlib_swap(identifier_list_1, identifier_list_2);
 }
 
 int32_t RustLib::concatenate(uintptr_t identifier_list_1, uintptr_t identifier_list_2) {
-    return -1;
+    return rlib_concatenate(identifier_list_1, identifier_list_2);
 }
 
 int32_t RustLib::remove_head(uintptr_t identifier_list_1) {
-    return -1;
+    return rlib_remove_head(identifier_list_1);
 }
 
 int32_t RustLib::foreach_sum(uintptr_t identifier_list_1) {
