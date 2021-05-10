@@ -176,6 +176,7 @@ mod linked_list_lib {
         }
     }
 
+    #[no_mangle]
     pub extern "C" fn rlib_remove_after(identifier: usize, index: usize) -> i32 {
         let mut lists = LISTS.lock().unwrap();
         return match lists.get_mut(identifier) {
