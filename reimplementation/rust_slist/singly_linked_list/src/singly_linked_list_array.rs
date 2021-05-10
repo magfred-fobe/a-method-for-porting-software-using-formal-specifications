@@ -139,6 +139,8 @@ impl<T: LinkedListValue> LinkedList<T> {
                             },
                 _ => false
         };
+
+    
   
         if !ishead {
             let mut newnextindex: Option<usize> = None;
@@ -161,6 +163,26 @@ impl<T: LinkedListValue> LinkedList<T> {
         
         self.freeindex.push(node.index);   
         self.size = self.size - 1;
+        Ok(())
+    }
+
+    pub fn remove_after(&mut self, node: Node<T>) -> LinkedListResult<()> {
+        if self.size() == 0 {
+            return Err(LinkedListError{message: String::from("Cannot remove element from empty list.")});
+        }else if node.index > self.nodes.len() {
+            return Err(LinkedListError{message: String::from("Cannot remove element from index out of bounds.")}); 
+        }
+
+        let mut node = self.nodes[node.index];
+        let next_index = match node.next{ 
+            None =>  return Err(LinkedListError{ message: String::from("Can not remove after on tail node")}),
+            Some(index) => index
+        };
+
+        let next = self.nodes[next_index];
+        self.freeindex.push(next.index);
+        node.next = next.next;
+        self.nodes[node.index] = node;
         Ok(())
     }
 

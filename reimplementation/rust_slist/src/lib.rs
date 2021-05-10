@@ -34,11 +34,11 @@ mod linked_list_lib {
     lazy_static! { static ref LISTS: Mutex<Vec<LinkedList<i32>>> = Mutex::new(Vec::new());}
     
     #[no_mangle]
-    pub extern "C" fn rlib_init_list() -> usize {
+    pub extern "C" fn rlib_init_list() -> i32 {
         match LISTS.lock() {
             Ok(mut list) => {
                 list.push(LinkedList::new());
-                (-1 + list.len() as i32) as usize
+                -1 + list.len() as i32
             },
             Err(_) => -1
         }
@@ -104,20 +104,6 @@ mod linked_list_lib {
         -1
     }
 
-    ///TODO: use actual remove_after impl when done 
-    #[no_mangle]
-    pub extern "C" fn rlib_remove_after(identifier: usize, index: usize) -> i32 {
-        let mut list = LISTS.lock().unwrap();
-        if let Some(list) = list.get_mut(identifier+1) {
-            if let Ok(Some(node)) = list.node_at_index(index) {        
-                if let Ok(_) = list.remove(node) {
-                    return 0
-                }
-            } 
-        }
-        -1
-    }
-
     #[no_mangle]
     pub extern "C" fn rlib_remove_head(identifier: usize) -> i32 {
         let mut list = LISTS.lock().unwrap();
@@ -170,6 +156,39 @@ mod linked_list_lib {
                 }
             },
             _ => -1
+        }
+    }
+
+    #[no_mangle]
+    pub extern "C" fn rlib_next(identifier: usize, index: usize) -> i32 {
+        let lists = LISTS.lock().unwrap();
+        return match lists.get(identifier) {
+            Some(list) => {
+                match list.node_at_index(index) {
+                    Ok(Some(node)) => match list.next(node) {
+                        Some(node) => node.value,
+                        None => -1
+                    },
+                    _ => -1
+                }
+            },
+            _ => -1
+        }
+    }
+
+    pub extern "C" fn rlib_remove_after(identifier: usize, index: usize) -> i32 {
+        let mut lists = LISTS.lock().unwrap();
+        return match lists.get_mut(identifier) {
+            Some(list) => {
+                match list.node_at_index(index) {
+                    Ok(Some(node)) => match list.remove_after(node) {
+                        Ok(_) => 0,
+                        _ => -1
+                    },
+                    _ => -1
+                }
+            }
+            None => -1
         }
     }
 
