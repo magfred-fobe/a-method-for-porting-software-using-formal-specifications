@@ -191,7 +191,16 @@ impl<T: LinkedListValue> LinkedList<T> {
         mem::swap(list_1, list_2)
     }
 
-    pub fn concat(list_1: &mut Self, list_2: &mut Self) -> LinkedListResult<()>  {    
+    pub fn concat(list_1: &mut Self, list_2: &mut Self) -> LinkedListResult<()>  {
+        if list_2.is_empty() {
+            return Ok(());
+        }
+
+        if list_1.is_empty() {
+            mem::swap(list_1, list_2);
+            return Ok(());
+        }
+        
         let mut list_1_end = match list_1.node_at_index(list_1.size()) {
             Ok(Some(node)) => node,
             Ok(None) => {

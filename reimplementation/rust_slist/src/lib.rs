@@ -4,23 +4,37 @@
 
 
 mod linked_list_lib {
+    use std::fmt::Debug;
     use std::mem;
     pub trait BorrowTwoMut<T> {
         fn borrow_two(&mut self, index_1: usize, index_2: usize) -> (Option<&mut T>, Option<&mut T>);
     }
-    impl<T> BorrowTwoMut<T> for Vec<T> {
+    impl<T> BorrowTwoMut<T> for Vec<T> 
+    where T: Debug
+    {
         fn borrow_two(&mut self, mut index_1: usize, mut index_2: usize) -> (Option<&mut T>, Option<&mut T>) {
         if index_1 == index_2 {
             panic!("Can not borrow the same object twice");
         }
+        let mut switch = false;
         if index_1 > index_2 {
             index_1 = index_1^index_2;
             index_2 = index_1^index_2;
+            index_1 = index_1^index_2;
+            switch = true;
         }
         let (left, right) = self.split_at_mut(index_2);
+        println!("RIGHT: {:?}, index: {}", right, index_2-index_1);
         let o_1 = left.get_mut(index_1);
-        let o_2 = right.get_mut(index_2-index_1);
-        (o_1, o_2)
+        let o_2 = right.get_mut(index_2-(index_1+1));
+        println!("LIST1: {:?}\nLIST2: {:?}", o_1, o_2);
+        
+        if switch {
+            (o_2, o_1)
+        }
+        else {
+            (o_1, o_2)
+        }
         }
     }
 
@@ -137,6 +151,7 @@ mod linked_list_lib {
     pub extern "C" fn rlib_concatenate(identifier_list_1: usize, identifier_list_2: usize) -> i32 {
         let mut lists = LISTS.lock().unwrap();
         if let (Some(list_1), Some(list_2)) = lists.borrow_two(identifier_list_1, identifier_list_2) {
+            println!("LIST{}: {:?}",identifier_list_1, list_1);
             LinkedList::concat(list_1, list_2).expect("should work");
             0
         }
