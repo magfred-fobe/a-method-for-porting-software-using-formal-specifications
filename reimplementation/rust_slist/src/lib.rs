@@ -121,7 +121,7 @@ mod linked_list_lib {
     #[no_mangle]
     pub extern "C" fn rlib_remove_head(identifier: usize) -> i32 {
         let mut list = LISTS.lock().unwrap();
-        if let Some(list) = list.get_mut(identifier+1) {
+        if let Some(list) = list.get_mut(identifier) {
             if let Ok(_) = list.remove_head() {
                 return 0
             }
