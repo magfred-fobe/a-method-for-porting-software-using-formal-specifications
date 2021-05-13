@@ -291,10 +291,35 @@ mod tests {
      *  and should be true at every step of the algorithm
      */
     fn remove_invariant(_ll: &LinkedList<i32>) -> bool {
-        true
+        let list_clone = ll.clone();
+        
     }
 
-    fn valid_list_invariant(_ll: &LinkedList<i32>) -> bool {
+    fn valid_list_invariant(ll: &LinkedList<i32>) -> bool {
+        //Check that exactly one node points to None
+        //None can not be in domain since nodes is not Option type
+        //Also check that there is no element pointing to itself
+        let mut i: usize = 0;
+        let mut found_None_in_range = false;
+        for x in &ll.nodes {
+            if !ll.freeindex.contains(&i) {
+                if x.next == None {
+                    //There was already a node pointing to None
+                    if found_None_in_range {
+                        return false;
+                    }
+                    if let Some(next) = x.next {
+                        if next == x.index {
+                            return false;
+                        }
+                    } 
+                    found_None_in_range = true;
+                }
+            }
+        }
+        if !found_None_in_range {
+            return false;
+        }
         true
     } 
 
