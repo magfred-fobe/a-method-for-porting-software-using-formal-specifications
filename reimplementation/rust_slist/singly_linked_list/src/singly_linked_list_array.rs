@@ -11,6 +11,12 @@ pub struct LinkedListError {
 }
 impl Error for LinkedListError {}
 
+impl LinkedListError {
+    fn new<S: Into<String>>(msg: S) -> LinkedListError{
+        LinkedListError{message: msg.into()}
+    }
+}
+
 type LinkedListResult<T> = Result<T, LinkedListError>;
 
 impl Display for LinkedListError {
@@ -56,7 +62,16 @@ impl<T: LinkedListValue> std::fmt::Display for Node<T> {
 
 impl<T: LinkedListValue> LinkedList<T> {
     pub fn remove_head(&mut self) -> LinkedListResult<()> {
-        Ok(())
+        match self.is_empty() {
+            true => Err(LinkedListError::new("can not remove head on empty list")),
+            _ => {
+                let old_head = self.head.unwrap();
+                self.head = self.nodes[old_head].next;
+                self.freeindex.push(old_head);
+                self.size -= 1;
+                Ok(())
+            }
+        }
     }
 
     pub fn head(&self) -> Option<Node<T>> {
@@ -129,41 +144,22 @@ impl<T: LinkedListValue> LinkedList<T> {
             return Err(LinkedListError{message: String::from("Cannot remove element from index out of bounds.")}); 
         }
 
-        let ishead = match self.head(){
-                Some(h) => if h.index == node.index {
-                                self.head = node.next;  
-                                self.nodes[h.index].next = None;
-                                true
-                            }else{
-                                false
-                            },
-                _ => false
-        };
-
-    
-  
-        if !ishead {
-            let mut newnextindex: Option<usize> = None;
-            for elem in &self.nodes {
-                if let Some(n) = elem.next{
-                    if n == node.index {
-                            newnextindex = Some(elem.index);
-                            break;
-                        }
-                }
-            }
-
-            match newnextindex {
-                 Some(index) => {self.nodes[index].next = node.next;
-                                 self.nodes[node.index].next = None;               
-                },
-                 None => {}
-            }
+        let head_index = self.head.unwrap(); 
+        if head_index == node.index {
+            return self.remove_head();
         }
-        
-        self.freeindex.push(node.index);   
-        self.size = self.size - 1;
-        Ok(())
+
+        let mut current = &mut self.nodes[head_index];
+        while let Some(next_index) = current.next {
+            if next_index == node.index {
+                current.next = node.next;
+                self.freeindex.push(node.index);   
+                self.size -= 1;
+                return Ok(());
+            }
+            current = &mut self.nodes[next_index];
+        }
+        Err(LinkedListError::new("Could not find node to remove"))
     }
 
     pub fn remove_after(&mut self, node: Node<T>) -> LinkedListResult<()> {
@@ -183,6 +179,7 @@ impl<T: LinkedListValue> LinkedList<T> {
         self.freeindex.push(next.index);
         node.next = next.next;
         self.nodes[node.index] = node;
+        self.size -= 1;
         Ok(())
     }
 
@@ -200,8 +197,8 @@ impl<T: LinkedListValue> LinkedList<T> {
             mem::swap(list_1, list_2);
             return Ok(());
         }
-        
-        let mut list_1_end = match list_1.node_at_index(list_1.size()) {
+
+        let mut list_1_end = match list_1.node_at_index(list_1.size()-1) {
             Ok(Some(node)) => node,
             Ok(None) => {
                 mem::swap(list_1, list_2);
@@ -269,32 +266,6 @@ impl<T: LinkedListValue> Iterator for Iter<'_, T> {
         (self.len, Some(self.len))
     }
 }
-
-/*
-impl<'a, T: LinkedListValue> IntoIterator for &'a mut LinkedList<T> {
-    type Item = &'a mut T;
-    type IntoIter = IterMut<'a, T>;
-
-    fn into_iter(self) -> IterMut<'a, T> {
-        self.iter_mut()
-    }
-}
-*/
-
-/*
-impl<T: LinkedListValue> Iterator for IntoIter<T> {
-    type Item = Node<T>;
-    fn next(&mut self) -> Option<Self::Item> {
-        if let Some(index) = self.next_index {
-            let next = self.nodes[index];
-                Some(next)
-        } else {
-            None
-        }
-    }
-}
-*/
-
 
 pub fn linked_list_from<T: LinkedListValue>(from: &Vec<T>) -> LinkedList<T> {
     if from.len() == 0 {
@@ -381,8 +352,37 @@ mod tests {
         }
     }
 
+    fn prop_foreach(list: Vec<i32>) -> bool {
+        let mut linked_list = linked_list_from(&list);
+        let mut i = 0;
+        for x in linked_list.iter() {
+            if x != list[i]{
+                return false;
+            }
+            i += 1;
+        }
+        true
+    }
+
+    fn prop_foreach_from(list: Vec<i32>, from: usize) -> bool {
+        if list.is_empty() {
+            return true;
+        }
+        let skip = from % list.len();
+        let mut linked_list = linked_list_from(&list);
+        let mut i = skip;
+        let iter = linked_list.iter();
+        let iter = iter.skip(skip);
+        for x in iter {
+            if x != list[i]{
+                return false;
+            }
+            i += 1;
+        }
+        true
+    }
+
     fn prop_is_empty(list: Vec<i32>) -> bool {
-        
         let linked_list = linked_list_from(&list);
                 
         if list.len() == 0 {
@@ -417,7 +417,6 @@ mod tests {
                 return newsize == size - 1
             }
         }
-    
         false  
     }
 
@@ -437,19 +436,16 @@ mod tests {
 
     #[test]
     fn test_remove_prop() {
-        //quickcheck(prop_remove as fn(Vec<i32>, usize) -> bool);
+        quickcheck(prop_remove as fn(Vec<i32>, usize) -> bool);
     }
 
     #[test]
-    fn iterator_stuff() {
-        let mut list: LinkedList<i32> = LinkedList::new();
-        list.insert_head(1);
-        list.insert_head(2);
-        list.insert_head(3);
-        println!("=====WHOLLY SHIT!======");
-        for i in list.iter() {
-            println!("VALUE: {} \n", i);
-        }
-        println!("=====            ======");
+    fn test_foreach_prop() {
+        quickcheck(prop_foreach as fn(Vec<i32>) -> bool);
+    }
+
+    #[test]
+    fn test_foreach_from_prop() {
+        quickcheck(prop_foreach_from as fn(Vec<i32>, usize) -> bool);
     }
 }

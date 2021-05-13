@@ -11,11 +11,11 @@
 #include "stdlib.h"
 
 struct SLIST_model {
-    std::vector<int> list;
+    std::vector<unsigned short> list;
 };
 
 //Change this to change what lib is tested
-using CurListType = Clib;
+using CurListType = RustLib;
 
 ///TODO: add check for head value
 struct lib_first: rc::state::Command<SLIST_model, LinkedListLib> {
@@ -36,7 +36,7 @@ struct lib_first: rc::state::Command<SLIST_model, LinkedListLib> {
 
 ///TODO: use head/first when it is implemented
 struct lib_insert_head : rc::state::Command<SLIST_model, LinkedListLib> {
-    int val = *rc::gen::arbitrary<int>();
+    int val = *rc::gen::arbitrary<unsigned short>();
     void apply(SLIST_model &model) const override {
         model.list.insert(model.list.begin(), 1, val);
         RC_ASSERT(model.list.at(0) == val);
@@ -55,7 +55,7 @@ struct lib_insert_head : rc::state::Command<SLIST_model, LinkedListLib> {
 
 struct lib_insert_after : rc::state::Command<SLIST_model, LinkedListLib> {
     unsigned int index = *rc::gen::arbitrary<unsigned int>();
-    int val = *rc::gen::arbitrary<int>();
+    int val = *rc::gen::arbitrary<unsigned short>();
 
     void checkPreconditions(const SLIST_model &model) const override {
         RC_PRE(!model.list.empty());
@@ -99,8 +99,17 @@ struct lib_remove_element : rc::state::Command<SLIST_model, LinkedListLib> {
         if (model.list.size() > removeIndex + 1) {
             next_val = model.list.at(removeIndex + 1);
         }
-        list.remove(list.list_index, removeIndex);
-        RC_ASSERT(list.value_at_index(list.list_index, removeIndex) == next_val);
+        if (list.remove(list.list_index, removeIndex) != 0) {
+            list.print_list(list.list_index);
+            RC_ASSERT(false && removeIndex);
+        }
+        if(list.value_at_index(list.list_index, removeIndex) != next_val) {
+            std::cout << "expected element at " << removeIndex << " in the following list: \n";
+            list.print_list(list.list_index);
+            std::cout << "to be: " << next_val << " but it was: " <<  list.value_at_index(list.list_index, removeIndex) << "\n";
+        }
+        if(next_val != -1)
+            RC_ASSERT(list.value_at_index(list.list_index, removeIndex) == next_val);
     }
 
     void show(std::ostream &os) const override {
@@ -172,7 +181,7 @@ struct lib_remove_head : rc::state::Command<SLIST_model, LinkedListLib> {
 };
 
 struct lib_swap : rc::state::Command<SLIST_model, LinkedListLib> {
-    std::vector<int> swap_with = *rc::gen::arbitrary<std::vector<int>>();
+    std::vector<unsigned short> swap_with = *rc::gen::arbitrary<std::vector<unsigned short>>();
 
     void apply(SLIST_model &model) const override {
         model.list.clear();
@@ -187,7 +196,7 @@ struct lib_swap : rc::state::Command<SLIST_model, LinkedListLib> {
             else
                 list.insert_after(identifier_list_2, i-1, swap_with.at(i));
         }
-        list.swap(list.list_index, identifier_list_2);
+        RC_ASSERT(list.swap(list.list_index, identifier_list_2) == 0);
     }
 
     void show(std::ostream &os) const override {
@@ -198,7 +207,7 @@ struct lib_swap : rc::state::Command<SLIST_model, LinkedListLib> {
 };
 
 struct lib_concatenate : rc::state::Command<SLIST_model, LinkedListLib> {
-    std::vector<int> concatenate_with = *rc::gen::arbitrary<std::vector<int>>();
+    std::vector<unsigned short> concatenate_with = *rc::gen::arbitrary<std::vector<unsigned short>>();
 
     void apply(SLIST_model &model) const override {
         for(auto i: concatenate_with)
@@ -266,15 +275,16 @@ struct lib_foreach : rc::state::Command<SLIST_model, LinkedListLib> {
 };
 
 struct lib_foreach_from : rc::state::Command<SLIST_model, LinkedListLib> {
+    unsigned int index = *rc::gen::arbitrary<unsigned int>();
 
     void checkPreconditions(const SLIST_model &model) const override {
         RC_PRE(!model.list.empty());
     }
 
     void run(const SLIST_model &model, LinkedListLib &list) const override {
-        unsigned int from_index = *rc::gen::arbitrary<unsigned int>() % model.list.size();
-        auto model_sum = 0;
-        std::for_each(std::begin(model.list) + from_index, std::end(model.list), [&model_sum](int const& value) {
+        auto from_index = index % model.list.size();
+        int model_sum = 0;
+        std::for_each(std::begin(model.list) + from_index, std::end(model.list), [&model_sum](unsigned short const& value) {
             model_sum += value;
         });
 
@@ -283,7 +293,7 @@ struct lib_foreach_from : rc::state::Command<SLIST_model, LinkedListLib> {
     }
 
     void show(std::ostream &os) const override {
-        os << "FOREACH FROM";
+        os << "FOREACH FROM << " << index;
     }
 };
 
@@ -292,6 +302,7 @@ TEST(SLIST_model_lib, SLIST_sequenceTest){
     RC_ASSERT(rc::check([] {
         SLIST_model model;
         CurListType list;
+        list.init_lib();
         list.list_index = list.init_list();
         rc::state::check(model,
                          list,
