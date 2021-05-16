@@ -314,7 +314,7 @@ mod tests {
                         }
                     }
                 }
-                return newsize == size - 1
+               return newsize == size - 1
             }
         }
     
@@ -337,6 +337,6 @@ mod tests {
 
     #[test]
     fn test_remove_prop() {
-        //quickcheck(prop_remove as fn(Vec<i32>, usize) -> bool);
+        quickcheck(prop_remove as fn(Vec<i32>, usize) -> bool);
     }
 }
