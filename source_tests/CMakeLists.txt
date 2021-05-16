@@ -30,18 +30,12 @@ add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/googletest-src
 
 
 # Add the source and test files
-add_executable(project test/SLIST_test.cpp
-        test/STAILQ_test.cpp src/queue.h
+add_executable(project
+        src/queue.h
         src/queue_impl.h
         src/queue_impl.cpp
-        test/STAILQ_test.cpp
-        test/LIST_test.cpp
-        test/LIST_test.cpp
-        test/TAILQ_test.cpp
         test/SLIST_model_test.cpp
-        test/LIST_model_test.cpp
-        test/STAILQ_model_test.cpp
-        test/TAILQ_model_test.cpp
+        test/SLIST_test.cpp
         test/lib_agnostic_SLIST_test.cpp
         test/lib_impl/LinkedListLib.h
         test/lib_impl/RustLib.cpp

@@ -43,7 +43,8 @@ int32_t clib_insert_after(uintptr_t identifier, uintptr_t index, int value) {
     auto element_to_be_inserted = new IntegerSLISTEntry();
     element_to_be_inserted->data = value;
     SLIST_INSERT_AFTER_impl(element_before_insertion, element_to_be_inserted);
-};
+    return 0;
+}
 
 int32_t clib_head(uintptr_t identifier)  {
     auto list = lists.at(identifier);

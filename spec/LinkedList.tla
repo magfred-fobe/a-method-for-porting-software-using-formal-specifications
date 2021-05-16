@@ -36,9 +36,7 @@ Last(list) ==
 
 \* A list may not contain cyclic references
 IsLinkedList(PointerMap) ==
-    Cyclic(PointerMap) = FALSE 
-    /\ Ring(PointerMap) = FALSE
-    /\ \A el \in ((DOMAIN PointerMap \union {NULL}) \ {First(PointerMap)}): \E x \in DOMAIN PointerMap : PointerMap[x]["next"] = el  /\ el /= x
+    \A el \in ((DOMAIN PointerMap \union {NULL}) \ {First(PointerMap)}): \E x \in DOMAIN PointerMap : PointerMap[x]["next"] = el  /\ el /= x
 
 \*States if the linked list argument is empty or not.
 Empty(l) == 

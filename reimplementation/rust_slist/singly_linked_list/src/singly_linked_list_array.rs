@@ -11,6 +11,12 @@ pub struct LinkedListError {
 }
 impl Error for LinkedListError {}
 
+impl LinkedListError {
+    fn new<S: Into<String>>(msg: S) -> LinkedListError{
+        LinkedListError{message: msg.into()}
+    }
+}
+
 type LinkedListResult<T> = Result<T, LinkedListError>;
 
 impl Display for LinkedListError {
@@ -56,7 +62,16 @@ impl<T: LinkedListValue> std::fmt::Display for Node<T> {
 
 impl<T: LinkedListValue> LinkedList<T> {
     pub fn remove_head(&mut self) -> LinkedListResult<()> {
-        Ok(())
+        match self.is_empty() {
+            true => Err(LinkedListError::new("can not remove head on empty list")),
+            _ => {
+                let old_head = self.head.unwrap();
+                self.head = self.nodes[old_head].next;
+                self.freeindex.push(old_head);
+                self.size -= 1;
+                Ok(())
+            }
+        }
     }
 
     pub fn head(&self) -> Option<Node<T>> {
@@ -129,38 +144,42 @@ impl<T: LinkedListValue> LinkedList<T> {
             return Err(LinkedListError{message: String::from("Cannot remove element from index out of bounds.")}); 
         }
 
-        let ishead = match self.head(){
-                Some(h) => if h.index == node.index {
-                                self.head = node.next;  
-                                self.nodes[h.index].next = None;
-                                true
-                            }else{
-                                false
-                            },
-                _ => false
-        };
-  
-        if !ishead {
-            let mut newnextindex: Option<usize> = None;
-            for elem in &self.nodes {
-                if let Some(n) = elem.next{
-                    if n == node.index {
-                            newnextindex = Some(elem.index);
-                            break;
-                        }
-                }
-            }
-
-            match newnextindex {
-                 Some(index) => {self.nodes[index].next = node.next;
-                                 self.nodes[node.index].next = None;               
-                },
-                 None => {}
-            }
+        let head_index = self.head.unwrap();
+        if head_index == node.index {
+            return self.remove_head();
         }
-        
-        self.freeindex.push(node.index);   
-        self.size = self.size - 1;
+
+        let mut current = &mut self.nodes[head_index];
+        while let Some(next_index) = current.next {
+            if next_index == node.index {
+                current.next = node.next;
+                self.freeindex.push(node.index);
+                self.size -= 1;
+                return Ok(());
+            }
+            current = &mut self.nodes[next_index];
+        }
+        Err(LinkedListError::new("Could not find node to remove"))
+    }
+
+    pub fn remove_after(&mut self, node: Node<T>) -> LinkedListResult<()> {
+        if self.size() == 0 {
+            return Err(LinkedListError{message: String::from("Cannot remove element from empty list.")});
+        }else if node.index > self.nodes.len() {
+            return Err(LinkedListError{message: String::from("Cannot remove element from index out of bounds.")});
+        }
+
+        let mut node = self.nodes[node.index];
+        let next_index = match node.next{
+            None =>  return Err(LinkedListError{ message: String::from("Can not remove after on tail node")}),
+            Some(index) => index
+        };
+
+        let next = self.nodes[next_index];
+        self.freeindex.push(next.index);
+        node.next = next.next;
+        self.nodes[node.index] = node;
+        self.size -= 1;
         Ok(())
     }
 
@@ -169,8 +188,17 @@ impl<T: LinkedListValue> LinkedList<T> {
         mem::swap(list_1, list_2)
     }
 
-    pub fn concat(list_1: &mut Self, list_2: &mut Self) -> LinkedListResult<()>  {    
-        let mut list_1_end = match list_1.node_at_index(list_1.size()) {
+    pub fn concat(list_1: &mut Self, list_2: &mut Self) -> LinkedListResult<()>  {
+        if list_2.is_empty() {
+            return Ok(());
+        }
+
+        if list_1.is_empty() {
+            mem::swap(list_1, list_2);
+            return Ok(());
+        }
+
+        let mut list_1_end = match list_1.node_at_index(list_1.size()-1) {
             Ok(Some(node)) => node,
             Ok(None) => {
                 mem::swap(list_1, list_2);
@@ -191,8 +219,51 @@ impl<T: LinkedListValue> LinkedList<T> {
         Ok(())
     }
 
+    pub fn iter(&self) -> Iter<T> {
+        Iter { head: self.head, len: self.size(), list: self }
+    }
+
     pub fn new() -> Self {
         LinkedList{ nodes: Vec::new(), head: None, ..Default::default()}
+    }
+}
+
+
+
+
+#[derive(Debug)]
+pub struct IntoIter<T: LinkedListValue> {
+    list: LinkedList<T>
+}
+
+pub struct Iter<'a, T: LinkedListValue> {
+    head: Option<usize>,
+    len: usize,
+    list: &'a LinkedList<T>
+}
+
+impl<T: LinkedListValue> Iterator for Iter<'_, T> {
+    type Item = T;
+
+    #[inline]
+    fn next(&mut self) -> Option<T> {
+        if self.len == 0 {
+            None
+        } else {
+            if self.head.is_none() {
+                None
+            } else {
+                let next_index = self.head.unwrap();
+                let item = self.list.nodes[next_index];
+                self.head = item.next;
+                Some(item.value)
+            }
+        }
+    }
+
+    #[inline]
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        (self.len, Some(self.len))
     }
 }
 
@@ -220,10 +291,35 @@ mod tests {
      *  and should be true at every step of the algorithm
      */
     fn remove_invariant(_ll: &LinkedList<i32>) -> bool {
+        let list_clone = _ll.clone();
         true
     }
 
-    fn valid_list_invariant(_ll: &LinkedList<i32>) -> bool {
+    fn valid_list_invariant(ll: &LinkedList<i32>) -> bool {
+        //Check that exactly one node points to None
+        //None can not be in domain since nodes is not Option type
+        //Also check that there is no element pointing to itself
+        let mut i: usize = 0;
+        let mut found_None_in_range = false;
+        for x in &ll.nodes {
+            if !ll.freeindex.contains(&i) {
+                if x.next == None {
+                    //There was already a node pointing to None
+                    if found_None_in_range {
+                        return false;
+                    }
+                    if let Some(next) = x.next {
+                        if next == x.index {
+                            return false;
+                        }
+                    }
+                    found_None_in_range = true;
+                }
+            }
+        }
+        if !found_None_in_range {
+            return false;
+        }
         true
     } 
 
@@ -281,8 +377,37 @@ mod tests {
         }
     }
 
+    fn prop_foreach(list: Vec<i32>) -> bool {
+        let mut linked_list = linked_list_from(&list);
+        let mut i = 0;
+        for x in linked_list.iter() {
+            if x != list[i]{
+                return false;
+            }
+            i += 1;
+        }
+        true
+    }
+
+    fn prop_foreach_from(list: Vec<i32>, from: usize) -> bool {
+        if list.is_empty() {
+            return true;
+        }
+        let skip = from % list.len();
+        let mut linked_list = linked_list_from(&list);
+        let mut i = skip;
+        let iter = linked_list.iter();
+        let iter = iter.skip(skip);
+        for x in iter {
+            if x != list[i]{
+                return false;
+            }
+            i += 1;
+        }
+        true
+    }
+
     fn prop_is_empty(list: Vec<i32>) -> bool {
-        
         let linked_list = linked_list_from(&list);
                 
         if list.len() == 0 {
@@ -317,13 +442,21 @@ mod tests {
                return newsize == size - 1
             }
         }
-    
         false  
+    }
+
+    fn prop_concat(list_1: Vec<i32>, list_2: Vec<i32>) -> bool {
+        let mut linked_list_1 = linked_list_from(&list_1);
+        let mut linked_list_2= linked_list_from(&list_2);
+        LinkedList::concat(&mut linked_list_1, &mut linked_list_2);
+        linked_list_2.size() == 0 &&
+           linked_list_1.size() == list_1.len() + list_2.len()
+
     }
 
     #[test]
     fn test_insert_after_prop() {
-        quickcheck(prop_insert_after as fn(Vec<i32>, i32, usize) -> bool);
+       quickcheck(prop_insert_after as fn(Vec<i32>, i32, usize) -> bool);
     }
     #[test]
     fn test_insert_head_prop() {
@@ -338,5 +471,20 @@ mod tests {
     #[test]
     fn test_remove_prop() {
         quickcheck(prop_remove as fn(Vec<i32>, usize) -> bool);
+    }
+
+    #[test]
+    fn test_foreach_prop() {
+        quickcheck(prop_foreach as fn(Vec<i32>) -> bool);
+    }
+
+    #[test]
+    fn test_foreach_from_prop() {
+        quickcheck(prop_foreach_from as fn(Vec<i32>, usize) -> bool);
+    }
+
+    #[test]
+    fn test_concat_prop() {
+        quickcheck(prop_concat as fn(Vec<i32>, Vec<i32>) -> bool);
     }
 }

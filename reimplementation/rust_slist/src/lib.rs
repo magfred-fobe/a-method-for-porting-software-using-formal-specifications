@@ -3,24 +3,36 @@
  */
 
 
-mod linked_list_lib {
+ mod linked_list_lib {
+    use std::fmt::Debug;
     use std::mem;
     pub trait BorrowTwoMut<T> {
         fn borrow_two(&mut self, index_1: usize, index_2: usize) -> (Option<&mut T>, Option<&mut T>);
     }
-    impl<T> BorrowTwoMut<T> for Vec<T> {
+    impl<T> BorrowTwoMut<T> for Vec<T> 
+    where T: Debug
+    {
         fn borrow_two(&mut self, mut index_1: usize, mut index_2: usize) -> (Option<&mut T>, Option<&mut T>) {
         if index_1 == index_2 {
             panic!("Can not borrow the same object twice");
         }
+        let mut switch = false;
         if index_1 > index_2 {
             index_1 = index_1^index_2;
             index_2 = index_1^index_2;
+            index_1 = index_1^index_2;
+            switch = true;
         }
         let (left, right) = self.split_at_mut(index_2);
         let o_1 = left.get_mut(index_1);
-        let o_2 = right.get_mut(index_2-index_1);
-        (o_1, o_2)
+        let o_2 = right.get_mut(0);
+        
+        if switch {
+            (o_2, o_1)
+        }
+        else {
+            (o_1, o_2)
+        }
         }
     }
 
@@ -39,6 +51,17 @@ mod linked_list_lib {
             Ok(mut list) => {
                 list.push(LinkedList::new());
                 -1 + list.len() as i32
+            },
+            Err(_) => -1
+        }
+    }
+        
+    #[no_mangle]
+    pub extern "C" fn rlib_init_lib() -> i32 {
+        match LISTS.lock() {
+            Ok(mut list) => {
+                list.clear();
+                0
             },
             Err(_) => -1
         }
@@ -97,21 +120,7 @@ mod linked_list_lib {
             if let Ok(Some(node)) = list.node_at_index(index) {        
                 return match list.remove(node) {
                     Ok(_) => 0,
-                    _ => -1
-                }
-            } 
-        }
-        -1
-    }
-
-    ///TODO: use actual remove_after impl when done 
-    #[no_mangle]
-    pub extern "C" fn rlib_remove_after(identifier: usize, index: usize) -> i32 {
-        let mut list = LISTS.lock().unwrap();
-        if let Some(list) = list.get_mut(identifier+1) {
-            if let Ok(Some(node)) = list.node_at_index(index) {        
-                if let Ok(_) = list.remove(node) {
-                    return 0
+                    Err(error) => {println!("{:?}", error); -1}
                 }
             } 
         }
@@ -121,7 +130,7 @@ mod linked_list_lib {
     #[no_mangle]
     pub extern "C" fn rlib_remove_head(identifier: usize) -> i32 {
         let mut list = LISTS.lock().unwrap();
-        if let Some(list) = list.get_mut(identifier+1) {
+        if let Some(list) = list.get_mut(identifier) {
             if let Ok(_) = list.remove_head() {
                 return 0
             }
@@ -155,6 +164,7 @@ mod linked_list_lib {
             0
         }
         else {
+            println!("ERROR");
             -1
         }
     }
@@ -173,14 +183,79 @@ mod linked_list_lib {
         }
     }
 
-    ///TODO: yeah, what to do?
     #[no_mangle]
-    pub extern "C" fn rlib_foreach_sum(identifier_list_1: usize) -> i32 {
-        return 0;
+    pub extern "C" fn rlib_next(identifier: usize, index: usize) -> i32 {
+        let lists = LISTS.lock().unwrap();
+        return match lists.get(identifier) {
+            Some(list) => {
+                match list.node_at_index(index) {
+                    Ok(Some(node)) => match list.next(node) {
+                        Some(node) => node.value,
+                        None => -1
+                    },
+                    _ => -1
+                }
+            },
+            _ => -1
+        }
     }
 
     #[no_mangle]
-    pub extern "C" fn rlib_foreach_from_sum(identifier_list_1: usize, index_from: usize) -> i32 {
-        return 0;
+    pub extern "C" fn rlib_print_list(identifier: usize) -> i32 {
+        let mut lists = LISTS.lock().unwrap();
+        println!("LIST{}: {:?}", identifier, lists.get(identifier).unwrap());
+        0
+    }
+
+    #[no_mangle]
+    pub extern "C" fn rlib_remove_after(identifier: usize, index: usize) -> i32 {
+        let mut lists = LISTS.lock().unwrap();
+        return match lists.get_mut(identifier) {
+            Some(list) => {
+                match list.node_at_index(index) {
+                    Ok(Some(node)) => match list.remove_after(node) {
+                        Ok(_) => 0,
+                        _ => -1
+                    },
+                    _ => -1
+                }
+            }
+            None => -1
+        }
+    }
+
+    ///TODO: yeah, what to do?
+    #[no_mangle]
+    pub extern "C" fn rlib_foreach_sum(identifier: usize) -> i32 {
+        let lists = LISTS.lock().unwrap();
+        return match lists.get(identifier) {
+            Some(list) => {
+                let mut i = 0;
+                for x in list.iter() {
+                    i += x;
+                }
+                i
+            },
+            None => -1
+        }
+    }
+
+    #[no_mangle]
+    pub extern "C" fn rlib_foreach_from_sum(identifier: usize, index_from: usize) -> i32 {
+        let lists = LISTS.lock().unwrap();
+        return match lists.get(identifier) {
+            Some(list) => {
+                let mut i = 0;
+                let mut iter = list.iter();
+                for _ in 0..index_from {
+                    iter.next();
+                }
+                for x in iter {
+                    i += x;
+                }
+                i
+            },
+            None => -1
+        }
     }
 }
