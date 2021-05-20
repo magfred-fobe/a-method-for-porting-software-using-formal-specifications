@@ -144,7 +144,7 @@ impl<T: LinkedListValue> LinkedList<T> {
             return Err(LinkedListError{message: String::from("Cannot remove element from index out of bounds.")}); 
         }
 
-        let head_index = self.head.unwrap(); 
+        let head_index = self.head.unwrap();
         if head_index == node.index {
             return self.remove_head();
         }
@@ -153,7 +153,7 @@ impl<T: LinkedListValue> LinkedList<T> {
         while let Some(next_index) = current.next {
             if next_index == node.index {
                 current.next = node.next;
-                self.freeindex.push(node.index);   
+                self.freeindex.push(node.index);
                 self.size -= 1;
                 return Ok(());
             }
@@ -166,11 +166,11 @@ impl<T: LinkedListValue> LinkedList<T> {
         if self.size() == 0 {
             return Err(LinkedListError{message: String::from("Cannot remove element from empty list.")});
         }else if node.index > self.nodes.len() {
-            return Err(LinkedListError{message: String::from("Cannot remove element from index out of bounds.")}); 
+            return Err(LinkedListError{message: String::from("Cannot remove element from index out of bounds.")});
         }
 
         let mut node = self.nodes[node.index];
-        let next_index = match node.next{ 
+        let next_index = match node.next{
             None =>  return Err(LinkedListError{ message: String::from("Can not remove after on tail node")}),
             Some(index) => index
         };
@@ -218,7 +218,7 @@ impl<T: LinkedListValue> LinkedList<T> {
         }
         Ok(())
     }
-    
+
     pub fn iter(&self) -> Iter<T> {
         Iter { head: self.head, len: self.size(), list: self }
     }
@@ -322,8 +322,19 @@ mod tests {
         let mut i: usize = 0;
         let mut found_None_in_range = false;
         for x in &ll.nodes {
-            if ll.freeindex.contains(&i) {
-                println!("CONTAINED: {}", i); 
+            if !ll.freeindex.contains(&i) {
+                if x.next == None {
+                    //There was already a node pointing to None
+                    if found_None_in_range {
+                        return false;
+                    }
+                    if let Some(next) = x.next {
+                        if next == x.index {
+                            return false;
+                        }
+                    }
+                    found_None_in_range = true;
+                }
             }
         }
         true
@@ -415,7 +426,24 @@ mod tests {
                         }
                     }
                 }
-                return newsize == size - 1
+               return newsize == size - 1
+            }
+        }
+        false  
+    }
+
+    fn prop_remove_after(list: Vec<i32>, index: usize) -> bool {
+        if list.len() < 2 {
+            return true
+        }
+
+        let mut linked_list = linked_list_from(&list);
+        let size = linked_list.size();
+        let index_in_range = index % (size-1);
+       
+        if let Ok(Some(node)) = linked_list.node_at_index(index_in_range){
+            if let Ok(_) = linked_list.remove_after(node){                  
+               return linked_list.size() == size - 1
             }
         }
         false  
@@ -453,7 +481,7 @@ mod tests {
 
     #[test]
     fn test_insert_after_prop() {
-        quickcheck(prop_insert_after as fn(Vec<i32>, i32, usize) -> bool);
+       quickcheck(prop_insert_after as fn(Vec<i32>, i32, usize) -> bool);
     }
     #[test]
     fn test_insert_head_prop() {
@@ -467,8 +495,9 @@ mod tests {
 
     #[test]
     fn test_remove_prop() {
-        //quickcheck(prop_remove as fn(Vec<i32>, usize) -> bool);
+        quickcheck(prop_remove as fn(Vec<i32>, usize) -> bool);
     }
+
 
 
     #[test]
@@ -480,5 +509,10 @@ mod tests {
         for i in list.iter() {
             println!("VALUE: {} \n", i);
         }
+    }
+
+    #[test]
+    fn test_concat_prop() {
+        quickcheck(prop_concat as fn(Vec<i32>, Vec<i32>) -> bool);
     }
 }
