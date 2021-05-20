@@ -37,17 +37,16 @@ impl <T: LinkedListValue> Node<T> {
         self.next.as_ref()
     }
 
-    pub fn insert_before(&mut self, node: *const Self, value: T) -> &Self {
+    fn insert_before(&mut self, node: *const Self, value: T) -> &Self {
         let next = match &self.next {
             Some(next) => next,
             None => panic!("insertion point not found in list")
         };
-        
         if next.as_ref() as *const _ == node {
             self.insert_after(value)
         } else {
             match &mut self.next {
-                Some(next) =>  next.insert_before(next.as_ref(), value),
+                Some(next) =>  next.insert_before(node, value),
                 None => panic!("Insertion point not found in list")
             }
         }
@@ -90,7 +89,6 @@ impl <T: LinkedListValue> Node<T> {
 #[derive(Debug, Clone, PartialEq)]
 pub struct LinkedList<T: LinkedListValue> {
     pub head: Option<Node<T>>,
-    iterator_index: usize
 }
 
 impl<T: LinkedListValue> LinkedList<T> {
@@ -152,13 +150,19 @@ impl<T: LinkedListValue> LinkedList<T> {
         }
     }
 
-    fn new() -> LinkedList<T> {
-        LinkedList{head: None, iterator_index: 0}
+    pub fn new() -> LinkedList<T> {
+        LinkedList{head: None}
     }
 
-    fn insert_before(&mut self, node: *const Node<T>, value: T) -> &Node<T> {
+    pub fn insert_before(&mut self, node: *const Node<T>, value: T) {
         if self.head.is_some() {
-            self.head.as_mut().unwrap().insert_before(node, value)
+            let head = self.head.as_mut().unwrap();
+            if node == head as *const _ {
+                self.insert_head(value);
+            } else
+            {
+                head.insert_before(node, value);
+            } 
         } else {
             panic!("Can not insert into empty list");
         }
@@ -199,7 +203,7 @@ impl<T: LinkedListValue> LinkedList<T> {
         }
         match current {
             Some(c) => c,
-            None => panic!("unsecpected end of list")
+            None => panic!("unexpected end of list")
         }
     }
 
@@ -256,123 +260,51 @@ impl<T: LinkedListValue> LinkedList<T> {
             list
         }
     }
-}
-/*
-impl<T: LinkedListValue> Iterator for LinkedList<T> {
-    type Item = T;
-    fn next(&mut self) -> Option<Self::Item> {
-        match self.iterator_index {
-            match self.head {
-                Some(val) => Some(self.head),
-                None => None
-            }
-            _ => 
+    
+    pub fn iter(&self) -> Iter<T> {
+        match &self.head {
+            Some(node) => {
+            Iter { current: Some(node) }
+            },
+            None => Iter { current: None}
         }
     }
+}
+
+/*
+#[derive(Debug)]
+pub struct IntoIter<T: LinkedListValue> {
+    current: LinkedList<T>
 }
 */
 
-
-fn test() {
-    {
-        let list: LinkedList<i32> = LinkedList::new();
-        //let node = list.borrowcheckertester(2);
-        
-    }
-    {
-        let list = vec!(0,0);
-        let size = list.len();
-        let index = 0;
-        let new_elem = 3;
-        if list.len() == 0 {
-            return
-        }
-        let mut linked_list = LinkedList::linked_list_from(&list);
-        let size = linked_list.size();
-        let index_in_range = index % size;
-        
-        let node = linked_list.node_at_index_mut(index_in_range);
-        node.insert_after(new_elem);        
-        let node_a = node as *const _;
-        let node: &Node<i32>;
-        unsafe {
-            node = &*node_a;
-        }
-        linked_list.node_at_index(index_in_range);
-        let node = match node.next() {
-            Some(c) => c,
-            None => panic!("No node found at index") 
-        };
-        assert!(node.value == new_elem);     //&& check_invariants(&linked_list)
-
-    }
-    {
-        let mut l1: LinkedList<i32> = LinkedList::new();
-        let mut l2: LinkedList<i32> = LinkedList::new();
-        l1.insert_head(3);
-        l1.insert_head(2);
-        l1.insert_head(1);
-        l2.insert_head(5);
-        l2.insert_head(4);
-        LinkedList::concat(&mut l1, &mut l2);
-        //print!("\nLIST1: {:?}", l1);
-        //print!("\nLIST2: {:?}\n", l2);
-        LinkedList::swap(&mut l1, &mut l2);
-        //print!("\nLIST1: {:?}", l1);
-        //print!("\nLIST2: {:?}\n", l2);
-        
-        return;
-    }
-    let mut l1: LinkedList<i32> = LinkedList::new();
-    l1.insert_head(1);
-    let n1 = l1.head_mut().as_mut().unwrap();
-    let n2 = n1.insert_after(23);
-    let n2 = n2 as *const _;
-    let n4 = l1.insert_before(n2, 90);
-    let n4_next = n4.next();
-    print!("\n===n4:        {:?}===\n", n4);
-    print!("\n===n4_next:   {:?}===\n", n4_next);
-    print!("\n\n\n{:?}\n", l1);
-    let n3: &Node<i32>;
-    unsafe {
-        n3 = &*n2;
-    }
-    print!("\n===n3:    {:?}===\n", n3);
-    //return;
-    let mut n1 = Node{value: 1, next: Some(Box::new(Node{value: 5, next:None}))};
-    n1.insert_after(12232);
-    print!("\n{:?}\n", n1);
-    let mut list = LinkedList::new();
-    list.insert_head(1);
-    let mut head = list.head_mut().as_mut().unwrap();
-    print!("HEAD VALUE: {}\n", head.value);
-    head.value = 6;
-    print!("{:?}\n", list);
-    let head = list.head().as_ref().unwrap();
-    print!("HEAD VALUE: {}\n", head.value);
-    list.insert_head(2);
-    print!("insert_head(1)\n");
-    list.insert_head(1);
-    print!("{:?}\n", list);
-    let head = list.head_mut().as_mut().unwrap();
-    print!("remove_after(head), ({:?})\n", head.clone());
-    head.remove_after();
-    print!("====\n");
-    print!("{:?}\n", list);
-    print!("====\n");
-    list.remove_head();
-    print!("====\n");
-    print!("{:?}\n", list);
-    print!("====\n");
-    list.remove_head();
-    print!("====\n");
-    print!("{:?}\n", list);
-    print!("====\n");
-    list.remove_head();
-    print!("====\n");
-    print!("{:?}\n", list);
-    print!("====\n");
+pub struct Iter<'a, T: LinkedListValue> {
+    current: Option<&'a Node<T>>
 }
+
+impl<'a, T: LinkedListValue> Iterator for Iter<'a, T> {
+    type Item = &'a T;
+
+    #[inline]
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.current.is_some() {
+            let val = Some(&self.current.unwrap().value);
+            let next = match &self.current.unwrap().next {
+                Some(node) => {
+                    Some(node.as_ref())
+                },
+                None => None
+            };
+            self.current = next;
+            val
+        } 
+        else
+        {
+            None
+        }
+    }
+}
+
 
 #[cfg(test)]
 use quickcheck::quickcheck;
@@ -383,34 +315,12 @@ mod tests {
 
     #[test]
     fn test_node_ref() {
-        test();
+        //test();
     }
 
     /*  Invariants. These are defined by the model
         and should be true at every step of the algorithm
     */
-    fn remove_invariant(_ll: &LinkedList<i32>) -> bool {
-        false
-    }
-
-    fn valid_list_invariant(_ll: &LinkedList<i32>) -> bool {
-        false
-    } 
-
-    fn has_last_invariant(_ll : &LinkedList<i32>) -> bool {
-        false
-    } 
-
-    fn insert_invariant(_ll: &LinkedList<i32>) -> bool {
-        false
-    }
-
-    fn check_invariants(ll: &LinkedList<i32>) {
-        assert!(remove_invariant(ll));
-        assert!(valid_list_invariant(ll));
-        assert!(has_last_invariant(ll));
-    }
-
 
     /*
      * There seems to be a bug in quickcheck
@@ -459,6 +369,12 @@ mod tests {
         (list.len() == 0) == linked_list.is_empty() 
     }
 
+    fn prop_insert_head(list: Vec<i32>, new_elem: i32) -> bool {
+        let mut linked_list: LinkedList<i32> = LinkedList::linked_list_from(&list);
+        linked_list.insert_head(new_elem);
+        linked_list.head().as_ref().unwrap().value == new_elem
+    }
+
     fn prop_remove(list: Vec<i32>, index: usize) -> bool {    
         if list.len() == 0 {
             return true
@@ -471,6 +387,26 @@ mod tests {
         linked_list.size() == size - 1
     }
 
+    fn prop_remove_after(list: Vec<i32>, index: usize) -> bool {    
+        if list.len() < 2 {
+            return true
+        }
+        let mut succeed = true;
+        let mut linked_list: LinkedList<i32> = LinkedList::linked_list_from(&list);
+        let size = list.len();
+        let index_in_range = index % (size-1);
+        let node = linked_list.node_at_index_mut(index_in_range);
+        node.remove_after();             
+        succeed &= linked_list.size() == size - 1;
+
+        if index_in_range < size -2 {
+            let next = linked_list.node_at_index(index_in_range+1);
+            let actual_next = list[index_in_range+2];
+            succeed &= next.value == actual_next; 
+        }
+        succeed
+    }
+
     fn prop_insert_after(list: Vec<i32>, new_elem: i32, index: usize) -> bool {
         if list.len() == 0 {
             return true;
@@ -480,18 +416,38 @@ mod tests {
         let index_in_range = index % size;
         let node = linked_list.node_at_index_mut(index_in_range);
         node.insert_after(new_elem);             
-        let node_a = node as *const _;
-        let node: &Node<i32>;
-        unsafe {
-            node = &*node_a;
-        }
-        linked_list.node_at_index(index_in_range);
         let node = match node.next() {
             Some(c) => c,
             None => panic!("ERROR") 
         };
         node.value == new_elem //&& check_invariants(&linked_list)
+    }
+
+    fn prop_insert_before(list: Vec<i32>, new_elem: i32, index: usize) -> bool {
+        if list.len() == 0 {
+            return true;
         }
+        let mut linked_list = LinkedList::linked_list_from(&list);
+        let size = linked_list.size();
+        let index_in_range = index % size;
+        let node = linked_list.node_at_index_mut(index_in_range) as *const _;
+        linked_list.insert_before(node, new_elem);             
+
+        let actual = linked_list.node_at_index(index_in_range);
+        actual.value == new_elem
+    }
+
+    fn prop_foreach(list: Vec<i32>) -> bool {
+        let mut i = 0;
+        let linked_list = LinkedList::linked_list_from(&list);
+        for x in linked_list.iter() {
+            if list[i] != *x {
+                return false;
+            }
+            i += 1;
+        }
+        true
+    }
 
     #[test]
     fn test_insert_after_prop() {
@@ -499,8 +455,13 @@ mod tests {
     }
 
     #[test]
+    fn test_insert_before_prop() {
+        quickcheck(prop_insert_before as fn(Vec<i32>, i32, usize) -> bool);
+    }
+
+    #[test]
     fn test_insert_head_prop() {
-        //quickcheck(prop_insert_head as fn(Vec<i32>, i32) -> bool);
+        quickcheck(prop_insert_head as fn(Vec<i32>, i32) -> bool);
     }
 
     #[test]
@@ -513,7 +474,6 @@ mod tests {
         quickcheck(prop_concat as fn(Vec<i32>, Vec<i32>)-> bool);
     }
 
-
     #[test]
     fn test_swap_prop() {
         quickcheck(prop_swap as fn(Vec<i32>, Vec<i32>)-> bool);
@@ -523,5 +483,15 @@ mod tests {
     fn test_remove_prop() {
         //println!("prop success: {}", prop_remove(vec!(0,0), 255));
         quickcheck(prop_remove as fn(Vec<i32>, usize) -> bool);
+    }
+
+    #[test]
+    fn test_remove_after_prop() {
+        quickcheck(prop_remove_after as fn(Vec<i32>, usize) -> bool);
+    }
+    
+    #[test]
+    fn test_foreach_prop() {
+        quickcheck(prop_foreach as fn(Vec<i32>) -> bool);
     }
 }
