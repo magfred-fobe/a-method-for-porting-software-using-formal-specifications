@@ -313,7 +313,6 @@ TEST(SLIST_model_lib, SLIST_sequenceTest){
                                  lib_remove_element,
                                  lib_remove_after,
                                  lib_remove_head,
-                                 //,SLIST_remove_prevptr
                                  lib_swap,
                                  lib_concatenate,
                                  lib_empty,
