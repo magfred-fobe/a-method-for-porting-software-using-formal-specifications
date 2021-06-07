@@ -5,10 +5,16 @@ The directory also contains the verification tests that runs on the linkable bin
 tests also run when building it. Therefore 
 
 - cargo 
-- cbindgen 
+- cbindgen
 
 Are prerquisites for building the project.
 
+Directory structure \
+└─/ - scripts, cmake root \
+&nbsp;&nbsp;&nbsp;&nbsp;├─lib - generated libraries \
+&nbsp;&nbsp;&nbsp;&nbsp;├─src - source implementation and C-library source \
+&nbsp;&nbsp;&nbsp;&nbsp;├─test - test implementations \
+&nbsp;&nbsp;&nbsp;&nbsp;└───lib_impl - library interface, library wrappers: rust, rust, and c
 
 CMake instructions:
 
