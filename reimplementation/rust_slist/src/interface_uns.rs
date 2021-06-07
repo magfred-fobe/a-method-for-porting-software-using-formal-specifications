@@ -164,7 +164,7 @@
     
     #[no_mangle]
     pub extern "C" fn rlib_uns_value_at_index(identifier: usize, index: usize) -> i32 {
-        let mut lists = LISTS.lock().unwrap();
+        let lists = LISTS.lock().unwrap();
         match lists.get(identifier) {
             Some(list) => {
                 match list.node_at_index(index) {
@@ -195,7 +195,7 @@
 
     #[no_mangle]
     pub extern "C" fn rlib_uns_print_list(identifier: usize) -> i32 {
-        let mut lists = LISTS.lock().unwrap();
+        let lists = LISTS.lock().unwrap();
         println!("LIST{}: {:?}", identifier, lists.get(identifier).unwrap());
         0
     }

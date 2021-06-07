@@ -202,7 +202,7 @@ impl<T: LinkedListValue> LinkedList<T> {
                 None => {}
             }
         } else {
-            *&mut list_1.head = list_2.head.take();
+            list_1.head = list_2.head.take();
         }
     }
 
@@ -256,7 +256,7 @@ impl<T: LinkedListValue> LinkedList<T> {
                     }
                     Ok(ret.unwrap())
                 },
-            None => panic!(panic_msg)
+            None => panic!("{}", panic_msg)
         }
     }
 
