@@ -1,7 +1,7 @@
 This directory conains the source of the queue structure and the property based tests \
-The tests can be built and run using CMake. If you are using CLion, the project can be built and run by pressing "run". \
+The tests can be built and run using CMake. If you are using CLion, the project can be built and run by pressing "run".
 
-The directory also contains the verificatiob tests that runs on the linkable binaries. These are built when making the project and \
+The directory also contains the verification tests that runs on the linkable binaries. These are built when making the project and \
 tests also run when building it. Therefore 
 
 - cargo 
