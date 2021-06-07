@@ -8,5 +8,5 @@ $cargo build --lib
 A .so or .lib should be located in ./target/debug
 
 Run property tests on the implementation\
-$cd singly_linked_list_unsafe && cargo test
+$cd singly_linked_list && cargo test
 
