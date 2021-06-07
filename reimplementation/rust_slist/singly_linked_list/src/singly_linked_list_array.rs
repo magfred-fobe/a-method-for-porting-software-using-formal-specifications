@@ -144,7 +144,7 @@ impl<T: LinkedListValue> LinkedList<T> {
             return Err(LinkedListError{message: String::from("Cannot remove element from index out of bounds.")}); 
         }
 
-        let head_index = self.head.unwrap();
+        let head_index = self.head.unwrap(); 
         if head_index == node.index {
             return self.remove_head();
         }
@@ -153,7 +153,7 @@ impl<T: LinkedListValue> LinkedList<T> {
         while let Some(next_index) = current.next {
             if next_index == node.index {
                 current.next = node.next;
-                self.freeindex.push(node.index);
+                self.freeindex.push(node.index);   
                 self.size -= 1;
                 return Ok(());
             }
@@ -166,11 +166,11 @@ impl<T: LinkedListValue> LinkedList<T> {
         if self.size() == 0 {
             return Err(LinkedListError{message: String::from("Cannot remove element from empty list.")});
         }else if node.index > self.nodes.len() {
-            return Err(LinkedListError{message: String::from("Cannot remove element from index out of bounds.")});
+            return Err(LinkedListError{message: String::from("Cannot remove element from index out of bounds.")}); 
         }
 
         let mut node = self.nodes[node.index];
-        let next_index = match node.next{
+        let next_index = match node.next{ 
             None =>  return Err(LinkedListError{ message: String::from("Can not remove after on tail node")}),
             Some(index) => index
         };
@@ -218,7 +218,7 @@ impl<T: LinkedListValue> LinkedList<T> {
         }
         Ok(())
     }
-
+    
     pub fn iter(&self) -> Iter<T> {
         Iter { head: self.head, len: self.size(), list: self }
     }
@@ -227,8 +227,6 @@ impl<T: LinkedListValue> LinkedList<T> {
         LinkedList{ nodes: Vec::new(), head: None, ..Default::default()}
     }
 }
-
-
 
 
 
@@ -264,31 +262,6 @@ impl<T: LinkedListValue> Iterator for Iter<'_, T> {
     }
 }
 
-/*
-impl<'a, T: LinkedListValue> IntoIterator for &'a mut LinkedList<T> {
-    type Item = &'a mut T;
-    type IntoIter = IterMut<'a, T>;
-
-    fn into_iter(self) -> IterMut<'a, T> {
-        self.iter_mut()
-    }
-}
-*/
-
-/*
-impl<T: LinkedListValue> Iterator for IntoIter<T> {
-    type Item = Node<T>;
-    fn next(&mut self) -> Option<Self::Item> {
-        if let Some(index) = self.next_index {
-            let next = self.nodes[index];
-                Some(next)
-        } else {
-            None
-        }
-    }
-}
-*/
-
 
 pub fn linked_list_from<T: LinkedListValue>(from: &Vec<T>) -> LinkedList<T> {
     if from.len() == 0 {
@@ -310,36 +283,6 @@ use quickcheck::quickcheck;
 mod tests {
     use super::*;
 
-    /*  Invariants. These are defined by the model
-     *  and should be true at every step of the algorithm
-     */
-    fn remove_invariant(_ll: &LinkedList<i32>) -> bool {
-        true
-    }
-
-    fn valid_list_invariant(ll: &LinkedList<i32>) -> bool {
-        //None can not be in range since nodes is not Option type
-        let mut i: usize = 0;
-        let mut found_None_in_range = false;
-        for x in &ll.nodes {
-            if !ll.freeindex.contains(&i) {
-                if x.next == None {
-                    //There was already a node pointing to None
-                    if found_None_in_range {
-                        return false;
-                    }
-                    if let Some(next) = x.next {
-                        if next == x.index {
-                            return false;
-                        }
-                    }
-                    found_None_in_range = true;
-                }
-            }
-        }
-        true
-    } 
-
     fn has_last_invariant(list : &LinkedList<i32>) -> bool {
         let mut current = list.head();
         for _i in 0..list.size {
@@ -352,15 +295,9 @@ mod tests {
             }
         }
         current.is_none()
-    } 
-
-    fn insert_invariant(_ll: &LinkedList<i32>) -> bool {
-        true
     }
 
     fn check_invariants(ll: &LinkedList<i32>) -> bool {
-        remove_invariant(ll) &&
-        valid_list_invariant(ll) &&
         has_last_invariant(ll)
     }
 
@@ -426,24 +363,7 @@ mod tests {
                         }
                     }
                 }
-               return newsize == size - 1
-            }
-        }
-        false  
-    }
-
-    fn prop_remove_after(list: Vec<i32>, index: usize) -> bool {
-        if list.len() < 2 {
-            return true
-        }
-
-        let mut linked_list = linked_list_from(&list);
-        let size = linked_list.size();
-        let index_in_range = index % (size-1);
-       
-        if let Ok(Some(node)) = linked_list.node_at_index(index_in_range){
-            if let Ok(_) = linked_list.remove_after(node){                  
-               return linked_list.size() == size - 1
+                return newsize == size - 1
             }
         }
         false  
@@ -466,12 +386,44 @@ mod tests {
         let mut linked_list_2= linked_list_from(&list_2);
         match LinkedList::concat(&mut linked_list_1, &mut linked_list_2) {
             Ok(_) => {
-                linked_list_2.size() == 0 &&
-                linked_list_1.size() == list_1.len() + list_2.len() &&
-                check_invariants(&linked_list_1)
+                if linked_list_2.size() != 0 || linked_list_1.size() != list_1.len() + list_2.len() {
+                    return false;
+                }
+                let mut i = 0;
+                for x in linked_list_1.iter() {
+                    if i < list_1.len() {
+                        if x != list_1[i] { return false; }
+                    } else {
+                        if x != list_2[i-list_1.len()] { return false; }
+                    }
+                    i += 1;
+                }
+                true
             },
             _ => false
         }
+    }
+
+    fn prop_swap(list_1: Vec<i32>, list_2: Vec<i32>) -> bool {
+        let mut linked_list_1 = linked_list_from(&list_1);
+        let mut linked_list_2 = linked_list_from(&list_2);
+        LinkedList::swap(&mut linked_list_1, &mut linked_list_2);
+        let mut i = 0;
+        for x in linked_list_1.iter() {
+            if x != list_2[i] {
+                return false;
+            } 
+            i += 1;
+        }
+        let mut i = 0;
+        for x in linked_list_2.iter() {
+            if x != list_1[i] {
+                return false;
+            } 
+            i += 1;
+        }
+        linked_list_2.size() == list_1.len() &&
+        linked_list_1.size() == list_2.len()
     }
 
     #[test]
@@ -481,7 +433,7 @@ mod tests {
 
     #[test]
     fn test_insert_after_prop() {
-       quickcheck(prop_insert_after as fn(Vec<i32>, i32, usize) -> bool);
+        quickcheck(prop_insert_after as fn(Vec<i32>, i32, usize) -> bool);
     }
     #[test]
     fn test_insert_head_prop() {
@@ -499,6 +451,11 @@ mod tests {
     }
 
 
+    #[test]
+    fn test_swap_prop() {
+        quickcheck(prop_swap as fn(Vec<i32>, Vec<i32>)-> bool);
+    }
+
 
     #[test]
     fn iterator_stuff() {
@@ -509,10 +466,5 @@ mod tests {
         for i in list.iter() {
             println!("VALUE: {} \n", i);
         }
-    }
-
-    #[test]
-    fn test_concat_prop() {
-        quickcheck(prop_concat as fn(Vec<i32>, Vec<i32>) -> bool);
     }
 }

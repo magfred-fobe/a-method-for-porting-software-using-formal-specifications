@@ -2,7 +2,7 @@
 // This library should be built into a a static lib that can be tested by the test code.
 //
 #pragma once
-#include "../../test/lib_impl/LinkedListLib.h";
+#include "../../test/lib_impl/LinkedListLib.h"
 #include <vector>
 
 extern "C" {

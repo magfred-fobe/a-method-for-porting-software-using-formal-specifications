@@ -12,6 +12,24 @@ struct SLIST_model {
     std::vector<int> list;
 };
 
+
+void createList(mySinglyLinkedListHead &head, const std::vector<int> &ents) {
+    if(ents.empty()) {
+        SLIST_INIT_impl(&head);
+        return;
+    }
+
+    auto prev_ent =  new IntegerSLISTEntry();
+    prev_ent->data = ents.at(0);
+    SLIST_INSERT_HEAD_impl(&head, prev_ent);
+    for (std::size_t i = 0; i < ents.size()-1; i++){
+        auto ent = new IntegerSLISTEntry();
+        ent->data = ents.at(i+1);
+        SLIST_INSERT_AFTER_impl(prev_ent, ent);
+        prev_ent = ent;
+    }
+}
+
 struct SLIST_first: rc::state::Command<SLIST_model, mySinglyLinkedListHead> {
     void run(const SLIST_model &model, mySinglyLinkedListHead &head) const override {
         if(model.list.empty())
@@ -95,6 +113,7 @@ struct SLIST_remove_element : rc::state::Command<SLIST_model, mySinglyLinkedList
             elementToRemove = SLIST_NEXT_impl(elementToRemove);
 
         SLIST_REMOVE_impl(&head, elementToRemove);
+        delete(elementToRemove);
     }
 
     void show(std::ostream &os) const override {
@@ -119,8 +138,11 @@ struct SLIST_remove_after : rc::state::Command<SLIST_model, mySinglyLinkedListHe
         unsigned int remove_index = index % (model.list.size() - 1);
         for(int i = 0; i < remove_index; i++)
             elementToRemove = SLIST_NEXT_impl(elementToRemove);
-
+        auto removed_element = elementToRemove->entries.sle_next;
         SLIST_REMOVE_AFTER_impl(elementToRemove);
+        if (removed_element) {
+            delete(removed_element);
+        }
     }
 
     void show(std::ostream &os) const override {
@@ -216,28 +238,25 @@ struct SLIST_swap : rc::state::Command<SLIST_model, mySinglyLinkedListHead> {
     }
 };
 
-struct SLIST_concatenate : rc::state::Command<SLIST_model, mySinglyLinkedListHead> {
-    std::vector<int> concatenate_with = *rc::gen::arbitrary<std::vector<int>>();
+struct SLIST_concatenate : rc::state::Command<
+        SLIST_model,
+        mySinglyLinkedListHead> {
+
+    std::vector<int> concatenate_with =
+            *rc::gen::arbitrary<std::vector<int>>();
 
     void apply(SLIST_model &model) const override {
         for(auto i: concatenate_with)
-        model.list.push_back(i);
+            model.list.push_back(i);
     }
 
-    void run(const SLIST_model &model, mySinglyLinkedListHead &head1) const override {
-        auto head2 = new mySinglyLinkedListHead();
-        SLIST_INIT_impl(head2);
-        IntegerSLISTEntry* prev_entry;
-        for(int i = 0; i < concatenate_with.size(); i++) {
-            auto entry = new IntegerSLISTEntry();
-            entry->data = concatenate_with.at(i);
-            if(i == 0)
-                SLIST_INSERT_HEAD_impl(head2, entry);
-            else
-                SLIST_INSERT_AFTER_impl(prev_entry, entry);
-            prev_entry = entry;
-        }
-        SLIST_CONCAT_impl(&head1, head2);
+    void run(
+            const SLIST_model &model,
+            mySinglyLinkedListHead &head1) const override {
+        mySinglyLinkedListHead head2{};
+        createList(head2, concatenate_with);
+        SLIST_CONCAT_impl(&head1, &head2);
+        RC_ASSERT(SLIST_EMPTY_impl(&head2));
     }
 
     void show(std::ostream &os) const override {

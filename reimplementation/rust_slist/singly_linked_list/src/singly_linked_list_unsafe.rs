@@ -1,15 +1,44 @@
 use std::fmt::Debug;
-//use std::sync::Arc;
+use std::error::Error;
+use std::fmt::Display;
 
 #[allow(dead_code)]
-pub trait LinkedListValue: Debug {}
+
 impl<T> LinkedListValue for T where T: Debug {}
 
+#[derive(Debug)]
+pub struct LinkedListError {
+    message: String
+}
+impl Error for LinkedListError {}
+
+impl LinkedListError {
+    fn new<S: Into<String>>(msg: S) -> LinkedListError{
+        LinkedListError{message: msg.into()}
+    }
+}
+
+impl Display for LinkedListError {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{}", self.message)
+    }
+}
+
+type LinkedListResult<T> = Result<T, LinkedListError>;
+
+
+pub trait LinkedListValue: Debug {}
+
 //Box, Rc, or Arc..?
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, PartialEq)]
 pub struct Node<T: LinkedListValue> {
     pub value: T,
     pub next: Option<Box<Node<T>>>
+}
+
+#[derive(Debug, PartialEq)]
+pub struct LinkedList<T: LinkedListValue> {
+    pub head: Option<Node<T>>,
 }
 
 impl <T: LinkedListValue> Node<T> {
@@ -78,17 +107,12 @@ impl <T: LinkedListValue> Node<T> {
         }
     }
 
-    fn remove_after(&mut self) {
+    pub fn remove_after(&mut self) {
         self.next = match &mut self.next {
             Some(val) => val.next.take(),
             None => None
         };
     }
-}
-
-#[derive(Debug, Clone, PartialEq)]
-pub struct LinkedList<T: LinkedListValue> {
-    pub head: Option<Node<T>>,
 }
 
 impl<T: LinkedListValue> LinkedList<T> {
@@ -115,7 +139,7 @@ impl<T: LinkedListValue> LinkedList<T> {
         self.head.is_none()
     }
 
-    fn insert_head(&mut self, value: T) {
+    pub fn insert_head(&mut self, value: T) {
         let next = match &mut self.head {
             None => None,
             _ => Some(Box::new(self.head.take().unwrap()))//Some(Box::new(val)) 
@@ -123,8 +147,7 @@ impl<T: LinkedListValue> LinkedList<T> {
         self.head = Some(Node{ value: value, next: next });
     }
 
-    ///TODO: Should error if empty?
-    fn remove_head(&mut self) {
+    pub fn remove_head(&mut self) {
         self.head = match &mut self.head {
             Some(h) => {
                 match h.next {
@@ -136,7 +159,7 @@ impl<T: LinkedListValue> LinkedList<T> {
         }
     }
 
-    fn remove(&mut self, node: *const Node<T>) {
+    pub fn remove(&mut self, node: *const Node<T>) {
         if self.head.is_some() {
             if let Some(head) = &self.head {
                 if head as *const _ == node {
@@ -183,38 +206,36 @@ impl<T: LinkedListValue> LinkedList<T> {
         }
     }
 
-    pub fn node_at_index(&self, index: usize) -> &Node<T> {
+    pub fn node_at_index(&self, index: usize) -> LinkedListResult<&Node<T>> {
         let current = &self.head;
         if index == 0 {
             return match current {
-                Some(head) => &head,
-                _ => panic!("can not get at index of empty list")
+                Some(head) => Ok(&head),
+                _ => Err(LinkedListError::new("can not get at index of empty list"))
             };
         }
         let mut current = match &self.head {
             Some(c) => &c.next,
-            None => panic!("")
+            None => return Err(LinkedListError::new("can not get at index of empty list"))
         };
         for _ in 1..index {
             current = match current {
                 Some(c) => &c.next,
-                None => panic!("unexpected end of list")    
+                None => return Err(LinkedListError::new("unexpected end of list"))    
             }
         }
         match current {
-            Some(c) => c,
-            None => panic!("unexpected end of list")
+            Some(c) => Ok(c),
+            None => Err(LinkedListError::new("unexpected end of list"))
         }
     }
 
-    pub fn node_at_index_mut(&mut self, index: usize) -> &mut Node<T> {
+    pub fn node_at_index_mut(&mut self, index: usize) -> LinkedListResult<&mut Node<T>> {
         let panic_msg = "unexpected end of list";
-        //Why cant i just unwrap_or_else after checking head is some?
-        //Why must i match over and over and over and over? 
         if index == 0 {
             return match &mut self.head {
-                Some(head) => head,
-                None => panic!("can not get at index of empty list")
+                Some(head) => Ok(head),
+                None => Err(LinkedListError::new("can not get at index of empty list"))
             };
         }
         
@@ -230,10 +251,10 @@ impl<T: LinkedListValue> LinkedList<T> {
                         }
                             current = c.next_mut();
                         } else {
-                            panic!(panic_msg)
+                            return Err(LinkedListError::new(panic_msg));
                         }
                     }
-                    ret.unwrap()
+                    Ok(ret.unwrap())
                 },
             None => panic!(panic_msg)
         }
@@ -254,7 +275,7 @@ impl<T: LinkedListValue> LinkedList<T> {
         } 
         else {
             let mut list = LinkedList::new();
-            for val in from.iter().rev(){
+            for val in from.iter().rev() {
                 list.insert_head(*val);
             }
             list
@@ -270,13 +291,6 @@ impl<T: LinkedListValue> LinkedList<T> {
         }
     }
 }
-
-/*
-#[derive(Debug)]
-pub struct IntoIter<T: LinkedListValue> {
-    current: LinkedList<T>
-}
-*/
 
 pub struct Iter<'a, T: LinkedListValue> {
     current: Option<&'a Node<T>>
@@ -313,53 +327,42 @@ use quickcheck::quickcheck;
 mod tests {
     use super::*;
 
-    #[test]
-    fn test_node_ref() {
-        //test();
-    }
-
-    /*  Invariants. These are defined by the model
-        and should be true at every step of the algorithm
-    */
-
-    /*
-     * There seems to be a bug in quickcheck
-     * if == is used, the number is never given as argument
-     * if > is used it is
-     * Not actually a bug, the failing function fails fast with a very large number
-     * the reason the final failure is 2 is because of shrinkage. 
-     */ 
-
-    /**
-     * SUCCEEDS
-     */
-    fn never_fails(num: i32) -> bool {
-        print!("never_fails num: {}\n", num);
-        num != 2 
-    }
-
-    /*
-     * FAILS WITH 2
-     */
-    fn eventually_fails(num: i32) -> bool {
-        print!("eventually_fails num: {}\n", num);
-        num <= 1
-    }
-
-    ///TODO: Every element in list_1, list_2 is present in linked_list_1 as part of property
     fn prop_concat(list_1: Vec<i32>, list_2: Vec<i32>) -> bool {
-        let mut linked_list_1: LinkedList<i32> = LinkedList::linked_list_from(&list_1);
-        let mut linked_list_2: LinkedList<i32> = LinkedList::linked_list_from(&list_2);
-        LinkedList::concat(&mut linked_list_1, &mut linked_list_2);
+        let mut linked_list_1 = LinkedList::linked_list_from(&list_1);
+        let mut linked_list_2 = LinkedList::linked_list_from(&list_2);
+        LinkedList::concat(&mut linked_list_1, &mut linked_list_2);        
+        let mut i = 0;
+        for x in linked_list_1.iter() {
+            if i < list_1.len() {
+                if *x != list_1[i] { return false; }
+            } else {
+                if *x != list_2[i-list_1.len()] { return false; }
+            }
+            i += 1;
+        }
         linked_list_2.size() == 0 &&
-        linked_list_1.size() == list_1.len() + list_2.len()
+        linked_list_1.size() == list_1.len() + list_2.len() 
     }
 
-    ///TODO: Check someting about the content of the lists
+    
     fn prop_swap(list_1: Vec<i32>, list_2: Vec<i32>) -> bool {
         let mut linked_list_1: LinkedList<i32> = LinkedList::linked_list_from(&list_1);
         let mut linked_list_2: LinkedList<i32> = LinkedList::linked_list_from(&list_2);
         LinkedList::swap(&mut linked_list_1, &mut linked_list_2);
+        let mut i = 0;
+        for x in linked_list_1.iter() {
+            if *x != list_2[i] {
+                return false;
+            } 
+            i += 1;
+        }
+        let mut i = 0;
+        for x in linked_list_2.iter() {
+            if *x != list_1[i] {
+                return false;
+            } 
+            i += 1;
+        }
         linked_list_2.size() == list_1.len() &&
         linked_list_1.size() == list_2.len()
     }
@@ -382,8 +385,11 @@ mod tests {
         let mut linked_list: LinkedList<i32> = LinkedList::linked_list_from(&list);
         let size = list.len();
         let index_in_range = index % size;
-        let node = linked_list.node_at_index(index_in_range);
-        linked_list.remove(node);             
+        let node = match linked_list.node_at_index(index_in_range) {
+            Ok(node) => node,
+            _ => return false
+        };
+        linked_list.remove(node);
         linked_list.size() == size - 1
     }
 
@@ -395,12 +401,18 @@ mod tests {
         let mut linked_list: LinkedList<i32> = LinkedList::linked_list_from(&list);
         let size = list.len();
         let index_in_range = index % (size-1);
-        let node = linked_list.node_at_index_mut(index_in_range);
+        let node = match linked_list.node_at_index_mut(index_in_range) {
+            Ok(node) => node,
+            _ => return false
+        };
         node.remove_after();             
         succeed &= linked_list.size() == size - 1;
 
         if index_in_range < size -2 {
-            let next = linked_list.node_at_index(index_in_range+1);
+            let next = match linked_list.node_at_index(index_in_range+1) {
+                Ok(node) => node,
+                _ => return false
+            };
             let actual_next = list[index_in_range+2];
             succeed &= next.value == actual_next; 
         }
@@ -414,13 +426,16 @@ mod tests {
         let mut linked_list = LinkedList::linked_list_from(&list);
         let size = linked_list.size();
         let index_in_range = index % size;
-        let node = linked_list.node_at_index_mut(index_in_range);
+        let node = match linked_list.node_at_index_mut(index_in_range) {
+            Ok(node) => node,
+            _ => return false
+        };
         node.insert_after(new_elem);             
         let node = match node.next() {
             Some(c) => c,
             None => panic!("ERROR") 
         };
-        node.value == new_elem //&& check_invariants(&linked_list)
+        node.value == new_elem
     }
 
     fn prop_insert_before(list: Vec<i32>, new_elem: i32, index: usize) -> bool {
@@ -430,11 +445,17 @@ mod tests {
         let mut linked_list = LinkedList::linked_list_from(&list);
         let size = linked_list.size();
         let index_in_range = index % size;
-        let node = linked_list.node_at_index_mut(index_in_range) as *const _;
+        let node = match linked_list.node_at_index_mut(index_in_range) {
+            Ok(node) => node as *const _,
+            _ => return false
+        };
         linked_list.insert_before(node, new_elem);             
 
-        let actual = linked_list.node_at_index(index_in_range);
-        actual.value == new_elem
+        match linked_list.node_at_index(index_in_range) {
+            Ok(actual) => actual.value == new_elem,
+            _ => false
+        }
+        
     }
 
     fn prop_foreach(list: Vec<i32>) -> bool {
@@ -481,7 +502,6 @@ mod tests {
 
     #[test]
     fn test_remove_prop() {
-        //println!("prop success: {}", prop_remove(vec!(0,0), 255));
         quickcheck(prop_remove as fn(Vec<i32>, usize) -> bool);
     }
 

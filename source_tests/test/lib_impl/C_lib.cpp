@@ -54,7 +54,7 @@ int32_t Clib::concatenate(uintptr_t identifier_list_1, uintptr_t identifier_list
 }
 
 int32_t Clib::remove_head(uintptr_t identifier) {
-    clib_remove_head(identifier);
+    return clib_remove_head(identifier);
 }
 
 int32_t Clib::foreach_sum(uintptr_t identifier) {

@@ -39,6 +39,7 @@ add_executable(project
         test/lib_agnostic_SLIST_test.cpp
         test/lib_impl/LinkedListLib.h
         test/lib_impl/RustLib.cpp
+        test/lib_impl/RustLib_Uns.cpp
         test/lib_impl/C_lib.cpp
         test/lib_impl/C_lib.h src/clibsrc/singly_linked_list_c.cpp src/clibsrc/singly_linked_list_c.h)
 

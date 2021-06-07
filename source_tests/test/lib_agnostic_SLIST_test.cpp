@@ -14,8 +14,10 @@ struct SLIST_model {
     std::vector<unsigned short> list;
 };
 
+
+
 //Change this to change what lib is tested
-using CurListType = RustLib;
+using CurListType = RustLib_Uns;
 
 ///TODO: add check for head value
 struct lib_first: rc::state::Command<SLIST_model, LinkedListLib> {

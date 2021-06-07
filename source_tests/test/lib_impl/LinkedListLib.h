@@ -47,6 +47,26 @@ public:
     int32_t print_list(uintptr_t identifier) override;
 };
 
+class RustLib_Uns : public LinkedListLib {
+public:
+    int32_t init_lib() override;
+    int32_t init_list() override;
+    int32_t empty(uintptr_t identifier) override;
+    int32_t next(uintptr_t identifier, uintptr_t index) override;
+    int32_t insert_after(uintptr_t identifier, uintptr_t index, int value) override;
+    int32_t head(uintptr_t identifier) override;
+    int32_t value_at_index(uintptr_t identifier, uintptr_t index) override;
+    int32_t remove_after(uintptr_t identifier, uintptr_t index) override;
+    int32_t remove(uintptr_t identifier, uintptr_t index) override;
+    int32_t insert_head(uintptr_t identifier, int32_t value) override;
+    int32_t swap(uintptr_t identifier_list_1, uintptr_t identifier_list_2) override;
+    int32_t concatenate(uintptr_t identifier_list_1, uintptr_t identifier_list_2) override;
+    int32_t remove_head(uintptr_t identifier) override;
+    int32_t foreach_sum(uintptr_t identifier) override;
+    int32_t foreach_from_sum(uintptr_t identifier, uintptr_t index_from) override;
+    int32_t print_list(uintptr_t identifier) override;
+};
+
 class Clib : public LinkedListLib {
 public:
     int32_t init_lib() override;
