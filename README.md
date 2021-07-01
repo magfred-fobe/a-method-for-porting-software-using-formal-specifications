@@ -1,6 +1,6 @@
 # A method for porting software using formal specifications
 
-An example of the method proposed to apply formal specifications to theprocess of porting code.
+An example of the method proposed to apply formal specifications to the process of porting code.
 In this example the linked list module of [FreeBSD](https://github.com/freebsd/freebsd-src/blob/main/sys/sys/queue.h) has been ported to Rust.
 
 The method can be seen as an inversion of the V-model.
