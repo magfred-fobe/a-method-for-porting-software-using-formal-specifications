@@ -65,7 +65,7 @@ The spec is implemented in the TLA+ language.
 Tools used:
 - [TLA+ Toolbox](https://lamport.azurewebsites.net/tla/toolbox.html)
 
-- Start the toolbox and load the spec files ([main.tla][spec/main.tla])
+- Start the toolbox and load the spec files ([main.tla](spec/main.tla))
 If any changes are made to the file, changes must be translated from PlusCal to TLA+ (File->Translate PlusCAl Algorithm)
 
 - Right click >models, found in the left hand "Spec Explorer", select new model and give it a name

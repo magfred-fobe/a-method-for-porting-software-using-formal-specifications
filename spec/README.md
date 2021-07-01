@@ -20,7 +20,7 @@ If any invariant is found to not evaluate to TRUE at any stage of the algorithm,
 The invariants come in two "flavours"; some assert some property of the current list, and others assert some outcome of applying an operator on the current list.
 
 ### To run and verify the model:
-- Start the toolbox and load the spec file ([main.tla](spec/main.tla))
+- Start the toolbox and load the spec file ([main.tla](main.tla))
 If any changes are made to the file, changes must be translated from PlusCal to TLA+ (File->Translate PlusCAl Algorithm)
 
 - Right click "models", found in the left hand "Spec Explorer", select "new model" and give it a name
