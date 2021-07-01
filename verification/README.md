@@ -17,11 +17,27 @@ Directory structure \
 &nbsp;&nbsp;&nbsp;&nbsp;├─test - test \
 &nbsp;&nbsp;&nbsp;&nbsp;└───lib_impl - library interface, library wrappers: rust, rust, and c
 
-CMake instructions:
+#### CLion instructions
+- Press run ▶️
+
+#### Manual CMake instructions:
 ```
 $ mkdir build && cd build
 $ cmake ..
 $ make
 $ ./verification_test
 ```
-This should download the dependencies gtest and rapidcheck and build the project.
+
+
+#### Note 
+The tests only run on one library at a time, and needs a recompile to change the target.\
+Available targets are: 
+- RustLib: vector backed Rust implementation
+- RustLib_Uns: reference based Rust implementation
+- Clib: Reference C library
+```
+lib_agnostic_SLIST_test.cpp:
+...
+18: using CurListType = LIBRARY_NAME;
+...
+```
