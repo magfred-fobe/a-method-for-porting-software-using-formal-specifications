@@ -26,7 +26,8 @@ Each step of the method is found in this repo in a separate directory:
 Any scripts in this repository are written to run on linux.
 
 ## Getting started
-### Source tests (/source_tests)
+### Source tests
+##### [/source_tests](/source_tests) for detailed readme
 Tools used:
 - [RapidCheck](https://github.com/emil-e/rapidcheck) a quickcheck implementation for C++.
 - [GoogleTest](https://github.com/google/googletest)
@@ -58,7 +59,8 @@ $ genhtml gtest_coverage.info --branch-coverage --output-directory ../../../../C
 ```
 
 
-### Model (/spec)
+### Model
+##### [/spec](/spec) for detailed readme
 The spec is implemented in the TLA+ language.
 Tools used:
 - [TLA+ Toolbox](https://lamport.azurewebsites.net/tla/toolbox.html)
@@ -86,7 +88,8 @@ For the model to perform any checking add the invariants:
 
 Run the model by pressing the run button ▶️
 
-### Reimplementation (/reimplementation/rust_slist)
+### Reimplementation
+##### [/reimplementation/rust_slist](/reimplementation/rust_slist) for detailed readme
 Tools used:
 - [Cargo](https://www.rust-lang.org/tools/install) comes with Rust default install.
 - To generate C bindings for the library [cbindgen](https://github.com/eqrion/cbindgen) is used. 
@@ -108,7 +111,8 @@ $ cargo build --lib
 $ cbindgen --config cbindgen.toml --crate singly_linked_list_rust --output OUTPUT_FILE
 ```
 
-### Verification (/verification) 
+### Verification
+##### [/verification](/verification) for detailed readme
 The verification tests are based on the tests from /source_tests
 This directory contains copies of the liked list C-source rather including them from /source_tests.
 
