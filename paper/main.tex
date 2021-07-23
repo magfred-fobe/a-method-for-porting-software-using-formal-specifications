@@ -1,0 +1,241 @@
+\documentclass{article}
+
+\usepackage{csquotes}
+\usepackage[
+    giveninits=true,
+    backend=biber,
+    style=ieee,
+  ]{biblatex}
+
+\usepackage{authblk}
+\usepackage{listings}
+\usepackage{amsmath}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage[labelfont=bf, labelsep=period]{caption}
+\usepackage{xcolor}
+\usepackage{amssymb}
+\usepackage{tabularx}
+
+\bibliography{citations} 
+\usepackage{setspace} 
+\usepackage[titles]{tocloft}
+\usepackage{pdfpages}
+\usepackage[swedish, english]{babel} 
+
+\definecolor{darkgreen}{RGB}{50,110,50}
+\definecolor{darkbrown}{RGB}{90,44,0}
+\definecolor{darkorange}{RGB}{170,82,0}
+\definecolor{darkred}{RGB}{170,50,0}
+\definecolor{aqua}{rgb}{0.0, 0.3, 0.4}
+\lstdefinelanguage{C_spec}{
+  language = C,
+  emph=[1]{
+  RC_ASSERT,
+  RC_GTEST_PROP
+  },
+  emphstyle=[1]{\color{aqua}},
+  emph=[2]{
+  mySinglyLinkedListHead,
+  IntegerSLISTEntry,
+  LinkedList,
+  RustLib,
+  Clib
+  },
+  emphstyle=[2]{\color{darkbrown}},
+  emph=[3]{
+  nullptr
+  },
+  emphstyle=[3]{\color{darkorange}},
+  emph=[4]{
+   mut
+  },
+  emphstyle=[4]{\color{darkred}}
+}
+\lstdefinestyle{CSTYLE}{language=C_spec,
+        frame=single,
+        commentstyle=\color{green!40!black},
+        numbers=left,
+        basicstyle=\footnotesize\ttfamily,
+        captionpos=b,
+        morekeywords= {
+            new,
+            uintptr_t,
+            int32_t,
+            usize,
+            i32,
+            let
+        },
+        keywordstyle=\bfseries\color{blue!40!black},
+        stringstyle=\color{darkgreen}
+}
+\lstset{language=C_spec, showstringspaces=false}
+
+%Rust language defs
+\usepackage{listings}
+\usepackage{listings-rust}
+
+\lstdefinelanguage{Rust_spec}{
+  language = Rust,
+  emph=[1]{
+  new,
+  unwrap,
+  take,
+  as_mut,
+  is_some,
+  is_none,
+  len,
+  head,
+  iter,
+  swap,
+  is_empty,
+  remove_head,
+  insert_head,
+  insert_after,
+  insert_before,
+  head(,
+  node_at_index
+  },
+  emphstyle=[1]{\color{aqua}},
+  emph=[2]{
+  Node,
+  LinkedListValue,
+  LinkedList,
+  LinkedListError,
+  Box,
+  Option,
+  Result,
+  Vec
+  },
+  emphstyle=[2]{\color{darkbrown}},
+  emph=[3]{
+   mut
+  },
+  emphstyle=[3]{\color{darkred}}
+}
+
+\lstdefinestyle{RUSTSTYLE}{language=Rust_spec,
+        frame=single,
+        commentstyle=\color{green!40!black},
+        numbers=left,
+        basicstyle=\footnotesize\ttfamily,
+        captionpos=b,
+        keywordstyle=\bfseries\color{blue!40!black},
+        stringstyle=\color{darkgreen}
+}
+\lstset{language=Rust_spec, showstringspaces=false}
+
+\newenvironment{nonbreaking} 
+    {\vspace{0.5\baselineskip}
+    \noindent
+    \begin{minipage}{\linewidth}
+    }
+    { 
+    \end{minipage}
+    }
+%Set the paragraph indentation to 0 + add newline for new paragraph
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{\baselineskip}
+
+\newcommand{\acknowlegmentssignature}{
+  \begin{flushleft}
+    Stockholm, June 2021\\
+    Magnus Fredriksson
+    and Fredrik Öberg \\
+  \end{flushleft}
+\cleardoublepage
+}
+
+
+
+\begin{document}
+\pagenumbering{roman}
+\includepdf[pages=-]{frontpage.pdf}
+
+
+
+
+\hspace{0pt}
+\vfill
+
+\begin{abstract}
+
+Formal specifications are mathematically based techniques with which a system can be analyzed, and its functionalities be described. Case studies have shown that using formal specifications can help reduce bugs and other inconsistencies when implementing a complex system; they are more likely found during the software design phase rather than later. 
+
+During the process of porting code, testing has been used to verify that the port has the same functionalities as the original. However, testing alone has been deemed necessary but not sufficient to accomplish this. This thesis questions if formal specifications could be used during the process of porting code to create an accurate model of the system, and thereby provide higher degrees of certainty that the final product conforms to the original. 
+
+A step-by-step methodology is presented to answer this question. The methodology ascertains the behavior of a port target through testing and a formal specification model based on these tests is created. This model is then used to create the port. The result indicates that the methodology used has some potential since it provided a high level of certainty that the ported code adhered to the original. Since the methodology puts a high emphasis on the specification and has several layers of verification, it is likely that it is suitable for projects with several modules and interdependencies. 
+
+When using it for porting a trivial or non-complex system, the overhead of the methodology may prove high in comparison to the value gained. It was also found that one must take into consideration the implicit functionalities a language provides. Strict reliance on a model could thereby lead to a less flexible process where creativity and consideration of the specifics of the target language may have produced a different result.
+ 
+\end{abstract}
+
+\textbf{Keywords:} porting, formal specification, TLA+, testing, Rust
+
+\vfill
+\hspace{0pt}
+
+\newpage
+\selectlanguage{swedish}
+
+\hspace{0pt}
+\vfill
+
+\begin{abstract}
+Formella specifikationer är matematiska tekniker med vilka ett system kan analyseras och dess funktioner beskrivas. Fallstudier har visat att användning av formella specifikationer vid mjukvaruutveckling kan bidra till att reducera antalet fel och därmed minska omkostnaderna. 
+
+Vid portering av kod har tester använts för att verifiera att porteringen har samma funktionaliteter som originalet. Tester anses dock vara otillräckliga - om än nödvändiga - för att fullständigt beskriva ett system. Denna avhandling ställer frågan om formella specifikationer kan användas i en porteringsprocess och därmed ge en högre grad av tillförlitlighet i att porteringen överensstämmer med originalet. 
+
+En steg-för-steg-metodik presenteras för att besvara denna fråga. Metodiken använder sig av tester för att beskriva det system som skall porteras och en modell baserad på formella specifikationer skapas genom dessa tester. Denna modell används därefter för att skapa porteringen. Resultatet indikerar att metoden har viss potential eftersom den upplevdes öka förståelsen för referensarbetet och därmed också tryggheten i att den portade koden överensstämde med originalet. Eftersom metodiken lägger stor vikt vid specifikationen och består av flera lager av verifiering är det troligt att den är mer lämplig för system som består av flertalet moduler med inbördes beroende. 
+
+Vid användning för att portera ett trivialt system kan metodens omkostnader visa sig vara för höga i förhållande till det värde som erhålls. Det visade sig även att en porteringsprocess måste ta hänsyn till de implicita funktioner ett språk tillhandahåller. En strikt anpassning till en modell kan därmed leda till en mindre flexibel process och därmed leda till ett icke tillfredsställande resultat, där kreativitet och hänsyn till målspråket skulle kunna ha gett ett annat.
+
+\end{abstract}
+
+\textbf{Nyckelord:} portering, formell specifikation, TLA+, testning, Rust
+
+
+\vfill
+\hspace{0pt}
+
+\newpage
+\selectlanguage{english}
+
+\hspace{0pt}
+\vspace{0.27\textheight}
+
+ \section*{Acknowledgments }
+  We would like to thank Rasmus Källqvist, Hind Kareem and Johan Montelius for their valuable input and continuous support during this project. 
+
+\acknowlegmentssignature
+
+\vfill
+\hspace{0pt}
+
+
+
+
+\setstretch{0.95}
+\tableofcontents
+\setstretch{1}
+\newpage
+\pagenumbering{arabic}
+\include{introduction}
+
+\include{background}
+
+\include{method}
+
+\include{implementation}
+
+\include{result}
+
+\include{discussion}
+
+\include{conclusion}
+
+\section{Bibliography}
+\printbibliography
+
+\includepdf[pages=-]{back.pdf}
+\end{document}

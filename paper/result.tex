@@ -1,0 +1,72 @@
+\section{Result}
+
+The functionalities of the target source code are deemed to be ported successfully, although some of the macro definitions were not modelled directly. The equivalent functionality provided for the omitted macros was provided by more than one macro, only one of each such case was modelled.
+
+\begin{figure}[H]
+ \vspace{12pt}
+\begin{center}
+ \begin{tabular}{||c |  c||} 
+ \hline
+ Functionality & Ported\\ [0.5ex] 
+ \hline\hline
+  HEAD & X \\ 
+ \hline
+ CLASS\_HEAD & -  \\
+ \hline
+ HEAD\_INITIALIZER & - \\ 
+ \hline
+ ENTRY & X  \\
+ \hline
+ CLASS\_ENTRY & -  \\
+ \hline
+ INIT & X \\
+ \hline
+ EMPTY & X \\  
+ \hline
+  END & X \\ 
+ \hline
+ FIRST & X  \\
+ \hline
+ NEXT & X  \\
+ \hline
+ FOREACH & X \\
+ \hline
+ FOREACH\_FROM & X \\ 
+ \hline
+  FOREACH\_SAFE & - \\ 
+ \hline
+ FOREACH\_FROM\_SAFE & -  \\
+ \hline
+ INSERT\_HEAD & X \\ 
+ \hline
+ INSERT\_AFTER & X  \\
+ \hline
+ CONCAT & X  \\
+ \hline
+ REMOVE\_AFTER & X \\
+ \hline
+ REMOVE\_HEAD & X \\ 
+ \hline
+  REMOVE & X \\ 
+ \hline
+  REMOVE\_PREVPTR & - \\
+ \hline
+ SWAP & X  \\
+ \hline
+\end{tabular}
+\end{center}
+    \caption{Ported Functions}
+    \label{fig:portedfuncs}
+\end{figure}
+
+All the macros specified in the target source code are present in listing \ref{fig:portedfuncs}. The functions marked with - are not present directly in the model or reimplementation. A detailed reason why is given for each of them:
+
+\begin{itemize}
+    \item CLASS\_HEAD: This macro is meant specifically for usage with class types as values. In the concrete test cases, a class type was not used and therefore this macro was omitted. 
+    \item HEAD\_INITIALIZER: This macro simply expands to \{NULL\}, and as such does not provide enough functionality to warrant modelling. Its usage is very specific to the C language.
+    \item FOREACH\_SAFE and FOREACH\_FROM\_SAFE: The functionalities provided by these macros are very similar to what FOREACH and FOREACH\_FROM provides, respectively. The difference is that the safe functions permits both removal and freeing the current node without interfering with the list traversal. A functionality not deemed necessary to model. 
+    \item REMOVE\_PREVPTR: This provides the same functionality as REMOVE but differs in implementation to provide a faster running time.
+\end{itemize}
+
+
+The original C source and the ported code was built as a linkable library to enable the verification procedure. These libraries were then subjected to a verification test-suite, which was the original stateful property-based tests modified slightly to work with the list libraries. The result of these tests indicate that the libraries built from the Rust source provide the same functionality as the one built from the C source. Therefore, the functionality can reasonably be determined to be successfully ported.
